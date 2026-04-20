@@ -2,6 +2,58 @@
 
 "use strict";
 
+// ========== ЗОЛОТО ИГРОКОВ (СОХРАНЕНИЕ) ==========
+let playersGold = JSON.parse(localStorage.getItem('tigrimionPlayersGold')) || {};
+
+function savePlayersGold() {
+    localStorage.setItem('tigrimionPlayersGold', JSON.stringify(playersGold));
+}
+
+function getPlayerGold(playerId) {
+    return playersGold[playerId] || 0;
+}
+
+function addPlayerGold(playerId, amount) {
+    if (!playersGold[playerId]) playersGold[playerId] = 0;
+    playersGold[playerId] += amount;
+    savePlayersGold();
+    updatePlayersGoldUI();
+}
+
+function spendPlayerGold(playerId, amount) {
+    if (!playersGold[playerId]) playersGold[playerId] = 0;
+    if (playersGold[playerId] < amount) return false;
+    playersGold[playerId] -= amount;
+    savePlayersGold();
+    updatePlayersGoldUI();
+    return true;
+}
+
+function resetAllGold() {
+    playersGold = {};
+    savePlayersGold();
+    updatePlayersGoldUI();
+    addLog('💰 Золото всех игроков сброшено.');
+}
+
+function updatePlayersGoldUI() {
+    const container = document.getElementById('playersGoldContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    players.forEach((p, idx) => {
+        const gold = getPlayerGold(idx);
+        const goldEl = document.createElement('div');
+        goldEl.className = 'player-gold';
+        goldEl.innerHTML = `
+            <span class="player-gold-icon">💰</span>
+            <span>Фронт ${idx + 1}:</span>
+            <span class="player-gold-value">${gold}</span>
+        `;
+        container.appendChild(goldEl);
+    });
+}
+
 // Хранилище статистики
 let heroStats = JSON.parse(localStorage.getItem('tigrimionHeroStats')) || {};
 
@@ -37,7 +89,6 @@ function resetAllStats() {
 let ALL_HEROES = [];
 (function generateHeroes() {
     ALL_HEROES = RAW_HEROES.map((h, originalIndex) => {
-        // Формат RAW_HEROES: [Имя, Раса, Профессия, Сага, МОЩЬ, HP, DMG, ARM, GOLD, IMAGE_NUM]
         const name = h[0];
         const race = h[1];
         const prof = h[2];
@@ -82,7 +133,9 @@ class Player {
         this.lazaret = []; 
         this.score = 0; 
         this.selectedHeroes = []; 
-        this.hasConfirmed = false; 
+        this.hasConfirmed = false;
+        this.marketDeck = [];
+        this.openMarket = [];
     }
 }
 
@@ -142,6 +195,193 @@ function canAddToGroup(player, hero) {
     return (first.race === hero.race && first.prof === hero.prof && first.saga === hero.saga);
 }
 
+// ========== ФУНКЦИИ РЫНКА ==========
+
+function initMarketDeck() {
+    const allHeroesCopy = shuffle([...ALL_HEROES]);
+    players.forEach(p => {
+        p.marketDeck = shuffle([...allHeroesCopy]);
+        p.openMarket = [];
+        for (let i = 0; i < 3; i++) {
+            if (p.marketDeck.length > 0) {
+                p.openMarket.push(p.marketDeck.pop());
+            }
+        }
+    });
+}
+
+function sellHero(player, hero) {
+    const heroIndex = player.hand.findIndex(h => h.id === hero.id);
+    if (heroIndex === -1) {
+        addLog('⚠️ Герой не найден в руке!');
+        return false;
+    }
+    
+    const goldValue = hero.gold;
+    player.hand.splice(heroIndex, 1);
+    player.lazaret.push(hero);
+    addPlayerGold(player.id, goldValue);
+    addLog(`💰 Фронт ${player.id + 1} продал ${hero.name} за ${goldValue} золота!`);
+    updateUI();
+    return true;
+}
+
+function buyRandomHero(player) {
+    if (!spendPlayerGold(player.id, 100)) {
+        addLog(`⚠️ Фронт ${player.id + 1}: недостаточно золота! Нужно 100💰.`);
+        return false;
+    }
+    
+    if (player.marketDeck.length === 0) {
+        addLog(`⚠️ Колода рынка пуста!`);
+        addPlayerGold(player.id, 100);
+        return false;
+    }
+    
+    const newHero = player.marketDeck.pop();
+    player.hand.push(newHero);
+    addLog(`🎲 Фронт ${player.id + 1} купил случайного героя: ${newHero.name}!`);
+    updateUI();
+    return true;
+}
+
+function buyOpenHero(player, heroIndex) {
+    if (!spendPlayerGold(player.id, 200)) {
+        addLog(`⚠️ Фронт ${player.id + 1}: недостаточно золота! Нужно 200💰.`);
+        return false;
+    }
+    
+    if (heroIndex < 0 || heroIndex >= player.openMarket.length) {
+        addPlayerGold(player.id, 200);
+        return false;
+    }
+    
+    const boughtHero = player.openMarket.splice(heroIndex, 1)[0];
+    player.hand.push(boughtHero);
+    
+    if (player.marketDeck.length > 0) {
+        player.openMarket.push(player.marketDeck.pop());
+    }
+    
+    addLog(`🛒 Фронт ${player.id + 1} купил ${boughtHero.name} за 200💰!`);
+    updateUI();
+    return true;
+}
+
+function showMarketModal() {
+    const modal = document.getElementById('marketModal');
+    const container = document.getElementById('marketCardsContainer');
+    if (!modal || !container) return;
+    
+    const currentPlayer = players[currentPlayerIndex];
+    container.innerHTML = '';
+    
+    currentPlayer.openMarket.forEach((hero, idx) => {
+        const card = document.createElement('div');
+        card.className = 'market-card';
+        card.innerHTML = `
+            <div class="market-card-portrait">
+                <img src="${hero.imageFile}" alt="${hero.name}" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'">
+            </div>
+            <div class="market-card-info">
+                <div class="market-card-name">${hero.name}</div>
+                <div class="market-card-subtitle">${hero.race} · ${hero.prof}</div>
+                <div class="market-card-power"><span>⚡ ${hero.power}</span></div>
+                <div class="market-card-stats">
+                    <span>❤️ ${hero.hp}</span>
+                    <span>🛡️ ${hero.arm}</span>
+                    <span>⚔️ ${hero.dmg}</span>
+                    <span>💰 ${hero.gold}</span>
+                </div>
+                <div class="market-card-price">200 💰</div>
+                <button class="market-buy-btn ${getPlayerGold(currentPlayer.id) < 200 ? 'disabled' : ''}" data-hero-index="${idx}">
+                    КУПИТЬ
+                </button>
+            </div>
+        `;
+        
+        const buyBtn = card.querySelector('.market-buy-btn');
+        buyBtn.addEventListener('click', () => {
+            if (buyOpenHero(currentPlayer, idx)) {
+                modal.classList.add('hidden');
+            }
+        });
+        
+        container.appendChild(card);
+    });
+    
+    modal.classList.remove('hidden');
+}
+
+function initDragAndDrop() {
+    const sellZone = document.getElementById('sellZone');
+    if (!sellZone) return;
+    
+    document.addEventListener('dragstart', (e) => {
+        const card = e.target.closest('.hero-card');
+        if (!card) return;
+        
+        const handContainer = card.closest('[id^="handP"]');
+        if (!handContainer) return;
+        
+        const playerId = parseInt(handContainer.id.replace('handP', ''));
+        if (playerId !== currentPlayerIndex) {
+            e.preventDefault();
+            return;
+        }
+        
+        const heroName = card.querySelector('.hero-name')?.textContent;
+        const player = players[currentPlayerIndex];
+        const hero = player.hand.find(h => h.name === heroName);
+        
+        if (hero) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                playerId: currentPlayerIndex,
+                heroId: hero.id
+            }));
+            card.classList.add('dragging');
+        }
+    });
+    
+    document.addEventListener('dragend', (e) => {
+        const card = e.target.closest('.hero-card');
+        if (card) card.classList.remove('dragging');
+    });
+    
+    sellZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        sellZone.classList.add('drag-over');
+    });
+    
+    sellZone.addEventListener('dragleave', () => {
+        sellZone.classList.remove('drag-over');
+    });
+    
+    sellZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        sellZone.classList.remove('drag-over');
+        
+        const data = e.dataTransfer.getData('text/plain');
+        if (!data) return;
+        
+        try {
+            const { playerId, heroId } = JSON.parse(data);
+            if (playerId !== currentPlayerIndex) {
+                addLog('⚠️ Сейчас не ваш ход!');
+                return;
+            }
+            
+            const player = players[playerId];
+            const hero = player.hand.find(h => h.id === heroId);
+            if (hero) {
+                sellHero(player, hero);
+            }
+        } catch (err) {
+            console.error('Ошибка продажи:', err);
+        }
+    });
+}
+
 // Рендеринг арены
 function renderArena() {
     const container = document.getElementById('arenaContainer');
@@ -196,7 +436,10 @@ function initGame(mode = gameMode) {
     lastBattleResult = null;
     
     renderArena();
+    initMarketDeck();
     updateUI(); 
+    updatePlayersGoldUI();
+    initDragAndDrop();
     addLog(`✨ Новая кампания! Режим: ${numPlayers} игрока. Раунд 1.`);
     checkAITurn();
 }
@@ -235,7 +478,6 @@ function updateUI() {
         }
     }
     
-    // Карты событий
     const eventsContainer = document.getElementById('eventCardsContainer');
     if (eventsContainer) {
         eventsContainer.innerHTML = '';
@@ -267,7 +509,6 @@ function updateUI() {
         });
     }
     
-    // Карты игроков
     players.forEach((pl, idx) => {
         const scoreSpan = document.getElementById(`scoreP${idx}`); 
         if (scoreSpan) scoreSpan.innerText = pl.score;
@@ -305,6 +546,7 @@ function updateUI() {
             const isHidden = (battlePhase === 'select' && (idx !== currentPlayerIndex || pl.isAI));
             card.className = `hero-card ${pl.selectedHeroes.includes(h) ? 'selected' : ''} ${isHidden ? 'hidden-card' : ''}`;
             card.setAttribute('data-race', h.race);
+            card.setAttribute('draggable', 'true');
             
             const maxStat = Math.max(h.maxHp, h.maxDmg, h.maxArm, h.maxGold, 1);
             card.innerHTML = `
@@ -343,6 +585,8 @@ function updateUI() {
         const deckInfo = document.getElementById(`deckInfo${idx}`); 
         if (deckInfo) deckInfo.innerText = `📚 Колода: ${pl.deck.length} · Лазарет: ${pl.lazaret.length}`;
     });
+    
+    updatePlayersGoldUI();
 }
 
 function toggleSingleHero(player, hero) {
@@ -590,31 +834,11 @@ function checkEmptyHands() {
 // ========== МУЗЫКАЛЬНЫЙ ПЛЕЕР ==========
 
 const playlist = [
-    {
-        name: 'Основная Тема Игры',
-        file: '1.mp3',
-        duration: '1:05'
-    },
-    {
-        name: 'Раса Полурослики',
-        file: '2.mp3',
-        duration: '1:05'
-    },
-    {
-        name: 'Раса Феи',
-        file: '3.mp3',
-        duration: '2:43'
-    },
-    {
-        name: 'Сага Вампиры',
-        file: '4.mp3',
-        duration: '1:05'
-    },
-    {
-        name: 'Раса Драконы',
-        file: '5.mp3',
-        duration: '1:05'
-    }
+    { name: 'Основная Тема Игры', file: '1.mp3', duration: '1:05' },
+    { name: 'Раса Полурослики', file: '2.mp3', duration: '1:05' },
+    { name: 'Раса Феи', file: '3.mp3', duration: '2:43' },
+    { name: 'Сага Вампиры', file: '4.mp3', duration: '1:05' },
+    { name: 'Раса Драконы', file: '5.mp3', duration: '1:05' }
 ];
 
 const MUSIC_BASE_URL = 'https://raw.githubusercontent.com/StaleGradov/CARD/main/images/';
@@ -635,7 +859,6 @@ const volumeSlider = document.getElementById('volumeSlider');
 const volumeValue = document.getElementById('volumeValue');
 const playlistTracks = document.getElementById('playlistTracks');
 
-// Загрузка сохранённых настроек
 const savedVolume = localStorage.getItem('musicVolume');
 if (savedVolume) {
     musicVolume = parseFloat(savedVolume);
@@ -649,7 +872,6 @@ if (savedTrack) {
     currentTrackIndex = parseInt(savedTrack);
 }
 
-// Инициализация первого трека
 function initMusic() {
     if (playlist.length > 0) {
         loadTrack(currentTrackIndex);
@@ -657,7 +879,6 @@ function initMusic() {
     }
 }
 
-// Загрузка трека
 function loadTrack(index) {
     if (index < 0) index = playlist.length - 1;
     if (index >= playlist.length) index = 0;
@@ -675,7 +896,6 @@ function loadTrack(index) {
     updateActiveTrack();
 }
 
-// Воспроизведение
 function playMusic() {
     if (!bgMusic) return;
     bgMusic.play().then(() => {
@@ -689,7 +909,6 @@ function playMusic() {
     });
 }
 
-// Пауза
 function pauseMusic() {
     if (!bgMusic) return;
     bgMusic.pause();
@@ -698,7 +917,6 @@ function pauseMusic() {
     if (togglePlaylistBtn) togglePlaylistBtn.classList.remove('playing');
 }
 
-// Переключение Play/Pause
 function togglePlayPause() {
     if (isPlaying) {
         pauseMusic();
@@ -707,14 +925,12 @@ function togglePlayPause() {
     }
 }
 
-// Обновление кнопки Play/Pause
 function updatePlayPauseButton() {
     if (playPauseBtn) {
         playPauseBtn.textContent = isPlaying ? '⏸️' : '▶️';
     }
 }
 
-// Предыдущий трек
 function prevTrack() {
     currentTrackIndex--;
     if (currentTrackIndex < 0) currentTrackIndex = playlist.length - 1;
@@ -724,7 +940,6 @@ function prevTrack() {
     }
 }
 
-// Следующий трек
 function nextTrack() {
     currentTrackIndex++;
     if (currentTrackIndex >= playlist.length) currentTrackIndex = 0;
@@ -734,7 +949,6 @@ function nextTrack() {
     }
 }
 
-// Рендер плейлиста
 function renderPlaylist() {
     if (!playlistTracks) return;
     
@@ -765,7 +979,6 @@ function renderPlaylist() {
     });
 }
 
-// Обновление активного трека в плейлисте
 function updateActiveTrack() {
     const tracks = document.querySelectorAll('.playlist-track');
     tracks.forEach((track, index) => {
@@ -788,7 +1001,6 @@ function updateActiveTrack() {
     });
 }
 
-// Изменение громкости
 function changeVolume(value) {
     musicVolume = value / 100;
     if (bgMusic) bgMusic.volume = musicVolume;
@@ -798,12 +1010,10 @@ function changeVolume(value) {
     localStorage.setItem('musicVolume', musicVolume);
 }
 
-// Переключение панели плейлиста
 function togglePlaylistPanel() {
     if (playlistPanel) playlistPanel.classList.toggle('hidden');
 }
 
-// Привязка событий плеера
 function bindMusicEvents() {
     if (togglePlaylistBtn) {
         togglePlaylistBtn.addEventListener('click', togglePlaylistPanel);
@@ -858,7 +1068,6 @@ function bindMusicEvents() {
     }
 }
 
-// Первый запуск музыки при клике (обход блокировки автовоспроизведения)
 document.addEventListener('click', function initMusicOnFirstClick() {
     if (playlist.length > 0 && bgMusic && !bgMusic.src) {
         loadTrack(currentTrackIndex);
@@ -866,7 +1075,6 @@ document.addEventListener('click', function initMusicOnFirstClick() {
     document.removeEventListener('click', initMusicOnFirstClick);
 }, { once: true });
 
-// Закрытие плейлиста при клике вне его
 document.addEventListener('click', (e) => {
     if (playlistPanel && !playlistPanel.classList.contains('hidden')) {
         const isClickInside = playlistPanel.contains(e.target) || 
@@ -879,11 +1087,9 @@ document.addEventListener('click', (e) => {
 
 // ========== ПРИВЯЗКА ОСНОВНЫХ СОБЫТИЙ ИГРЫ ==========
 document.addEventListener('DOMContentLoaded', () => {
-    // Инициализация музыки
     initMusic();
     bindMusicEvents();
     
-    // Основные события игры
     document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', (e) => {
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -899,6 +1105,43 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const resetStatsBtn = document.getElementById('resetStatsBtn');
     if (resetStatsBtn) resetStatsBtn.onclick = resetAllStats;
+    
+    const resetGoldBtn = document.getElementById('resetGoldBtn');
+    if (resetGoldBtn) resetGoldBtn.onclick = resetAllGold;
+    
+    const deckZone = document.getElementById('deckZone');
+    if (deckZone) {
+        deckZone.addEventListener('click', () => {
+            if (battlePhase !== 'select') {
+                addLog('⚠️ Рынок доступен только в фазе выбора!');
+                return;
+            }
+            showMarketModal();
+        });
+    }
+    
+    const closeMarketModal = document.getElementById('closeMarketModal');
+    if (closeMarketModal) {
+        closeMarketModal.addEventListener('click', () => {
+            document.getElementById('marketModal').classList.add('hidden');
+        });
+    }
+    
+    const buyRandomFromModal = document.getElementById('buyRandomFromModal');
+    if (buyRandomFromModal) {
+        buyRandomFromModal.addEventListener('click', () => {
+            const player = players[currentPlayerIndex];
+            if (buyRandomHero(player)) {
+                document.getElementById('marketModal').classList.add('hidden');
+            }
+        });
+    }
+    
+    document.getElementById('marketModal')?.addEventListener('click', (e) => {
+        if (e.target.classList.contains('market-modal')) {
+            e.target.classList.add('hidden');
+        }
+    });
     
     initGame(2);
 });
