@@ -63,8 +63,8 @@ body {
 }
 
 .event-card { 
-    width: 220px;
-    min-width: 200px;
+    width: 260px;
+    min-width: 240px;
     background: #1a1a1a; 
     border-radius: 20px; 
     overflow: hidden; 
@@ -193,8 +193,8 @@ body {
 
 /* Карты героев — увеличенные */
 .hero-card { 
-    width: 240px;
-    min-width: 220px;
+    width: 280px;
+    min-width: 260px;
     background: #1a1a1a; 
     border-radius: 20px; 
     overflow: hidden; 
