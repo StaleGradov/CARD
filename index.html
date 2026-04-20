@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Тигримион · Хроники Королевств</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="game-container">
+    <div class="title">⚔️ ТИГРИМИОН · БИТВА КОРОЛЕВСТВ ⚔️</div>
+    
+    <div class="mode-selector">
+        <button class="mode-btn active" data-mode="2">👥 2 Игрока</button>
+        <button class="mode-btn" data-mode="3">👥 3 Игрока</button>
+        <button class="mode-btn" data-mode="4">👥 4 Игрока</button>
+        <button class="mode-btn" data-mode="pc">🤖 Против ПК</button>
+    </div>
+
+    <div class="sub">
+        Раунд <span id="roundDisplay">1/5</span> · Счёт <span id="scoreDisplay">0 : 0</span>
+        <button class="reset-stats-btn" id="resetStatsBtn">📊 Сбросить статистику</button>
+    </div>
+
+    <div class="event-cards-row" id="eventCardsContainer"></div>
+
+    <div class="arena" id="arenaContainer"></div>
+
+    <div class="turn-indicator" id="turnIndicator"></div>
+
+    <div style="display: flex; gap: 20px; margin: 20px 0;">
+        <button class="fight-btn" id="actionBtn" style="flex: 1;">✅ ЗАКОНЧИТЬ ВЫБОР</button>
+    </div>
+
+    <div class="log" id="log">[⚔️] Тигримион ждёт. Выберите героя для Раунда 1.</div>
+    <button class="fight-btn reset-btn" id="resetGame" style="margin-top: 10px;">🔄 НОВАЯ КАМПАНИЯ</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
