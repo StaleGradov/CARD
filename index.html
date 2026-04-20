@@ -36,6 +36,209 @@
     <button class="fight-btn reset-btn" id="resetGame" style="margin-top: 10px;">🔄 НОВАЯ КАМПАНИЯ</button>
 </div>
 
+<!-- Панель отладки (появляется по Ctrl+Shift+D) -->
+<div id="debug-panel" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.95);
+    border: 2px solid #ffd700;
+    border-radius: 12px;
+    padding: 15px;
+    z-index: 9999;
+    display: none;
+    backdrop-filter: blur(10px);
+    color: white;
+    font-family: monospace;
+    min-width: 280px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <strong>🔧 Отладка (Ctrl+Shift+D)</strong>
+        <button id="close-debug" style="background:red; border:none; color:white; cursor:pointer; border-radius: 4px; padding: 2px 8px;">✕</button>
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 12px;">🎨 Масштаб интерфейса: <span id="scale-value">100</span>%</label>
+        <input type="range" id="ui-scale" min="50" max="150" step="5" value="100" style="width: 100%;">
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 12px;">📏 Ширина карточек героев: <span id="hero-width-value">260</span>px</label>
+        <input type="range" id="hero-width" min="150" max="400" step="10" value="260" style="width: 100%;">
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 12px;">📏 Высота карточек героев: <span id="hero-height-value">260</span>px</label>
+        <input type="range" id="hero-height" min="150" max="400" step="10" value="260" style="width: 100%;">
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 12px;">🃏 Ширина карточек событий: <span id="event-width-value">480</span>px</label>
+        <input type="range" id="event-width" min="250" max="700" step="10" value="480" style="width: 100%;">
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 12px;">📝 Размер шрифта заголовка: <span id="title-font-value">1.8</span>rem</label>
+        <input type="range" id="title-font" min="1" max="4" step="0.1" value="1.8" style="width: 100%;">
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 12px;">📝 Размер шрифта текста: <span id="text-font-value">0.9</span>rem</label>
+        <input type="range" id="text-font" min="0.6" max="1.5" step="0.05" value="0.9" style="width: 100%;">
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 12px;">📏 Отступы (padding): <span id="padding-value">16</span>px</label>
+        <input type="range" id="global-padding" min="5" max="40" step="2" value="16" style="width: 100%;">
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 12px;">🎴 Скругление углов: <span id="radius-value">20</span>px</label>
+        <input type="range" id="border-radius" min="5" max="50" step="2" value="20" style="width: 100%;">
+    </div>
+    
+    <div style="margin-top: 12px;">
+        <button id="reset-debug" style="background: #ffd700; color: black; border: none; padding: 5px 10px; cursor: pointer; width: 100%; border-radius: 6px; font-weight: bold;">
+            🔄 Сбросить настройки
+        </button>
+    </div>
+</div>
+
+<script>
+// ==================== ОТЛАДОЧНЫЙ РЕЖИМ ====================
+(function() {
+    const debugPanel = document.getElementById('debug-panel');
+    let debugEnabled = false;
+    
+    // Включение/выключение по Ctrl+Shift+D
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            e.preventDefault();
+            if (debugPanel.style.display === 'none' || debugPanel.style.display === '') {
+                debugPanel.style.display = 'block';
+                loadCurrentValues();
+            } else {
+                debugPanel.style.display = 'none';
+            }
+        }
+    });
+    
+    document.getElementById('close-debug').addEventListener('click', function() {
+        debugPanel.style.display = 'none';
+    });
+    
+    // Функция загрузки текущих значений CSS-переменных
+    function loadCurrentValues() {
+        const root = document.documentElement;
+        
+        const scale = getComputedStyle(root).getPropertyValue('--ui-scale').trim() || '100';
+        document.getElementById('ui-scale').value = parseInt(scale);
+        document.getElementById('scale-value').innerText = scale;
+        
+        const heroW = getComputedStyle(root).getPropertyValue('--hero-card-width').trim() || '260';
+        document.getElementById('hero-width').value = parseInt(heroW);
+        document.getElementById('hero-width-value').innerText = heroW;
+        
+        const heroH = getComputedStyle(root).getPropertyValue('--hero-card-height').trim() || '260';
+        document.getElementById('hero-height').value = parseInt(heroH);
+        document.getElementById('hero-height-value').innerText = heroH;
+        
+        const eventW = getComputedStyle(root).getPropertyValue('--event-card-width').trim() || '480';
+        document.getElementById('event-width').value = parseInt(eventW);
+        document.getElementById('event-width-value').innerText = eventW;
+        
+        const titleFont = getComputedStyle(root).getPropertyValue('--title-font-size').trim() || '1.8';
+        document.getElementById('title-font').value = parseFloat(titleFont);
+        document.getElementById('title-font-value').innerText = titleFont;
+        
+        const textFont = getComputedStyle(root).getPropertyValue('--text-font-size').trim() || '0.9';
+        document.getElementById('text-font').value = parseFloat(textFont);
+        document.getElementById('text-font-value').innerText = textFont;
+        
+        const padding = getComputedStyle(root).getPropertyValue('--global-padding').trim() || '16';
+        document.getElementById('global-padding').value = parseInt(padding);
+        document.getElementById('padding-value').innerText = padding;
+        
+        const radius = getComputedStyle(root).getPropertyValue('--border-radius').trim() || '20';
+        document.getElementById('border-radius').value = parseInt(radius);
+        document.getElementById('radius-value').innerText = radius;
+    }
+    
+    // Применение всех настроек
+    function applySettings() {
+        const root = document.documentElement;
+        
+        const scale = document.getElementById('ui-scale').value;
+        root.style.setProperty('--ui-scale', scale + '%');
+        document.getElementById('scale-value').innerText = scale;
+        
+        const heroW = document.getElementById('hero-width').value;
+        root.style.setProperty('--hero-card-width', heroW + 'px');
+        document.getElementById('hero-width-value').innerText = heroW;
+        
+        const heroH = document.getElementById('hero-height').value;
+        root.style.setProperty('--hero-card-height', heroH + 'px');
+        document.getElementById('hero-height-value').innerText = heroH;
+        
+        const eventW = document.getElementById('event-width').value;
+        root.style.setProperty('--event-card-width', eventW + 'px');
+        document.getElementById('event-width-value').innerText = eventW;
+        
+        const titleFont = document.getElementById('title-font').value;
+        root.style.setProperty('--title-font-size', titleFont + 'rem');
+        document.getElementById('title-font-value').innerText = titleFont;
+        
+        const textFont = document.getElementById('text-font').value;
+        root.style.setProperty('--text-font-size', textFont + 'rem');
+        document.getElementById('text-font-value').innerText = textFont;
+        
+        const padding = document.getElementById('global-padding').value;
+        root.style.setProperty('--global-padding', padding + 'px');
+        document.getElementById('padding-value').innerText = padding;
+        
+        const radius = document.getElementById('border-radius').value;
+        root.style.setProperty('--border-radius', radius + 'px');
+        document.getElementById('radius-value').innerText = radius;
+    }
+    
+    // Сброс всех настроек
+    function resetSettings() {
+        document.getElementById('ui-scale').value = 100;
+        document.getElementById('hero-width').value = 260;
+        document.getElementById('hero-height').value = 260;
+        document.getElementById('event-width').value = 480;
+        document.getElementById('title-font').value = 1.8;
+        document.getElementById('text-font').value = 0.9;
+        document.getElementById('global-padding').value = 16;
+        document.getElementById('border-radius').value = 20;
+        applySettings();
+    }
+    
+    // Подписка на события
+    document.getElementById('ui-scale').addEventListener('input', applySettings);
+    document.getElementById('hero-width').addEventListener('input', applySettings);
+    document.getElementById('hero-height').addEventListener('input', applySettings);
+    document.getElementById('event-width').addEventListener('input', applySettings);
+    document.getElementById('title-font').addEventListener('input', applySettings);
+    document.getElementById('text-font').addEventListener('input', applySettings);
+    document.getElementById('global-padding').addEventListener('input', applySettings);
+    document.getElementById('border-radius').addEventListener('input', applySettings);
+    document.getElementById('reset-debug').addEventListener('click', resetSettings);
+    
+    // Инициализация CSS-переменных при загрузке
+    const root = document.documentElement;
+    if (!root.style.getPropertyValue('--ui-scale')) root.style.setProperty('--ui-scale', '100%');
+    if (!root.style.getPropertyValue('--hero-card-width')) root.style.setProperty('--hero-card-width', '260px');
+    if (!root.style.getPropertyValue('--hero-card-height')) root.style.setProperty('--hero-card-height', '260px');
+    if (!root.style.getPropertyValue('--event-card-width')) root.style.setProperty('--event-card-width', '480px');
+    if (!root.style.getPropertyValue('--title-font-size')) root.style.setProperty('--title-font-size', '1.8rem');
+    if (!root.style.getPropertyValue('--text-font-size')) root.style.setProperty('--text-font-size', '0.9rem');
+    if (!root.style.getPropertyValue('--global-padding')) root.style.setProperty('--global-padding', '16px');
+    if (!root.style.getPropertyValue('--border-radius')) root.style.setProperty('--border-radius', '20px');
+})();
+</script>
+
 <script src="js/data.js"></script>
 <script src="js/game.js"></script>
 </body>
