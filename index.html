@@ -20,13 +20,38 @@
     <div class="sub">
         Раунд <span id="roundDisplay">1/5</span> · Счёт <span id="scoreDisplay">0 : 0</span>
         <button class="reset-stats-btn" id="resetStatsBtn">📊 Сбросить статистику</button>
+        <button class="reset-stats-btn" id="resetGoldBtn" style="margin-left:10px;">💰 Сбросить золото</button>
     </div>
 
-    <div class="event-cards-row" id="eventCardsContainer"></div>
+    <!-- Верхний ряд: Рынок + События + Колода -->
+    <div class="top-market-row">
+        <!-- Зона продажи (слева) -->
+        <div class="sell-zone" id="sellZone" data-action="sell">
+            <div class="sell-zone-icon">💰</div>
+            <div class="sell-zone-text">РЫНОК РАБОВ</div>
+            <div class="sell-zone-hint">Перетащите героя сюда для продажи</div>
+        </div>
+
+        <!-- Карты событий -->
+        <div class="event-cards-row" id="eventCardsContainer"></div>
+
+        <!-- Зона колоды (справа) -->
+        <div class="deck-zone" id="deckZone">
+            <div class="deck-card">
+                <div class="deck-card-back">🃏</div>
+                <div class="deck-card-text">КОЛОДА</div>
+                <div class="deck-card-price">🎲 100💰</div>
+            </div>
+            <div class="deck-hint">Нажмите для покупки случайного героя</div>
+        </div>
+    </div>
 
     <div class="arena" id="arenaContainer"></div>
 
     <div class="turn-indicator" id="turnIndicator"></div>
+
+    <!-- Отображение золота игроков -->
+    <div class="players-gold-row" id="playersGoldContainer"></div>
 
     <div style="display: flex; gap: 20px; margin: 20px 0;">
         <button class="fight-btn" id="actionBtn" style="flex: 1;">✅ ЗАКОНЧИТЬ ВЫБОР</button>
@@ -34,6 +59,20 @@
 
     <div class="log" id="log">[⚔️] Тигримион ждёт. Выберите героя для Раунда 1.</div>
     <button class="fight-btn reset-btn" id="resetGame" style="margin-top: 10px;">🔄 НОВАЯ КАМПАНИЯ</button>
+</div>
+
+<!-- Модальное окно открытого рынка -->
+<div id="marketModal" class="market-modal hidden">
+    <div class="market-modal-content">
+        <div class="market-modal-header">
+            <span>🛒 ОТКРЫТЫЙ РЫНОК — 200💰 ЗА ГЕРОЯ</span>
+            <button class="market-modal-close" id="closeMarketModal">✕</button>
+        </div>
+        <div class="market-cards-row" id="marketCardsContainer"></div>
+        <div class="market-modal-footer">
+            <button class="market-btn" id="buyRandomFromModal">🎲 Купить случайного (100💰)</button>
+        </div>
+    </div>
 </div>
 
 <!-- ========== МУЗЫКАЛЬНЫЙ ПЛЕЕР ========== -->
