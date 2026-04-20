@@ -8,7 +8,17 @@
     --armor-color: #2196f3; 
     --dmg-color: #ffc107; 
     --gold-color: #ffd700; 
-    --bg-dark: #0d0d0d; 
+    --bg-dark: #0d0d0d;
+    
+    /* Отладочные переменные */
+    --ui-scale: 100%;
+    --hero-card-width: 260px;
+    --hero-card-height: 260px;
+    --event-card-width: 480px;
+    --title-font-size: 1.8rem;
+    --text-font-size: 0.9rem;
+    --global-padding: 16px;
+    --border-radius: 20px;
 }
 
 body { 
@@ -20,24 +30,27 @@ body {
     min-height: 100vh; 
     margin: 0; 
     padding: 12px; 
+    font-size: var(--text-font-size);
 }
 
 .game-container { 
-    max-width: 3200px; 
+    max-width: 1600px; 
     width: 100%; 
     background: rgba(0, 0, 0, 0.75); 
     backdrop-filter: blur(4px); 
-    border-radius: 48px; 
-    padding: 16px 24px 20px; 
+    border-radius: calc(var(--border-radius) * 2.4); 
+    padding: var(--global-padding) calc(var(--global-padding) * 1.5) calc(var(--global-padding) * 1.25); 
     border: 1px solid #e7bc7e; 
     box-shadow: 0 20px 35px rgba(0, 0, 0, 0.6); 
     position: relative; 
+    transform: scale(calc(var(--ui-scale) / 100));
+    transform-origin: center top;
 }
 
 /* Уменьшенный заголовок */
 .title { 
     text-align: center; 
-    font-size: 1.8rem; 
+    font-size: var(--title-font-size); 
     letter-spacing: 4px; 
     color: #ffdfa5; 
     text-shadow: 0 3px 0 #6b3f00; 
@@ -48,7 +61,7 @@ body {
     text-align: center; 
     color: #ecd690; 
     margin-bottom: 12px; 
-    font-size: 1rem; 
+    font-size: calc(var(--text-font-size) * 1.1); 
     font-weight: bold; 
 }
 
@@ -65,7 +78,7 @@ body {
     border-radius: 60px;
 }
 .round-info {
-    font-size: 1.1rem;
+    font-size: calc(var(--text-font-size) * 1.2);
     font-weight: bold;
     color: #ffdfa5;
     background: #2a2419c0;
@@ -78,21 +91,24 @@ body {
     color: #ffcf8a;
     padding: 4px 14px;
     border-radius: 30px;
-    font-size: 0.75rem;
+    font-size: calc(var(--text-font-size) * 0.85);
     cursor: pointer;
 }
 .mode-selector { 
     display: flex; 
     gap: 8px; 
+    justify-content: center;
+    margin-bottom: 8px;
 }
 .mode-btn { 
     background: #3a2a1a; 
     border: 1px solid #a77b44; 
     color: #ffcf8a; 
-    padding: 4px 14px; 
+    padding: 6px 18px; 
     border-radius: 30px; 
-    font-size: 0.8rem; 
+    font-size: calc(var(--text-font-size) * 0.9); 
     cursor: pointer; 
+    transition: 0.1s;
 }
 .mode-btn.active { 
     background: #b3470c; 
@@ -111,10 +127,10 @@ body {
     padding: 5px 0;
 }
 .event-card { 
-    width: 480px;
-    min-width: 420px;
+    width: var(--event-card-width);
+    min-width: calc(var(--event-card-width) * 0.85);
     background: #1a1a1a; 
-    border-radius: 24px; 
+    border-radius: var(--border-radius); 
     overflow: hidden; 
     border: 2px solid #c9a45b; 
     box-shadow: 0 6px 0 #7a4a1f, 0 0 20px rgba(201, 164, 91, 0.3); 
@@ -129,7 +145,7 @@ body {
 }
 .event-portrait { 
     width: 100%; 
-    height: 220px;
+    height: calc(var(--event-card-width) * 0.45);
     position: relative; 
 }
 .event-portrait img { 
@@ -151,20 +167,20 @@ body {
     background: #1a1a1a; 
 }
 .event-name { 
-    font-size: 1rem; 
+    font-size: calc(var(--text-font-size) * 1.1); 
     font-weight: bold; 
     text-align: center; 
     color: #ffdfa5; 
     text-transform: uppercase; 
 }
 .event-desc { 
-    font-size: 0.8rem; 
+    font-size: calc(var(--text-font-size) * 0.9); 
     opacity: 0.9; 
     text-align: center; 
     color: #ecd690; 
 }
 .event-icon { 
-    font-size: 1.8rem; 
+    font-size: calc(var(--text-font-size) * 2); 
     text-align: center; 
     margin-bottom: 5px; 
 }
@@ -178,9 +194,9 @@ body {
 }
 .player-card { 
     flex: 1 1 400px; 
-    min-width: 360px; 
+    min-width: 320px; 
     background: #1e261ae0; 
-    border-radius: 32px; 
+    border-radius: calc(var(--border-radius) * 1.6); 
     padding: 12px 15px; 
     backdrop-filter: blur(4px); 
     border: 2px solid #c9a45b; 
@@ -192,7 +208,7 @@ body {
     align-items: center; 
     justify-content: center; 
     gap: 8px; 
-    font-size: 1.3rem; 
+    font-size: calc(var(--text-font-size) * 1.5); 
     font-weight: bold; 
     background: linear-gradient(145deg, #2d261b, #1a150e); 
     border-radius: 50px; 
@@ -203,7 +219,7 @@ body {
     border: 1px solid #b47c48; 
 }
 .score-badge { 
-    font-size: 1rem; 
+    font-size: calc(var(--text-font-size) * 1.1); 
     color: gold; 
     background: #3a2a1a; 
     padding: 2px 10px; 
@@ -216,20 +232,20 @@ body {
     display: flex; 
     flex-wrap: nowrap;
     gap: 12px; 
-    justify-content: center;   /* центрирование, если героев мало */
+    justify-content: center;
     align-items: stretch;
     margin-top: 8px; 
-    min-height: 340px;
+    min-height: calc(var(--hero-card-height) + 40px);
     overflow-x: auto;
     padding: 5px 2px;
 }
-/* Каждый герой растягивается, но не мельче 200px */
+/* Каждый герой растягивается */
 .hero-card { 
-    flex: 1 1 0;          /* занимает равномерно доступную ширину */
-    min-width: 200px;     /* минимальная ширина для читаемости */
-    max-width: 300px;     /* но не слишком огромный */
+    flex: 1 1 0;
+    min-width: calc(var(--hero-card-width) * 0.7);
+    max-width: var(--hero-card-width);
     background: #1a1a1a; 
-    border-radius: 20px; 
+    border-radius: var(--border-radius); 
     overflow: hidden; 
     border: 3px solid;
     box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(0,0,0,0.5); 
@@ -251,7 +267,7 @@ body {
 }
 .hero-portrait { 
     width: 100%; 
-    height: 220px;
+    height: var(--hero-card-height);
     position: relative; 
 }
 .hero-portrait img { 
@@ -273,7 +289,7 @@ body {
     background: #1a1a1a; 
 }
 .hero-name { 
-    font-size: 0.9rem; 
+    font-size: calc(var(--text-font-size) * 1.0); 
     font-weight: bold; 
     text-align: center; 
     margin-bottom: 2px; 
@@ -281,7 +297,7 @@ body {
     text-transform: uppercase; 
 }
 .hero-subtitle { 
-    font-size: 0.6rem; 
+    font-size: calc(var(--text-font-size) * 0.7); 
     opacity: 0.7; 
     text-align: center; 
     margin-bottom: 6px; 
@@ -296,7 +312,7 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    font-size: 1rem; 
+    font-size: calc(var(--text-font-size) * 1.1); 
     background: #2a2a2a; 
     padding: 2px 5px; 
     border-radius: 20px; 
@@ -304,7 +320,7 @@ body {
     cursor: pointer; 
 }
 .hero-icon span:last-child { 
-    font-size: 0.4rem; 
+    font-size: calc(var(--text-font-size) * 0.5); 
     opacity: 0.6; 
 }
 .hero-power-badge { 
@@ -316,7 +332,7 @@ body {
     padding: 2px 10px; 
     border-radius: 30px; 
     font-weight: bold; 
-    font-size: 0.75rem; 
+    font-size: calc(var(--text-font-size) * 0.85); 
     border: 1px solid #ffd58c; 
     color: #ffd58c; 
 }
@@ -326,7 +342,7 @@ body {
 .label-group { 
     display: flex; 
     justify-content: space-between; 
-    font-size: 0.55rem; 
+    font-size: calc(var(--text-font-size) * 0.65); 
     margin-bottom: 2px; 
     opacity: 0.8; 
 }
@@ -352,12 +368,12 @@ body {
     margin-top: 6px; 
     padding-top: 4px; 
     border-top: 1px solid #444; 
-    font-size: 0.6rem; 
+    font-size: calc(var(--text-font-size) * 0.7); 
 }
 .record-win { color: #4caf50; } 
 .record-loss { color: #f44336; }
 
-/* Кнопка боя и сброса — компактные */
+/* Кнопки */
 .actions-row {
     display: flex;
     gap: 15px;
@@ -368,7 +384,7 @@ body {
     border: none; 
     flex: 2;
     padding: 10px; 
-    font-size: 1.1rem; 
+    font-size: calc(var(--text-font-size) * 1.2); 
     font-weight: bold; 
     color: #ffefb9; 
     border-radius: 60px; 
@@ -394,10 +410,10 @@ body {
     flex: 1;
 }
 
-/* Лог уменьшен, чтобы не вылезать */
+/* Лог */
 .log { 
     background: #090c07e0; 
-    border-radius: 20px; 
+    border-radius: var(--border-radius); 
     padding: 8px 15px; 
     margin-top: 12px; 
     height: 100px; 
@@ -405,26 +421,36 @@ body {
     font-family: 'Courier New', monospace; 
     color: #e5d5a5; 
     border: 1px solid #c9a45b; 
-    font-size: 0.8rem; 
+    font-size: calc(var(--text-font-size) * 0.9); 
 }
 .deck-counter { 
-    display: none; /* скрываем старый счётчик героев, чтобы не мешал */
+    display: none;
 }
-/* Убираем визуально надпись "Выбрано героев: 0/3" */
+
+/* Скрываем старый счётчик героев */
 .player-card .deck-counter {
     display: none;
 }
 
-/* Сброс статистики мелкий */
-.reset-stats-btn { 
-    background: #4a3a2a; 
-    border: 1px solid #a77b44; 
-    color: #ffcf8a; 
-    padding: 4px 12px; 
-    border-radius: 30px; 
-    font-size: 0.7rem; 
-    cursor: pointer; 
-    margin-left: 8px; 
+.turn-indicator { 
+    text-align: center; 
+    font-size: calc(var(--text-font-size) * 1.3); 
+    color: gold; 
+    margin: 5px 0; 
+}
+.hidden-card { 
+    filter: brightness(0.15) blur(4px); 
+    pointer-events: none; 
+}
+.hidden-card .hero-name, 
+.hidden-card .hero-subtitle, 
+.hidden-card .hero-power-badge, 
+.hidden-card .stat-row, 
+.hidden-card .hero-record { 
+    visibility: hidden; 
+}
+.hidden-card .hero-icons-row { 
+    visibility: hidden; 
 }
 
 /* Цвета рамок */
@@ -446,27 +472,6 @@ body {
     to { box-shadow: 0 6px 0 #3a2a1a, 0 0 22px #ff4400, 0 0 45px #ffcc00; }
 }
 
-.turn-indicator { 
-    text-align: center; 
-    font-size: 1.2rem; 
-    color: gold; 
-    margin: 5px 0; 
-}
-.hidden-card { 
-    filter: brightness(0.15) blur(4px); 
-    pointer-events: none; 
-}
-.hidden-card .hero-name, 
-.hidden-card .hero-subtitle, 
-.hidden-card .hero-power-badge, 
-.hidden-card .stat-row, 
-.hidden-card .hero-record { 
-    visibility: hidden; 
-}
-.hidden-card .hero-icons-row { 
-    visibility: hidden; 
-}
-
 /* Модальное окно */
 .result-modal { 
     position: fixed; 
@@ -486,12 +491,12 @@ body {
     width: 90%; 
     background: linear-gradient(145deg, #1e261a, #0a0f07); 
     border: 3px solid #c9a45b; 
-    border-radius: 40px; 
+    border-radius: calc(var(--border-radius) * 2); 
     padding: 25px; 
 }
 .result-title { 
     text-align: center; 
-    font-size: 2rem; 
+    font-size: calc(var(--title-font-size) * 1.1); 
     color: #ffdfa5; 
     margin-bottom: 15px; 
 }
@@ -504,7 +509,7 @@ body {
 .result-hero { 
     flex: 1; 
     background: #1a1a1a; 
-    border-radius: 20px; 
+    border-radius: var(--border-radius); 
     padding: 15px; 
     border: 2px solid; 
     text-align: center; 
@@ -520,7 +525,7 @@ body {
 .result-portrait { 
     width: 100%; 
     height: 170px; 
-    border-radius: 16px; 
+    border-radius: calc(var(--border-radius) * 0.8); 
     overflow: hidden; 
     margin-bottom: 12px; 
     border: 2px solid #a77b44; 
@@ -531,7 +536,7 @@ body {
     object-fit: cover; 
 }
 .result-power-large { 
-    font-size: 1.6rem; 
+    font-size: calc(var(--text-font-size) * 1.8); 
     font-weight: bold; 
     color: gold; 
     background: #2a2a2a; 
@@ -551,20 +556,20 @@ body {
     justify-content: space-between; 
     padding: 6px 10px; 
     background: #2a2a2a; 
-    border-radius: 10px; 
-    font-size: 0.9rem; 
+    border-radius: calc(var(--border-radius) * 0.5); 
+    font-size: calc(var(--text-font-size) * 1.0); 
 }
 .result-vs { 
     display: flex; 
     align-items: center; 
-    font-size: 2.5rem; 
+    font-size: calc(var(--text-font-size) * 2.8); 
     color: gold; 
 }
 .result-close-btn { 
     display: block; 
     margin: 20px auto 0; 
     padding: 10px 30px; 
-    font-size: 1rem; 
+    font-size: calc(var(--text-font-size) * 1.1); 
     background: linear-gradient(145deg, #b3470c, #8a3509); 
     border: 2px solid #e7bc7e; 
     color: #ffefb9; 
@@ -572,6 +577,7 @@ body {
     cursor: pointer; 
 }
 
+/* Экран победы/поражения */
 .victory-screen, .defeat-screen { 
     position: absolute; 
     top: 0; 
@@ -584,19 +590,19 @@ body {
     justify-content: center; 
     background: rgba(0, 0, 0, 0.85); 
     backdrop-filter: blur(8px); 
-    border-radius: 40px; 
+    border-radius: calc(var(--border-radius) * 2); 
     z-index: 10; 
     text-align: center; 
     padding: 20px; 
 }
 .victory-screen h2 { 
-    font-size: 3rem; 
+    font-size: calc(var(--title-font-size) * 1.7); 
     color: gold; 
     text-shadow: 0 0 20px orange; 
     animation: pulse 1.5s infinite; 
 }
 .defeat-screen h2 { 
-    font-size: 3rem; 
+    font-size: calc(var(--title-font-size) * 1.7); 
     color: #8b0000; 
     text-shadow: 0 0 20px red; 
 }
@@ -621,18 +627,15 @@ body {
 
 /* Адаптивность */
 @media (max-width: 1100px) {
-    .hero-card { min-width: 170px; }
-    .hero-portrait { height: 190px; }
-    .event-card { width: 380px; min-width: 320px; }
-    .event-portrait { height: 180px; }
-    .player-card { min-width: 300px; }
+    .hero-card { min-width: 180px; }
+    .hero-portrait { height: calc(var(--hero-card-height) * 0.8); }
+    .event-card { width: calc(var(--event-card-width) * 0.8); min-width: 280px; }
+    .event-portrait { height: calc(var(--event-card-width) * 0.35); }
 }
 @media (max-width: 800px) {
-    .game-container { padding: 12px 16px; }
+    .game-container { padding: calc(var(--global-padding) * 0.7); }
     .hero-cards { flex-wrap: wrap; justify-content: center; }
     .hero-card { flex: 0 1 220px; }
-    .event-card { width: 100%; min-width: 260px; }
-    .top-bar { flex-direction: column; align-items: stretch; }
+    .mode-selector { flex-wrap: wrap; }
     .actions-row { flex-direction: column; }
 }
-    </style>
