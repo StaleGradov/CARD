@@ -226,10 +226,11 @@ body {
     padding: 5px 2px;
 }
 
+/* НОВЫЕ ПРОПОРЦИИ КАРТОЧКИ ГЕРОЯ: высота примерно 1.5 от ширины */
 .hero-card { 
     flex: 1 1 0;
-    min-width: 280px;
-    max-width: 480px;
+    min-width: 260px;      /* чуть уже для лучшей пропорции */
+    max-width: 380px;      /* ограничиваем максимальную ширину */
     background: #1a1a1a; 
     border-radius: 24px; 
     overflow: hidden; 
@@ -253,9 +254,10 @@ body {
     border-color: gold !important; 
 }
 
+/* ПОРТРЕТ — теперь занимает больше места (примерно 60-65% высоты карточки) */
 .hero-portrait { 
     width: 100%;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 1 / 0.85;  /* Ширина относится к высоте как 1 : 0.85 → портрет высокий */
     position: relative;
     flex-shrink: 0;
     background: #0d0d0d;
@@ -263,7 +265,7 @@ body {
 .hero-portrait img { 
     width: 100%; 
     height: 100%; 
-    object-fit: cover; 
+    object-fit: cover;    /* картинка не растягивается, а обрезается сохраняя пропорции */
     display: block;
 }
 .hero-portrait::after { 
@@ -277,64 +279,39 @@ body {
     pointer-events: none;
 }
 
-/* ========= НАЛОЖЕНИЕ ВАШЕГО ПЕРГАМЕНТА НА ОБЛАСТЬ С НАДПИСЯМИ ========= */
+/* ИНФОРМАЦИОННАЯ ЧАСТЬ — компактнее, с наложением пергамента */
 .hero-info { 
-    padding: 12px 14px 14px;
-    /* Ваше изображение пергамента в качестве фона */
+    padding: 8px 10px 10px;   /* уменьшили отступы */
     background: var(--parchment-bg) center/cover no-repeat;
-    /* Затемнение для читаемости текста — регулируйте прозрачность */
-    background-color: rgba(30, 25, 18, 0.7);
+    background-color: rgba(30, 25, 18, 0.75);
     background-blend-mode: multiply;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;                 /* уменьшили расстояние между элементами */
     position: relative;
-    /* Рамка и тень для эффекта "вставки" */
     border-top: 2px solid rgba(199, 161, 91, 0.6);
     box-shadow: inset 0 0 15px rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.3);
 }
 
-/* Альтернативный вариант с overlay для лучшей читаемости текста */
-/* Если текст плохо читается, раскомментируйте следующий блок и закомментируйте background-color выше */
-/*
-.hero-info {
-    background: var(--parchment-bg) center/cover no-repeat;
-    position: relative;
-}
-.hero-info::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 0;
-}
-.hero-info > * {
-    position: relative;
-    z-index: 1;
-}
-*/
-
 .hero-name { 
-    font-size: 1.35rem;
+    font-size: 1.15rem;       /* чуть мельче */
     font-weight: bold; 
     text-align: center; 
-    margin-bottom: 2px; 
+    margin-bottom: 0px; 
     color: #ffefc0; 
     text-transform: uppercase; 
     letter-spacing: 1px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    line-height: 1.2;
 }
 
 .hero-subtitle { 
-    font-size: 0.95rem;
+    font-size: 0.8rem;        /* мельче */
     font-weight: 500;
     opacity: 0.9; 
     text-align: center; 
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     color: #f5e2b0;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
@@ -342,8 +319,8 @@ body {
 .hero-icons-row { 
     display: flex; 
     justify-content: center; 
-    gap: 12px; 
-    margin: 4px 0;
+    gap: 8px;                /* уменьшили отступ */
+    margin: 2px 0;
     flex-wrap: wrap;
 }
 
@@ -351,22 +328,22 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    font-size: 1.25rem;
+    font-size: 1rem;          /* мельче */
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон для читаемости */
+    background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(2px);
-    padding: 5px 10px; 
+    padding: 3px 7px;         /* меньше паддинг */
     border-radius: 30px; 
     border: 1px solid rgba(201, 164, 91, 0.6);
-    gap: 3px;
-    min-width: 65px;
+    gap: 2px;
+    min-width: 55px;
 }
 .hero-icon span:first-child {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: normal;
 }
 .hero-icon span:last-child { 
-    font-size: 0.65rem;
+    font-size: 0.55rem;
     opacity: 0.9;
     font-weight: normal;
     letter-spacing: 0.3px;
@@ -374,15 +351,15 @@ body {
 
 .hero-power-badge { 
     text-align: center; 
-    margin: 4px 0;
+    margin: 2px 0;
 }
 .power-value { 
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(2px);
-    padding: 6px 18px;
+    padding: 3px 12px;        /* компактнее */
     border-radius: 40px; 
     font-weight: bold; 
-    font-size: 1.25rem;
+    font-size: 1rem;          /* мельче */
     border: 1px solid #ffd58c; 
     color: #ffd58c;
     display: inline-block;
@@ -393,8 +370,8 @@ body {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 6px 0 4px;
+    gap: 6px;                 /* меньше отступ */
+    margin: 2px 0 0px;
 }
 
 .stat-row { 
@@ -403,9 +380,9 @@ body {
 .label-group { 
     display: flex; 
     justify-content: space-between; 
-    font-size: 0.85rem;
+    font-size: 0.7rem;        /* мельче */
     font-weight: 500;
-    margin-bottom: 4px; 
+    margin-bottom: 2px; 
     opacity: 0.95;
     letter-spacing: 0.3px;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
@@ -413,9 +390,10 @@ body {
 .stat-value {
     font-weight: bold;
     color: #ffefb0;
+    font-size: 0.7rem;
 }
 .bar-bg { 
-    height: 6px;
+    height: 4px;              /* тоньше полоски */
     background: rgba(0, 0, 0, 0.5); 
     border-radius: 3px; 
     overflow: hidden; 
@@ -684,15 +662,16 @@ body {
 
 /* Адаптивность */
 @media (max-width: 1100px) {
-    .hero-card { min-width: 250px; }
-    .hero-portrait { aspect-ratio: 3 / 2; }
-    .hero-icon { min-width: 55px; padding: 4px 8px; }
-    .hero-icon span:first-child { font-size: 1rem; }
-    .hero-icon span:last-child { font-size: 0.6rem; }
-    .hero-name { font-size: 1.2rem; }
-    .hero-subtitle { font-size: 0.85rem; }
-    .power-value { font-size: 1.1rem; padding: 5px 14px; }
-    .label-group { font-size: 0.8rem; }
+    .hero-card { min-width: 230px; max-width: 320px; }
+    .hero-portrait { aspect-ratio: 1 / 0.85; }
+    .hero-icon { min-width: 50px; padding: 3px 6px; }
+    .hero-icon span:first-child { font-size: 0.85rem; }
+    .hero-icon span:last-child { font-size: 0.5rem; }
+    .hero-name { font-size: 1rem; }
+    .hero-subtitle { font-size: 0.7rem; }
+    .power-value { font-size: 0.9rem; padding: 3px 10px; }
+    .label-group { font-size: 0.65rem; }
+    .stat-value { font-size: 0.65rem; }
     .event-card { width: 380px; min-width: 320px; }
     .event-portrait { height: 180px; }
     .player-card { min-width: 300px; }
@@ -700,10 +679,10 @@ body {
 @media (max-width: 800px) {
     .game-container { padding: 12px 16px; }
     .hero-cards { flex-wrap: wrap; justify-content: center; }
-    .hero-card { flex: 0 1 260px; min-width: 260px; }
-    .hero-portrait { aspect-ratio: 3 / 2; }
-    .hero-icon { min-width: 60px; }
-    .stats-container { gap: 8px; }
+    .hero-card { flex: 0 1 250px; min-width: 240px; max-width: 280px; }
+    .hero-portrait { aspect-ratio: 1 / 0.85; }
+    .hero-icon { min-width: 48px; }
+    .stats-container { gap: 5px; }
     .event-card { width: 100%; min-width: 260px; }
     .top-bar { flex-direction: column; align-items: stretch; }
     .actions-row { flex-direction: column; }
