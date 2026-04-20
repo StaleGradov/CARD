@@ -34,7 +34,162 @@ body {
     position: relative; 
 }
 
-/* Уменьшенный заголовок */
+/* Панель редактора */
+.editor-panel {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #c9a45b;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.editor-btn {
+    background: #4a3a2a;
+    border: 1px solid #a77b44;
+    color: #ffcf8a;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.editor-btn:hover {
+    background: #5a4a3a;
+    transform: translateY(-1px);
+}
+
+.editor-btn.active {
+    background: #b3470c;
+    color: white;
+    box-shadow: 0 0 10px orange;
+}
+
+.editor-status {
+    margin-left: auto;
+    color: #ecd690;
+    font-size: 0.9rem;
+    padding: 5px 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+}
+
+/* Drag & Drop стили */
+.draggable {
+    cursor: move;
+    position: relative;
+    transition: box-shadow 0.2s;
+}
+
+.edit-mode .draggable {
+    cursor: move;
+    border: 2px dashed rgba(201, 164, 91, 0.5);
+}
+
+.edit-mode .draggable:hover {
+    border: 2px dashed #c9a45b;
+    box-shadow: 0 0 15px rgba(201, 164, 91, 0.3);
+}
+
+.edit-mode .draggable.dragging {
+    opacity: 0.8;
+    box-shadow: 0 10px 30px rgba(201, 164, 91, 0.5);
+    z-index: 1000;
+}
+
+/* Resize стили */
+.resizable {
+    position: relative;
+    transition: box-shadow 0.2s;
+}
+
+.edit-mode .resizable {
+    border: 2px dashed rgba(33, 150, 243, 0.5);
+    resize: both;
+    overflow: auto;
+}
+
+.edit-mode .resizable:hover {
+    border: 2px dashed #2196f3;
+    box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
+}
+
+.resize-handle {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, #2196f3 50%);
+    border-radius: 0 0 4px 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.edit-mode .resizable:hover .resize-handle {
+    opacity: 0.8;
+}
+
+/* Карточки героев с возможностью ресайза */
+.hero-card {
+    flex: 1 1 0;
+    min-width: 200px;
+    max-width: 300px;
+    background: #1a1a1a; 
+    border-radius: 20px; 
+    overflow: hidden; 
+    border: 3px solid;
+    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(0,0,0,0.5); 
+    color: white; 
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+    display: flex; 
+    flex-direction: column;
+    position: relative;
+}
+
+.edit-mode .hero-card {
+    cursor: move;
+    resize: both;
+    overflow: auto;
+    min-width: 150px;
+    min-height: 300px;
+}
+
+.edit-mode .hero-card .resize-handle {
+    opacity: 0.6;
+}
+
+/* Карточки событий с ресайзом */
+.event-card {
+    width: 480px;
+    min-width: 420px;
+    background: #1a1a1a; 
+    border-radius: 24px; 
+    overflow: hidden; 
+    border: 2px solid #c9a45b; 
+    box-shadow: 0 6px 0 #7a4a1f, 0 0 20px rgba(201, 164, 91, 0.3); 
+    color: white; 
+    transition: all 0.2s ease; 
+    display: flex; 
+    flex-direction: column;
+    position: relative;
+}
+
+.edit-mode .event-card {
+    cursor: move;
+    resize: both;
+    overflow: auto;
+    min-width: 300px;
+    min-height: 250px;
+}
+
+/* Остальные стили из оригинального файла */
 .title { 
     text-align: center; 
     font-size: 1.8rem; 
@@ -52,39 +207,11 @@ body {
     font-weight: bold; 
 }
 
-/* Компактная строка счётчика и кнопок */
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 12px;
-    background: rgba(0,0,0,0.4);
-    padding: 6px 15px;
-    border-radius: 60px;
-}
-.round-info {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #ffdfa5;
-    background: #2a2419c0;
-    padding: 4px 16px;
-    border-radius: 40px;
-}
-.reset-stats-btn {
-    background: #4a3a2a;
-    border: 1px solid #a77b44;
-    color: #ffcf8a;
-    padding: 4px 14px;
-    border-radius: 30px;
-    font-size: 0.75rem;
-    cursor: pointer;
-}
 .mode-selector { 
     display: flex; 
     gap: 8px; 
 }
+
 .mode-btn { 
     background: #3a2a1a; 
     border: 1px solid #a77b44; 
@@ -94,13 +221,13 @@ body {
     font-size: 0.8rem; 
     cursor: pointer; 
 }
+
 .mode-btn.active { 
     background: #b3470c; 
     color: white; 
     box-shadow: 0 0 8px orange; 
 }
 
-/* Увеличенные карточки событий */
 .event-cards-row { 
     display: flex; 
     gap: 20px; 
@@ -110,33 +237,24 @@ body {
     overflow-x: auto;
     padding: 5px 0;
 }
-.event-card { 
-    width: 480px;
-    min-width: 420px;
-    background: #1a1a1a; 
-    border-radius: 24px; 
-    overflow: hidden; 
-    border: 2px solid #c9a45b; 
-    box-shadow: 0 6px 0 #7a4a1f, 0 0 20px rgba(201, 164, 91, 0.3); 
-    color: white; 
-    transition: all 0.2s ease; 
-    display: flex; 
-    flex-direction: column; 
-}
+
 .event-card:hover { 
     transform: translateY(-4px); 
     box-shadow: 0 10px 0 #7a4a1f, 0 0 25px rgba(201, 164, 91, 0.4); 
 }
+
 .event-portrait { 
     width: 100%; 
     height: 220px;
     position: relative; 
 }
+
 .event-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
 }
+
 .event-portrait::after { 
     content: ''; 
     position: absolute; 
@@ -146,10 +264,12 @@ body {
     height: 40px; 
     background: linear-gradient(to top, #1a1a1a, transparent); 
 }
+
 .event-info { 
     padding: 12px 14px; 
     background: #1a1a1a; 
 }
+
 .event-name { 
     font-size: 1rem; 
     font-weight: bold; 
@@ -157,25 +277,27 @@ body {
     color: #ffdfa5; 
     text-transform: uppercase; 
 }
+
 .event-desc { 
     font-size: 0.8rem; 
     opacity: 0.9; 
     text-align: center; 
     color: #ecd690; 
 }
+
 .event-icon { 
     font-size: 1.8rem; 
     text-align: center; 
     margin-bottom: 5px; 
 }
 
-/* Арена - компактнее, но герои растягиваются */
 .arena { 
     display: flex; 
     flex-wrap: wrap; 
     gap: 20px; 
     justify-content: center; 
 }
+
 .player-card { 
     flex: 1 1 400px; 
     min-width: 360px; 
@@ -187,6 +309,7 @@ body {
     box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3); 
     position: relative; 
 }
+
 .player-name { 
     display: flex; 
     align-items: center; 
@@ -202,6 +325,7 @@ body {
     text-shadow: 0 1px 0 #5a3a1a; 
     border: 1px solid #b47c48; 
 }
+
 .score-badge { 
     font-size: 1rem; 
     color: gold; 
@@ -211,54 +335,42 @@ body {
     border: 1px solid #e7bc7e; 
 }
 
-/* Контейнер героев: центрирование и заполнение ширины */
 .hero-cards { 
     display: flex; 
     flex-wrap: nowrap;
     gap: 12px; 
-    justify-content: center;   /* центрирование, если героев мало */
+    justify-content: center;
     align-items: stretch;
     margin-top: 8px; 
     min-height: 340px;
     overflow-x: auto;
     padding: 5px 2px;
 }
-/* Каждый герой растягивается, но не мельче 200px */
-.hero-card { 
-    flex: 1 1 0;          /* занимает равномерно доступную ширину */
-    min-width: 200px;     /* минимальная ширина для читаемости */
-    max-width: 300px;     /* но не слишком огромный */
-    background: #1a1a1a; 
-    border-radius: 20px; 
-    overflow: hidden; 
-    border: 3px solid;
-    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(0,0,0,0.5); 
-    color: white; 
-    cursor: pointer; 
-    transition: all 0.2s ease; 
-    display: flex; 
-    flex-direction: column; 
-}
+
 .hero-card:hover { 
     transform: translateY(-4px); 
     box-shadow: 0 10px 0 #3a2a1a, 0 0 25px rgba(201, 164, 91, 0.4); 
 }
+
 .hero-card.selected { 
     transform: scale(1.01) translateY(-3px); 
     box-shadow: 0 8px 0 #3a2a1a, 0 0 30px gold; 
     border-width: 4px; 
     border-color: gold !important; 
 }
+
 .hero-portrait { 
     width: 100%; 
     height: 220px;
     position: relative; 
 }
+
 .hero-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
 }
+
 .hero-portrait::after { 
     content: ''; 
     position: absolute; 
@@ -268,10 +380,12 @@ body {
     height: 40px; 
     background: linear-gradient(to top, #1a1a1a, transparent); 
 }
+
 .hero-info { 
     padding: 8px 10px 10px; 
     background: #1a1a1a; 
 }
+
 .hero-name { 
     font-size: 0.9rem; 
     font-weight: bold; 
@@ -280,18 +394,21 @@ body {
     color: inherit; 
     text-transform: uppercase; 
 }
+
 .hero-subtitle { 
     font-size: 0.6rem; 
     opacity: 0.7; 
     text-align: center; 
     margin-bottom: 6px; 
 }
+
 .hero-icons-row { 
     display: flex; 
     justify-content: center; 
     gap: 6px; 
     margin-bottom: 6px; 
 }
+
 .hero-icon { 
     display: flex; 
     flex-direction: column; 
@@ -303,14 +420,17 @@ body {
     border: 1px solid #555; 
     cursor: pointer; 
 }
+
 .hero-icon span:last-child { 
     font-size: 0.4rem; 
     opacity: 0.6; 
 }
+
 .hero-power-badge { 
     text-align: center; 
     margin-bottom: 6px; 
 }
+
 .power-value { 
     background: #2a2a2a; 
     padding: 2px 10px; 
@@ -320,9 +440,11 @@ body {
     border: 1px solid #ffd58c; 
     color: #ffd58c; 
 }
+
 .stat-row { 
     margin-bottom: 4px; 
 }
+
 .label-group { 
     display: flex; 
     justify-content: space-between; 
@@ -330,21 +452,25 @@ body {
     margin-bottom: 2px; 
     opacity: 0.8; 
 }
+
 .bar-bg { 
     height: 4px; 
     background: #333; 
     border-radius: 3px; 
     overflow: hidden; 
 }
+
 .bar-fill { 
     height: 100%; 
     width: 0; 
     transition: width 0.3s ease-out; 
 }
+
 .hp-bar { background: var(--hp-color); box-shadow: 0 0 4px var(--hp-color); }
 .armor-bar { background: var(--armor-color); box-shadow: 0 0 4px var(--armor-color); }
 .dmg-bar { background: var(--dmg-color); box-shadow: 0 0 4px var(--dmg-color); }
 .gold-bar { background: var(--gold-color); box-shadow: 0 0 4px var(--gold-color); }
+
 .hero-record { 
     display: flex; 
     justify-content: center; 
@@ -354,15 +480,16 @@ body {
     border-top: 1px solid #444; 
     font-size: 0.6rem; 
 }
+
 .record-win { color: #4caf50; } 
 .record-loss { color: #f44336; }
 
-/* Кнопка боя и сброса — компактные */
 .actions-row {
     display: flex;
     gap: 15px;
     margin: 15px 0 8px;
 }
+
 .fight-btn { 
     background: linear-gradient(145deg, #b3470c, #8a3509); 
     border: none; 
@@ -379,22 +506,24 @@ body {
     text-transform: uppercase; 
     letter-spacing: 1px; 
 }
+
 .fight-btn:active { 
     transform: translateY(2px); 
     box-shadow: 0 2px 0 #5a2a0a; 
 }
+
 .fight-btn.disabled { 
     background: #5e4b36; 
     pointer-events: none; 
     opacity: 0.6; 
 }
+
 .reset-btn { 
     background: linear-gradient(145deg, #2a471f, #1a3012); 
     box-shadow: 0 4px 0 #1a2a0a; 
     flex: 1;
 }
 
-/* Лог уменьшен, чтобы не вылезать */
 .log { 
     background: #090c07e0; 
     border-radius: 20px; 
@@ -407,15 +536,15 @@ body {
     border: 1px solid #c9a45b; 
     font-size: 0.8rem; 
 }
+
 .deck-counter { 
-    display: none; /* скрываем старый счётчик героев, чтобы не мешал */
+    display: none;
 }
-/* Убираем визуально надпись "Выбрано героев: 0/3" */
+
 .player-card .deck-counter {
     display: none;
 }
 
-/* Сброс статистики мелкий */
 .reset-stats-btn { 
     background: #4a3a2a; 
     border: 1px solid #a77b44; 
@@ -441,6 +570,7 @@ body {
     border-width: 4px;
     animation: fireGlow 1.5s infinite alternate;
 }
+
 @keyframes fireGlow {
     from { box-shadow: 0 6px 0 #3a2a1a, 0 0 12px #ff6600, 0 0 25px #ffaa00; }
     to { box-shadow: 0 6px 0 #3a2a1a, 0 0 22px #ff4400, 0 0 45px #ffcc00; }
@@ -452,10 +582,12 @@ body {
     color: gold; 
     margin: 5px 0; 
 }
+
 .hidden-card { 
     filter: brightness(0.15) blur(4px); 
     pointer-events: none; 
 }
+
 .hidden-card .hero-name, 
 .hidden-card .hero-subtitle, 
 .hidden-card .hero-power-badge, 
@@ -463,6 +595,7 @@ body {
 .hidden-card .hero-record { 
     visibility: hidden; 
 }
+
 .hidden-card .hero-icons-row { 
     visibility: hidden; 
 }
@@ -481,6 +614,7 @@ body {
     align-items: center; 
     justify-content: center; 
 }
+
 .result-content { 
     max-width: 1000px; 
     width: 90%; 
@@ -489,18 +623,21 @@ body {
     border-radius: 40px; 
     padding: 25px; 
 }
+
 .result-title { 
     text-align: center; 
     font-size: 2rem; 
     color: #ffdfa5; 
     margin-bottom: 15px; 
 }
+
 .result-comparison { 
     display: flex; 
     gap: 25px; 
     justify-content: center; 
     flex-wrap: wrap;
 }
+
 .result-hero { 
     flex: 1; 
     background: #1a1a1a; 
@@ -509,14 +646,17 @@ body {
     border: 2px solid; 
     text-align: center; 
 }
+
 .result-hero.winner { 
     border-color: gold; 
     box-shadow: 0 0 25px gold; 
 }
+
 .result-hero.loser { 
     border-color: #8b0000; 
     opacity: 0.8; 
 }
+
 .result-portrait { 
     width: 100%; 
     height: 170px; 
@@ -525,11 +665,13 @@ body {
     margin-bottom: 12px; 
     border: 2px solid #a77b44; 
 }
+
 .result-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
 }
+
 .result-power-large { 
     font-size: 1.6rem; 
     font-weight: bold; 
@@ -540,12 +682,14 @@ body {
     border-radius: 40px; 
     margin: 8px 0; 
 }
+
 .result-stats { 
     display: grid; 
     grid-template-columns: 1fr 1fr; 
     gap: 8px; 
     margin: 12px 0; 
 }
+
 .result-stat { 
     display: flex; 
     justify-content: space-between; 
@@ -554,12 +698,14 @@ body {
     border-radius: 10px; 
     font-size: 0.9rem; 
 }
+
 .result-vs { 
     display: flex; 
     align-items: center; 
     font-size: 2.5rem; 
     color: gold; 
 }
+
 .result-close-btn { 
     display: block; 
     margin: 20px auto 0; 
@@ -589,17 +735,20 @@ body {
     text-align: center; 
     padding: 20px; 
 }
+
 .victory-screen h2 { 
     font-size: 3rem; 
     color: gold; 
     text-shadow: 0 0 20px orange; 
     animation: pulse 1.5s infinite; 
 }
+
 .defeat-screen h2 { 
     font-size: 3rem; 
     color: #8b0000; 
     text-shadow: 0 0 20px red; 
 }
+
 @keyframes pulse { 
     0% { transform: scale(1); } 
     50% { transform: scale(1.03); text-shadow: 0 0 40px gold; } 
@@ -613,6 +762,7 @@ body {
     background: #1a1a1a;
     border-radius: 3px;
 }
+
 .hero-cards::-webkit-scrollbar-thumb,
 .event-cards-row::-webkit-scrollbar-thumb {
     background: #c9a45b;
@@ -627,6 +777,7 @@ body {
     .event-portrait { height: 180px; }
     .player-card { min-width: 300px; }
 }
+
 @media (max-width: 800px) {
     .game-container { padding: 12px 16px; }
     .hero-cards { flex-wrap: wrap; justify-content: center; }
@@ -635,4 +786,3 @@ body {
     .top-bar { flex-direction: column; align-items: stretch; }
     .actions-row { flex-direction: column; }
 }
-    </style>
