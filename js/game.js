@@ -587,8 +587,303 @@ function checkEmptyHands() {
     });
 }
 
-// Привязка событий
+// ========== МУЗЫКАЛЬНЫЙ ПЛЕЕР ==========
+
+const playlist = [
+    {
+        name: 'Эпическая битва',
+        file: 'battle_epic.mp3',
+        duration: '3:42'
+    },
+    {
+        name: 'Таверна у камина',
+        file: 'tavern_fire.mp3',
+        duration: '4:15'
+    },
+    {
+        name: 'Лесная мелодия',
+        file: 'forest_theme.mp3',
+        duration: '3:28'
+    },
+    {
+        name: 'Древние руины',
+        file: 'ancient_ruins.mp3',
+        duration: '5:02'
+    },
+    {
+        name: 'Марш королей',
+        file: 'kings_march.mp3',
+        duration: '2:55'
+    }
+];
+
+const MUSIC_BASE_URL = 'https://raw.githubusercontent.com/StaleGradov/CARD/main/images/';
+
+let currentTrackIndex = 0;
+let isPlaying = false;
+let musicVolume = 0.3;
+
+const bgMusic = document.getElementById('bgMusic');
+const togglePlaylistBtn = document.getElementById('togglePlaylist');
+const playlistPanel = document.getElementById('playlistPanel');
+const closePlaylistBtn = document.getElementById('closePlaylist');
+const nowPlayingText = document.querySelector('.now-playing-text');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const prevTrackBtn = document.getElementById('prevTrackBtn');
+const nextTrackBtn = document.getElementById('nextTrackBtn');
+const volumeSlider = document.getElementById('volumeSlider');
+const volumeValue = document.getElementById('volumeValue');
+const playlistTracks = document.getElementById('playlistTracks');
+
+// Загрузка сохранённых настроек
+const savedVolume = localStorage.getItem('musicVolume');
+if (savedVolume) {
+    musicVolume = parseFloat(savedVolume);
+    if (volumeSlider) volumeSlider.value = musicVolume * 100;
+    if (volumeValue) volumeValue.textContent = Math.round(musicVolume * 100) + '%';
+}
+if (bgMusic) bgMusic.volume = musicVolume;
+
+const savedTrack = localStorage.getItem('currentTrack');
+if (savedTrack) {
+    currentTrackIndex = parseInt(savedTrack);
+}
+
+// Инициализация первого трека
+function initMusic() {
+    if (playlist.length > 0) {
+        loadTrack(currentTrackIndex);
+        renderPlaylist();
+    }
+}
+
+// Загрузка трека
+function loadTrack(index) {
+    if (index < 0) index = playlist.length - 1;
+    if (index >= playlist.length) index = 0;
+    
+    currentTrackIndex = index;
+    const track = playlist[currentTrackIndex];
+    if (bgMusic) bgMusic.src = MUSIC_BASE_URL + track.file;
+    
+    if (nowPlayingText) {
+        nowPlayingText.textContent = track.name;
+    }
+    
+    localStorage.setItem('currentTrack', currentTrackIndex);
+    renderPlaylist();
+    updateActiveTrack();
+}
+
+// Воспроизведение
+function playMusic() {
+    if (!bgMusic) return;
+    bgMusic.play().then(() => {
+        isPlaying = true;
+        updatePlayPauseButton();
+        if (togglePlaylistBtn) togglePlaylistBtn.classList.add('playing');
+    }).catch(e => {
+        console.log('Автовоспроизведение заблокировано, нажмите Play');
+        isPlaying = false;
+        updatePlayPauseButton();
+    });
+}
+
+// Пауза
+function pauseMusic() {
+    if (!bgMusic) return;
+    bgMusic.pause();
+    isPlaying = false;
+    updatePlayPauseButton();
+    if (togglePlaylistBtn) togglePlaylistBtn.classList.remove('playing');
+}
+
+// Переключение Play/Pause
+function togglePlayPause() {
+    if (isPlaying) {
+        pauseMusic();
+    } else {
+        playMusic();
+    }
+}
+
+// Обновление кнопки Play/Pause
+function updatePlayPauseButton() {
+    if (playPauseBtn) {
+        playPauseBtn.textContent = isPlaying ? '⏸️' : '▶️';
+    }
+}
+
+// Предыдущий трек
+function prevTrack() {
+    currentTrackIndex--;
+    if (currentTrackIndex < 0) currentTrackIndex = playlist.length - 1;
+    loadTrack(currentTrackIndex);
+    if (isPlaying) {
+        playMusic();
+    }
+}
+
+// Следующий трек
+function nextTrack() {
+    currentTrackIndex++;
+    if (currentTrackIndex >= playlist.length) currentTrackIndex = 0;
+    loadTrack(currentTrackIndex);
+    if (isPlaying) {
+        playMusic();
+    }
+}
+
+// Рендер плейлиста
+function renderPlaylist() {
+    if (!playlistTracks) return;
+    
+    playlistTracks.innerHTML = '';
+    
+    playlist.forEach((track, index) => {
+        const trackEl = document.createElement('div');
+        trackEl.className = 'playlist-track' + (index === currentTrackIndex ? ' active' : '');
+        trackEl.innerHTML = `
+            <span class="playlist-track-icon">🎵</span>
+            <div class="playlist-track-info">
+                <div class="playlist-track-name">${track.name}</div>
+                <div class="playlist-track-duration">${track.duration}</div>
+            </div>
+            ${index === currentTrackIndex ? '<span class="playlist-track-playing">▶️</span>' : ''}
+        `;
+        
+        trackEl.addEventListener('click', () => {
+            loadTrack(index);
+            if (!isPlaying) {
+                playMusic();
+            } else {
+                playMusic();
+            }
+        });
+        
+        playlistTracks.appendChild(trackEl);
+    });
+}
+
+// Обновление активного трека в плейлисте
+function updateActiveTrack() {
+    const tracks = document.querySelectorAll('.playlist-track');
+    tracks.forEach((track, index) => {
+        if (index === currentTrackIndex) {
+            track.classList.add('active');
+            const playingIndicator = track.querySelector('.playlist-track-playing');
+            if (!playingIndicator) {
+                const indicator = document.createElement('span');
+                indicator.className = 'playlist-track-playing';
+                indicator.textContent = '▶️';
+                track.appendChild(indicator);
+            }
+        } else {
+            track.classList.remove('active');
+            const playingIndicator = track.querySelector('.playlist-track-playing');
+            if (playingIndicator) {
+                playingIndicator.remove();
+            }
+        }
+    });
+}
+
+// Изменение громкости
+function changeVolume(value) {
+    musicVolume = value / 100;
+    if (bgMusic) bgMusic.volume = musicVolume;
+    if (volumeValue) {
+        volumeValue.textContent = Math.round(musicVolume * 100) + '%';
+    }
+    localStorage.setItem('musicVolume', musicVolume);
+}
+
+// Переключение панели плейлиста
+function togglePlaylistPanel() {
+    if (playlistPanel) playlistPanel.classList.toggle('hidden');
+}
+
+// Привязка событий плеера
+function bindMusicEvents() {
+    if (togglePlaylistBtn) {
+        togglePlaylistBtn.addEventListener('click', togglePlaylistPanel);
+    }
+    
+    if (closePlaylistBtn) {
+        closePlaylistBtn.addEventListener('click', () => {
+            if (playlistPanel) playlistPanel.classList.add('hidden');
+        });
+    }
+    
+    if (playPauseBtn) {
+        playPauseBtn.addEventListener('click', togglePlayPause);
+    }
+    
+    if (prevTrackBtn) {
+        prevTrackBtn.addEventListener('click', prevTrack);
+    }
+    
+    if (nextTrackBtn) {
+        nextTrackBtn.addEventListener('click', nextTrack);
+    }
+    
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+            changeVolume(e.target.value);
+        });
+    }
+    
+    if (bgMusic) {
+        bgMusic.addEventListener('ended', () => {
+            nextTrack();
+        });
+        
+        bgMusic.addEventListener('play', () => {
+            isPlaying = true;
+            updatePlayPauseButton();
+            if (togglePlaylistBtn) togglePlaylistBtn.classList.add('playing');
+        });
+        
+        bgMusic.addEventListener('pause', () => {
+            isPlaying = false;
+            updatePlayPauseButton();
+            if (togglePlaylistBtn) togglePlaylistBtn.classList.remove('playing');
+        });
+        
+        bgMusic.addEventListener('error', (e) => {
+            console.log('Ошибка загрузки трека:', e);
+            addLog('⚠️ Не удалось загрузить музыкальный трек');
+            nextTrack();
+        });
+    }
+}
+
+// Первый запуск музыки при клике (обход блокировки автовоспроизведения)
+document.addEventListener('click', function initMusicOnFirstClick() {
+    if (playlist.length > 0 && bgMusic && !bgMusic.src) {
+        loadTrack(currentTrackIndex);
+    }
+    document.removeEventListener('click', initMusicOnFirstClick);
+}, { once: true });
+
+// Закрытие плейлиста при клике вне его
+document.addEventListener('click', (e) => {
+    if (playlistPanel && !playlistPanel.classList.contains('hidden')) {
+        const isClickInside = playlistPanel.contains(e.target) || 
+                              (togglePlaylistBtn && togglePlaylistBtn.contains(e.target));
+        if (!isClickInside) {
+            playlistPanel.classList.add('hidden');
+        }
+    }
+});
+
+// ========== ПРИВЯЗКА ОСНОВНЫХ СОБЫТИЙ ИГРЫ ==========
 document.addEventListener('DOMContentLoaded', () => {
+    // Инициализация музыки
+    initMusic();
+    bindMusicEvents();
+    
+    // Основные события игры
     document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', (e) => {
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
