@@ -255,10 +255,10 @@ body {
     border-color: gold !important; 
 }
 
-/* ПОРТРЕТ — занимает 60% высоты карточки */
+/* ПОРТРЕТ — увеличен до 63% (чуть подрезаем картинку) */
 .hero-portrait { 
     width: 100%;
-    height: 60%;
+    height: 63%;
     position: relative;
     flex-shrink: 0;
     background: #0d0d0d;
@@ -280,17 +280,17 @@ body {
     pointer-events: none;
 }
 
-/* ИНФОРМАЦИОННАЯ ЧАСТЬ — 40% высоты, без прокрутки */
+/* ИНФОРМАЦИОННАЯ ЧАСТЬ — 37% высоты, увеличенные шрифты */
 .hero-info { 
-    height: 40%;
-    padding: 4px 6px 6px;
+    height: 37%;
+    padding: 5px 7px 6px;
     background: var(--parchment-bg) center/cover no-repeat;
     background-color: rgba(30, 25, 18, 0.85);
     background-blend-mode: multiply;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
     position: relative;
     border-top: 2px solid rgba(199, 161, 91, 0.6);
     box-shadow: inset 0 0 15px rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.3);
@@ -298,23 +298,23 @@ body {
 }
 
 .hero-name { 
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: bold; 
     text-align: center; 
-    margin-bottom: 0px; 
+    margin-bottom: 1px; 
     color: #ffefc0; 
     text-transform: uppercase; 
     letter-spacing: 0.5px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    line-height: 1.1;
+    line-height: 1.15;
 }
 
 .hero-subtitle { 
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     font-weight: 500;
     opacity: 0.9; 
     text-align: center; 
-    margin-bottom: 1px;
+    margin-bottom: 2px;
     color: #f5e2b0;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
@@ -322,8 +322,8 @@ body {
 .hero-icons-row { 
     display: flex; 
     justify-content: center; 
-    gap: 4px;
-    margin: 0px;
+    gap: 6px;
+    margin: 2px 0;
     flex-wrap: wrap;
 }
 
@@ -331,22 +331,22 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     font-weight: bold;
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(2px);
-    padding: 1px 4px;
+    padding: 2px 6px;
     border-radius: 20px; 
     border: 1px solid rgba(201, 164, 91, 0.5);
-    gap: 0px;
-    min-width: 38px;
+    gap: 1px;
+    min-width: 48px;
 }
 .hero-icon span:first-child {
-    font-size: 0.65rem;
+    font-size: 0.8rem;
     font-weight: normal;
 }
 .hero-icon span:last-child { 
-    font-size: 0.45rem;
+    font-size: 0.55rem;
     opacity: 0.9;
     font-weight: normal;
     letter-spacing: 0px;
@@ -354,15 +354,15 @@ body {
 
 .hero-power-badge { 
     text-align: center; 
-    margin: 0px;
+    margin: 1px 0;
 }
 .power-value { 
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(2px);
-    padding: 1px 8px;
+    padding: 2px 10px;
     border-radius: 30px; 
     font-weight: bold; 
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     border: 1px solid #ffd58c; 
     color: #ffd58c;
     display: inline-block;
@@ -373,8 +373,8 @@ body {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    margin: 0px;
+    gap: 3px;
+    margin: 2px 0 0;
 }
 
 .stat-row { 
@@ -383,7 +383,7 @@ body {
 .label-group { 
     display: flex; 
     justify-content: space-between; 
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     font-weight: 500;
     margin-bottom: 1px; 
     opacity: 0.95;
@@ -393,10 +393,10 @@ body {
 .stat-value {
     font-weight: bold;
     color: #ffefb0;
-    font-size: 0.55rem;
+    font-size: 0.65rem;
 }
 .bar-bg { 
-    height: 3px;
+    height: 4px;
     background: rgba(0, 0, 0, 0.5); 
     border-radius: 2px; 
     overflow: hidden; 
@@ -410,7 +410,7 @@ body {
 .hp-bar { background: var(--hp-color); box-shadow: 0 0 3px var(--hp-color); }
 .armor-bar { background: var(--armor-color); box-shadow: 0 0 3px var(--armor-color); }
 .dmg-bar { background: var(--dmg-color); box-shadow: 0 0 3px var(--dmg-color); }
-.gold-bar { background: var(--gold-color); box-shadow: 0 0 3px var(--gold-color); }
+.gold-bar { background: var(--gold-color); box-shadow: 0 0 4px var(--gold-color); }
 
 /* Скрытая статистика побед/поражений */
 .hero-record { 
@@ -670,27 +670,27 @@ body {
         height: 339px;
     }
     .hero-icon {
-        min-width: 35px;
-        padding: 1px 3px;
+        min-width: 42px;
+        padding: 1px 4px;
     }
     .hero-icon span:first-child {
-        font-size: 0.6rem;
+        font-size: 0.7rem;
     }
     .hero-icon span:last-child {
-        font-size: 0.4rem;
+        font-size: 0.5rem;
     }
     .hero-name {
-        font-size: 0.75rem;
+        font-size: 0.85rem;
     }
     .hero-subtitle {
-        font-size: 0.55rem;
+        font-size: 0.6rem;
     }
     .power-value {
-        font-size: 0.65rem;
-        padding: 1px 6px;
+        font-size: 0.7rem;
+        padding: 1px 8px;
     }
     .label-group, .stat-value {
-        font-size: 0.5rem;
+        font-size: 0.6rem;
     }
 }
 
