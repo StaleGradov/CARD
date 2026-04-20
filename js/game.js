@@ -591,29 +591,29 @@ function checkEmptyHands() {
 
 const playlist = [
     {
-        name: 'Эпическая битва',
-        file: 'battle_epic.mp3',
-        duration: '3:42'
+        name: 'Основная Тема Игры',
+        file: '1.mp3',
+        duration: '1:05'
     },
     {
-        name: 'Таверна у камина',
-        file: 'tavern_fire.mp3',
-        duration: '4:15'
+        name: 'Раса Полурослики',
+        file: '2.mp3',
+        duration: '1:05'
     },
     {
-        name: 'Лесная мелодия',
-        file: 'forest_theme.mp3',
-        duration: '3:28'
+        name: 'Раса Феи',
+        file: '3.mp3',
+        duration: '1:12'
     },
     {
-        name: 'Древние руины',
-        file: 'ancient_ruins.mp3',
-        duration: '5:02'
+        name: 'Сага Вампиры',
+        file: '4.mp3',
+        duration: '1:05'
     },
     {
-        name: 'Марш королей',
-        file: 'kings_march.mp3',
-        duration: '2:55'
+        name: 'Раса Драконы',
+        file: '5.mp3',
+        duration: '1:05'
     }
 ];
 
