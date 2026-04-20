@@ -23,7 +23,7 @@ body {
 }
 
 .game-container { 
-    max-width: 2200px; 
+    max-width: 2800px; 
     width: 100%; 
     background: rgba(0, 0, 0, 0.8); 
     backdrop-filter: blur(4px); 
