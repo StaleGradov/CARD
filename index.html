@@ -36,7 +36,7 @@
     <button class="fight-btn reset-btn" id="resetGame" style="margin-top: 10px;">🔄 НОВАЯ КАМПАНИЯ</button>
 </div>
 
-<!-- Панель отладки (появляется по Ctrl+Shift+D) -->
+<!-- Панель отладки (Ctrl+Shift+D) -->
 <div id="debug-panel" style="
     position: fixed;
     bottom: 20px;
@@ -59,47 +59,37 @@
     </div>
     
     <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px;">🎨 Масштаб интерфейса: <span id="scale-value">100</span>%</label>
-        <input type="range" id="ui-scale" min="50" max="150" step="5" value="100" style="width: 100%;">
+        <label style="display: block; font-size: 12px;">📏 Ширина карточек героев: <span id="hero-width-val">260</span>px</label>
+        <input type="range" id="hero-width-slider" min="150" max="400" step="10" value="260" style="width: 100%;">
     </div>
     
     <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px;">📏 Ширина карточек героев: <span id="hero-width-value">260</span>px</label>
-        <input type="range" id="hero-width" min="150" max="400" step="10" value="260" style="width: 100%;">
+        <label style="display: block; font-size: 12px;">📏 Высота карточек героев: <span id="hero-height-val">260</span>px</label>
+        <input type="range" id="hero-height-slider" min="150" max="400" step="10" value="260" style="width: 100%;">
     </div>
     
     <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px;">📏 Высота карточек героев: <span id="hero-height-value">260</span>px</label>
-        <input type="range" id="hero-height" min="150" max="400" step="10" value="260" style="width: 100%;">
+        <label style="display: block; font-size: 12px;">🃏 Ширина карточек событий: <span id="event-width-val">400</span>px</label>
+        <input type="range" id="event-width-slider" min="250" max="700" step="10" value="400" style="width: 100%;">
     </div>
     
     <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px;">🃏 Ширина карточек событий: <span id="event-width-value">480</span>px</label>
-        <input type="range" id="event-width" min="250" max="700" step="10" value="480" style="width: 100%;">
+        <label style="display: block; font-size: 12px;">📝 Размер шрифта заголовка: <span id="title-font-val">2.5</span>rem</label>
+        <input type="range" id="title-font-slider" min="1" max="4" step="0.1" value="2.5" style="width: 100%;">
     </div>
     
     <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px;">📝 Размер шрифта заголовка: <span id="title-font-value">1.8</span>rem</label>
-        <input type="range" id="title-font" min="1" max="4" step="0.1" value="1.8" style="width: 100%;">
+        <label style="display: block; font-size: 12px;">📝 Размер шрифта текста: <span id="text-font-val">0.9</span>rem</label>
+        <input type="range" id="text-font-slider" min="0.6" max="1.5" step="0.05" value="0.9" style="width: 100%;">
     </div>
     
     <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px;">📝 Размер шрифта текста: <span id="text-font-value">0.9</span>rem</label>
-        <input type="range" id="text-font" min="0.6" max="1.5" step="0.05" value="0.9" style="width: 100%;">
-    </div>
-    
-    <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px;">📏 Отступы (padding): <span id="padding-value">16</span>px</label>
-        <input type="range" id="global-padding" min="5" max="40" step="2" value="16" style="width: 100%;">
-    </div>
-    
-    <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px;">🎴 Скругление углов: <span id="radius-value">20</span>px</label>
-        <input type="range" id="border-radius" min="5" max="50" step="2" value="20" style="width: 100%;">
+        <label style="display: block; font-size: 12px;">🎴 Скругление углов: <span id="radius-val">20</span>px</label>
+        <input type="range" id="radius-slider" min="5" max="50" step="2" value="20" style="width: 100%;">
     </div>
     
     <div style="margin-top: 12px;">
-        <button id="reset-debug" style="background: #ffd700; color: black; border: none; padding: 5px 10px; cursor: pointer; width: 100%; border-radius: 6px; font-weight: bold;">
+        <button id="reset-debug-btn" style="background: #ffd700; color: black; border: none; padding: 5px 10px; cursor: pointer; width: 100%; border-radius: 6px; font-weight: bold;">
             🔄 Сбросить настройки
         </button>
     </div>
@@ -107,135 +97,167 @@
 
 <script>
 // ==================== ОТЛАДОЧНЫЙ РЕЖИМ ====================
+// Работает без изменения существующих стилей и JS
 (function() {
-    const debugPanel = document.getElementById('debug-panel');
-    let debugEnabled = false;
+    const panel = document.getElementById('debug-panel');
     
     // Включение/выключение по Ctrl+Shift+D
     document.addEventListener('keydown', function(e) {
         if (e.ctrlKey && e.shiftKey && e.key === 'D') {
             e.preventDefault();
-            if (debugPanel.style.display === 'none' || debugPanel.style.display === '') {
-                debugPanel.style.display = 'block';
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'block';
                 loadCurrentValues();
             } else {
-                debugPanel.style.display = 'none';
+                panel.style.display = 'none';
             }
         }
     });
     
-    document.getElementById('close-debug').addEventListener('click', function() {
-        debugPanel.style.display = 'none';
-    });
+    document.getElementById('close-debug').onclick = () => panel.style.display = 'none';
     
-    // Функция загрузки текущих значений CSS-переменных
-    function loadCurrentValues() {
-        const root = document.documentElement;
+    // Функция применения стилей ко всем элементам
+    function applyStyles() {
+        const heroWidth = document.getElementById('hero-width-slider').value;
+        const heroHeight = document.getElementById('hero-height-slider').value;
+        const eventWidth = document.getElementById('event-width-slider').value;
+        const titleFont = document.getElementById('title-font-slider').value;
+        const textFont = document.getElementById('text-font-slider').value;
+        const radius = document.getElementById('radius-slider').value;
         
-        const scale = getComputedStyle(root).getPropertyValue('--ui-scale').trim() || '100';
-        document.getElementById('ui-scale').value = parseInt(scale);
-        document.getElementById('scale-value').innerText = scale;
+        // Обновляем отображаемые значения
+        document.getElementById('hero-width-val').innerText = heroWidth;
+        document.getElementById('hero-height-val').innerText = heroHeight;
+        document.getElementById('event-width-val').innerText = eventWidth;
+        document.getElementById('title-font-val').innerText = titleFont;
+        document.getElementById('text-font-val').innerText = textFont;
+        document.getElementById('radius-val').innerText = radius;
         
-        const heroW = getComputedStyle(root).getPropertyValue('--hero-card-width').trim() || '260';
-        document.getElementById('hero-width').value = parseInt(heroW);
-        document.getElementById('hero-width-value').innerText = heroW;
+        // Применяем стили к карточкам героев
+        const heroCards = document.querySelectorAll('.hero-card');
+        heroCards.forEach(card => {
+            card.style.width = heroWidth + 'px';
+            card.style.minWidth = heroWidth + 'px';
+            const portrait = card.querySelector('.hero-portrait');
+            if (portrait) portrait.style.height = heroHeight + 'px';
+        });
         
-        const heroH = getComputedStyle(root).getPropertyValue('--hero-card-height').trim() || '260';
-        document.getElementById('hero-height').value = parseInt(heroH);
-        document.getElementById('hero-height-value').innerText = heroH;
+        // Применяем стили к карточкам событий
+        const eventCards = document.querySelectorAll('.event-card');
+        eventCards.forEach(card => {
+            card.style.width = eventWidth + 'px';
+            card.style.minWidth = eventWidth + 'px';
+            const portrait = card.querySelector('.event-portrait');
+            if (portrait) portrait.style.height = (eventWidth * 0.45) + 'px';
+        });
         
-        const eventW = getComputedStyle(root).getPropertyValue('--event-card-width').trim() || '480';
-        document.getElementById('event-width').value = parseInt(eventW);
-        document.getElementById('event-width-value').innerText = eventW;
+        // Применяем шрифты
+        const title = document.querySelector('.title');
+        if (title) title.style.fontSize = titleFont + 'rem';
         
-        const titleFont = getComputedStyle(root).getPropertyValue('--title-font-size').trim() || '1.8';
-        document.getElementById('title-font').value = parseFloat(titleFont);
-        document.getElementById('title-font-value').innerText = titleFont;
+        const allText = document.querySelectorAll('.hero-name, .hero-subtitle, .power-value, .label-group, .hero-record, .event-name, .event-desc, .log, .player-name, .score-badge, .sub, .mode-btn, .fight-btn, .reset-stats-btn');
+        allText.forEach(el => {
+            if (el.classList.contains('title')) return;
+            if (el.classList.contains('player-name')) {
+                el.style.fontSize = (textFont * 1.5) + 'rem';
+            } else if (el.classList.contains('hero-name')) {
+                el.style.fontSize = (textFont * 1.0) + 'rem';
+            } else if (el.classList.contains('hero-subtitle')) {
+                el.style.fontSize = (textFont * 0.7) + 'rem';
+            } else if (el.classList.contains('event-name')) {
+                el.style.fontSize = (textFont * 1.1) + 'rem';
+            } else {
+                el.style.fontSize = textFont + 'rem';
+            }
+        });
         
-        const textFont = getComputedStyle(root).getPropertyValue('--text-font-size').trim() || '0.9';
-        document.getElementById('text-font').value = parseFloat(textFont);
-        document.getElementById('text-font-value').innerText = textFont;
-        
-        const padding = getComputedStyle(root).getPropertyValue('--global-padding').trim() || '16';
-        document.getElementById('global-padding').value = parseInt(padding);
-        document.getElementById('padding-value').innerText = padding;
-        
-        const radius = getComputedStyle(root).getPropertyValue('--border-radius').trim() || '20';
-        document.getElementById('border-radius').value = parseInt(radius);
-        document.getElementById('radius-value').innerText = radius;
+        // Применяем скругление
+        const roundedElements = document.querySelectorAll('.game-container, .player-card, .hero-card, .event-card, .log, .fight-btn, .mode-btn');
+        roundedElements.forEach(el => {
+            if (el.classList.contains('game-container')) {
+                el.style.borderRadius = (radius * 2.4) + 'px';
+            } else if (el.classList.contains('player-card')) {
+                el.style.borderRadius = (radius * 1.6) + 'px';
+            } else {
+                el.style.borderRadius = radius + 'px';
+            }
+        });
     }
     
-    // Применение всех настроек
-    function applySettings() {
-        const root = document.documentElement;
+    // Загрузка текущих значений из существующих элементов
+    function loadCurrentValues() {
+        const heroCard = document.querySelector('.hero-card');
+        if (heroCard) {
+            const currentWidth = heroCard.offsetWidth;
+            const portrait = heroCard.querySelector('.hero-portrait');
+            const currentHeight = portrait ? portrait.offsetHeight : 260;
+            document.getElementById('hero-width-slider').value = currentWidth;
+            document.getElementById('hero-height-slider').value = currentHeight;
+            document.getElementById('hero-width-val').innerText = currentWidth;
+            document.getElementById('hero-height-val').innerText = currentHeight;
+        }
         
-        const scale = document.getElementById('ui-scale').value;
-        root.style.setProperty('--ui-scale', scale + '%');
-        document.getElementById('scale-value').innerText = scale;
+        const eventCard = document.querySelector('.event-card');
+        if (eventCard) {
+            const currentWidth = eventCard.offsetWidth;
+            document.getElementById('event-width-slider').value = currentWidth;
+            document.getElementById('event-width-val').innerText = currentWidth;
+        }
         
-        const heroW = document.getElementById('hero-width').value;
-        root.style.setProperty('--hero-card-width', heroW + 'px');
-        document.getElementById('hero-width-value').innerText = heroW;
+        const title = document.querySelector('.title');
+        if (title) {
+            const currentFont = parseFloat(getComputedStyle(title).fontSize);
+            const currentRem = currentFont / 16;
+            document.getElementById('title-font-slider').value = currentRem;
+            document.getElementById('title-font-val').innerText = currentRem.toFixed(1);
+        }
         
-        const heroH = document.getElementById('hero-height').value;
-        root.style.setProperty('--hero-card-height', heroH + 'px');
-        document.getElementById('hero-height-value').innerText = heroH;
+        const log = document.querySelector('.log');
+        if (log) {
+            const currentFont = parseFloat(getComputedStyle(log).fontSize);
+            const currentRem = currentFont / 16;
+            document.getElementById('text-font-slider').value = currentRem;
+            document.getElementById('text-font-val').innerText = currentRem.toFixed(2);
+        }
         
-        const eventW = document.getElementById('event-width').value;
-        root.style.setProperty('--event-card-width', eventW + 'px');
-        document.getElementById('event-width-value').innerText = eventW;
-        
-        const titleFont = document.getElementById('title-font').value;
-        root.style.setProperty('--title-font-size', titleFont + 'rem');
-        document.getElementById('title-font-value').innerText = titleFont;
-        
-        const textFont = document.getElementById('text-font').value;
-        root.style.setProperty('--text-font-size', textFont + 'rem');
-        document.getElementById('text-font-value').innerText = textFont;
-        
-        const padding = document.getElementById('global-padding').value;
-        root.style.setProperty('--global-padding', padding + 'px');
-        document.getElementById('padding-value').innerText = padding;
-        
-        const radius = document.getElementById('border-radius').value;
-        root.style.setProperty('--border-radius', radius + 'px');
-        document.getElementById('radius-value').innerText = radius;
+        const container = document.querySelector('.game-container');
+        if (container) {
+            const currentRadius = parseFloat(getComputedStyle(container).borderRadius);
+            document.getElementById('radius-slider').value = currentRadius / 2.4;
+            document.getElementById('radius-val').innerText = Math.round(currentRadius / 2.4);
+        }
     }
     
     // Сброс всех настроек
     function resetSettings() {
-        document.getElementById('ui-scale').value = 100;
-        document.getElementById('hero-width').value = 260;
-        document.getElementById('hero-height').value = 260;
-        document.getElementById('event-width').value = 480;
-        document.getElementById('title-font').value = 1.8;
-        document.getElementById('text-font').value = 0.9;
-        document.getElementById('global-padding').value = 16;
-        document.getElementById('border-radius').value = 20;
-        applySettings();
+        document.getElementById('hero-width-slider').value = 260;
+        document.getElementById('hero-height-slider').value = 260;
+        document.getElementById('event-width-slider').value = 400;
+        document.getElementById('title-font-slider').value = 2.5;
+        document.getElementById('text-font-slider').value = 0.9;
+        document.getElementById('radius-slider').value = 20;
+        applyStyles();
     }
     
     // Подписка на события
-    document.getElementById('ui-scale').addEventListener('input', applySettings);
-    document.getElementById('hero-width').addEventListener('input', applySettings);
-    document.getElementById('hero-height').addEventListener('input', applySettings);
-    document.getElementById('event-width').addEventListener('input', applySettings);
-    document.getElementById('title-font').addEventListener('input', applySettings);
-    document.getElementById('text-font').addEventListener('input', applySettings);
-    document.getElementById('global-padding').addEventListener('input', applySettings);
-    document.getElementById('border-radius').addEventListener('input', applySettings);
-    document.getElementById('reset-debug').addEventListener('click', resetSettings);
+    document.getElementById('hero-width-slider').addEventListener('input', applyStyles);
+    document.getElementById('hero-height-slider').addEventListener('input', applyStyles);
+    document.getElementById('event-width-slider').addEventListener('input', applyStyles);
+    document.getElementById('title-font-slider').addEventListener('input', applyStyles);
+    document.getElementById('text-font-slider').addEventListener('input', applyStyles);
+    document.getElementById('radius-slider').addEventListener('input', applyStyles);
+    document.getElementById('reset-debug-btn').addEventListener('click', resetSettings);
     
-    // Инициализация CSS-переменных при загрузке
-    const root = document.documentElement;
-    if (!root.style.getPropertyValue('--ui-scale')) root.style.setProperty('--ui-scale', '100%');
-    if (!root.style.getPropertyValue('--hero-card-width')) root.style.setProperty('--hero-card-width', '260px');
-    if (!root.style.getPropertyValue('--hero-card-height')) root.style.setProperty('--hero-card-height', '260px');
-    if (!root.style.getPropertyValue('--event-card-width')) root.style.setProperty('--event-card-width', '480px');
-    if (!root.style.getPropertyValue('--title-font-size')) root.style.setProperty('--title-font-size', '1.8rem');
-    if (!root.style.getPropertyValue('--text-font-size')) root.style.setProperty('--text-font-size', '0.9rem');
-    if (!root.style.getPropertyValue('--global-padding')) root.style.setProperty('--global-padding', '16px');
-    if (!root.style.getPropertyValue('--border-radius')) root.style.setProperty('--border-radius', '20px');
+    // Наблюдатель за появлением новых карточек (для динамически создаваемых)
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length > 0) {
+                applyStyles();
+            }
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 
