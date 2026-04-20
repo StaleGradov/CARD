@@ -226,13 +226,15 @@ body {
     padding: 5px 2px;
 }
 
-/* НОВЫЕ ПРОПОРЦИИ КАРТОЧКИ ГЕРОЯ: высота примерно 1.5 от ширины */
+/* ========= КАРТОЧКИ С ТОЧНЫМИ ПРОПОРЦИЯМИ А6 (1:1.414) ========= */
 .hero-card { 
-    flex: 1 1 0;
-    min-width: 260px;      /* чуть уже для лучшей пропорции */
-    max-width: 380px;      /* ограничиваем максимальную ширину */
+    flex: 0 0 auto;
+    width: 280px;           /* Базовая ширина */
+    height: 396px;          /* 280 × 1.414 = 395.92 ≈ 396px */
+    min-width: auto;
+    max-width: none;
     background: #1a1a1a; 
-    border-radius: 24px; 
+    border-radius: 20px; 
     overflow: hidden; 
     border: 3px solid;
     box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(0,0,0,0.5); 
@@ -241,7 +243,6 @@ body {
     transition: all 0.2s ease; 
     display: flex; 
     flex-direction: column;
-    height: auto;
 }
 .hero-card:hover { 
     transform: translateY(-4px); 
@@ -254,10 +255,10 @@ body {
     border-color: gold !important; 
 }
 
-/* ПОРТРЕТ — теперь занимает больше места (примерно 60-65% высоты карточки) */
+/* ПОРТРЕТ — занимает ровно 65% высоты карточки А6 */
 .hero-portrait { 
     width: 100%;
-    aspect-ratio: 1 / 0.85;  /* Ширина относится к высоте как 1 : 0.85 → портрет высокий */
+    height: 65%;            /* 65% от 396px = ~257px */
     position: relative;
     flex-shrink: 0;
     background: #0d0d0d;
@@ -265,7 +266,7 @@ body {
 .hero-portrait img { 
     width: 100%; 
     height: 100%; 
-    object-fit: cover;    /* картинка не растягивается, а обрезается сохраняя пропорции */
+    object-fit: cover;     /* картинка не растягивается, а обрезается */
     display: block;
 }
 .hero-portrait::after { 
@@ -279,35 +280,46 @@ body {
     pointer-events: none;
 }
 
-/* ИНФОРМАЦИОННАЯ ЧАСТЬ — компактнее, с наложением пергамента */
+/* ИНФОРМАЦИОННАЯ ЧАСТЬ — 35% высоты, компактно */
 .hero-info { 
-    padding: 8px 10px 10px;   /* уменьшили отступы */
+    height: 35%;            /* 35% от 396px = ~139px */
+    padding: 6px 8px 8px;
     background: var(--parchment-bg) center/cover no-repeat;
-    background-color: rgba(30, 25, 18, 0.75);
+    background-color: rgba(30, 25, 18, 0.8);
     background-blend-mode: multiply;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;                 /* уменьшили расстояние между элементами */
+    gap: 4px;
     position: relative;
     border-top: 2px solid rgba(199, 161, 91, 0.6);
     box-shadow: inset 0 0 15px rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.3);
+    overflow-y: auto;       /* если текста много — скролл */
+}
+
+/* Убираем скроллбар, если не нужно (чисто для эстетики) */
+.hero-info::-webkit-scrollbar {
+    width: 3px;
+}
+.hero-info::-webkit-scrollbar-thumb {
+    background: #c9a45b;
+    border-radius: 3px;
 }
 
 .hero-name { 
-    font-size: 1.15rem;       /* чуть мельче */
+    font-size: 1rem;
     font-weight: bold; 
     text-align: center; 
     margin-bottom: 0px; 
     color: #ffefc0; 
     text-transform: uppercase; 
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     line-height: 1.2;
 }
 
 .hero-subtitle { 
-    font-size: 0.8rem;        /* мельче */
+    font-size: 0.7rem;
     font-weight: 500;
     opacity: 0.9; 
     text-align: center; 
@@ -319,8 +331,8 @@ body {
 .hero-icons-row { 
     display: flex; 
     justify-content: center; 
-    gap: 8px;                /* уменьшили отступ */
-    margin: 2px 0;
+    gap: 6px;
+    margin: 1px 0;
     flex-wrap: wrap;
 }
 
@@ -328,50 +340,50 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    font-size: 1rem;          /* мельче */
+    font-size: 0.85rem;
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(2px);
-    padding: 3px 7px;         /* меньше паддинг */
+    padding: 2px 6px;
     border-radius: 30px; 
     border: 1px solid rgba(201, 164, 91, 0.6);
-    gap: 2px;
-    min-width: 55px;
+    gap: 1px;
+    min-width: 48px;
 }
 .hero-icon span:first-child {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: normal;
 }
 .hero-icon span:last-child { 
-    font-size: 0.55rem;
+    font-size: 0.5rem;
     opacity: 0.9;
     font-weight: normal;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
 }
 
 .hero-power-badge { 
     text-align: center; 
-    margin: 2px 0;
+    margin: 1px 0;
 }
 .power-value { 
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(2px);
-    padding: 3px 12px;        /* компактнее */
+    padding: 2px 10px;
     border-radius: 40px; 
     font-weight: bold; 
-    font-size: 1rem;          /* мельче */
+    font-size: 0.85rem;
     border: 1px solid #ffd58c; 
     color: #ffd58c;
     display: inline-block;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     text-shadow: 0 1px 1px black;
 }
 
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 6px;                 /* меньше отступ */
-    margin: 2px 0 0px;
+    gap: 4px;
+    margin: 1px 0 0px;
 }
 
 .stat-row { 
@@ -380,34 +392,34 @@ body {
 .label-group { 
     display: flex; 
     justify-content: space-between; 
-    font-size: 0.7rem;        /* мельче */
+    font-size: 0.6rem;
     font-weight: 500;
-    margin-bottom: 2px; 
+    margin-bottom: 1px; 
     opacity: 0.95;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
 .stat-value {
     font-weight: bold;
     color: #ffefb0;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
 }
 .bar-bg { 
-    height: 4px;              /* тоньше полоски */
+    height: 3px;
     background: rgba(0, 0, 0, 0.5); 
-    border-radius: 3px; 
+    border-radius: 2px; 
     overflow: hidden; 
 }
 .bar-fill { 
     height: 100%; 
     width: 0; 
     transition: width 0.3s ease-out; 
-    border-radius: 3px;
+    border-radius: 2px;
 }
-.hp-bar { background: var(--hp-color); box-shadow: 0 0 4px var(--hp-color); }
-.armor-bar { background: var(--armor-color); box-shadow: 0 0 4px var(--armor-color); }
-.dmg-bar { background: var(--dmg-color); box-shadow: 0 0 4px var(--dmg-color); }
-.gold-bar { background: var(--gold-color); box-shadow: 0 0 4px var(--gold-color); }
+.hp-bar { background: var(--hp-color); box-shadow: 0 0 3px var(--hp-color); }
+.armor-bar { background: var(--armor-color); box-shadow: 0 0 3px var(--armor-color); }
+.dmg-bar { background: var(--dmg-color); box-shadow: 0 0 3px var(--dmg-color); }
+.gold-bar { background: var(--gold-color); box-shadow: 0 0 3px var(--gold-color); }
 
 /* Скрытая статистика побед/поражений */
 .hero-record { 
@@ -660,49 +672,71 @@ body {
     border-radius: 3px;
 }
 
-/* Адаптивность */
-@media (max-width: 1100px) {
-    .hero-card { min-width: 230px; max-width: 320px; }
-    .hero-portrait { aspect-ratio: 1 / 0.85; }
-    .hero-icon { min-width: 50px; padding: 3px 6px; }
-    .hero-icon span:first-child { font-size: 0.85rem; }
-    .hero-icon span:last-child { font-size: 0.5rem; }
-    .hero-name { font-size: 1rem; }
-    .hero-subtitle { font-size: 0.7rem; }
-    .power-value { font-size: 0.9rem; padding: 3px 10px; }
-    .label-group { font-size: 0.65rem; }
-    .stat-value { font-size: 0.65rem; }
-    .event-card { width: 380px; min-width: 320px; }
-    .event-portrait { height: 180px; }
-    .player-card { min-width: 300px; }
-}
-@media (max-width: 800px) {
-    .game-container { padding: 12px 16px; }
-    .hero-cards { flex-wrap: wrap; justify-content: center; }
-    .hero-card { flex: 0 1 250px; min-width: 240px; max-width: 280px; }
-    .hero-portrait { aspect-ratio: 1 / 0.85; }
-    .hero-icon { min-width: 48px; }
-    .stats-container { gap: 5px; }
-    .event-card { width: 100%; min-width: 260px; }
-    .top-bar { flex-direction: column; align-items: stretch; }
-    .actions-row { flex-direction: column; }
-}
-
-
-/* Режим для экспорта в А6 - временно включите этот класс на body */
-.a6-export-mode .hero-card {
-    width: 300px;
-    height: 424px;  /* 300 × 1.414 = 424 */
-    min-width: auto;
-    max-width: none;
+/* Адаптивность для разных экранов */
+@media (max-width: 900px) {
+    .hero-card {
+        width: 240px;
+        height: 339px;  /* 240 × 1.414 */
+    }
+    .hero-icon {
+        min-width: 42px;
+        padding: 1px 4px;
+    }
+    .hero-icon span:first-child {
+        font-size: 0.7rem;
+    }
+    .hero-name {
+        font-size: 0.85rem;
+    }
+    .hero-subtitle {
+        font-size: 0.6rem;
+    }
+    .power-value {
+        font-size: 0.7rem;
+        padding: 1px 8px;
+    }
+    .label-group, .stat-value {
+        font-size: 0.55rem;
+    }
 }
 
-.a6-export-mode .hero-portrait {
-    height: 65%;
-    aspect-ratio: auto;
+@media (max-width: 700px) {
+    .hero-cards {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .hero-card {
+        width: 260px;
+        height: 368px;
+    }
+    .player-card {
+        min-width: auto;
+    }
 }
 
-.a6-export-mode .hero-info {
-    height: 35%;
-    overflow-y: auto;
+@media (max-width: 550px) {
+    .hero-card {
+        width: 220px;
+        height: 311px;
+    }
+}
+
+/* Для печати / экспорта в А6 — идеальное соответствие */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+    .game-container {
+        padding: 0;
+        background: none;
+        box-shadow: none;
+    }
+    .hero-card {
+        width: 105mm;
+        height: 148mm;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
 }
