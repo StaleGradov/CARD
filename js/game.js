@@ -1,4 +1,4 @@
-// ---------- ИГРОВАЯ ЛОГИКА ----------
+// ---------- ИГРОВАЯ ЛОГИКА (ОБНОВЛЁННАЯ) ----------
 
 "use strict";
 
@@ -33,108 +33,65 @@ function resetAllStats() {
     updateUI();
 }
 
-// Генерация всех героев
+// Генерация всех героев (ИСПОЛЬЗУЕТ ГОТОВЫЕ СТАТЫ ИЗ RAW_HEROES)
 let ALL_HEROES = [];
 (function generateHeroes() {
-    const heroesByRace = {};
-    RAW_HEROES.forEach((h, idx) => { 
-        const race = h[1]; 
-        if (!heroesByRace[race]) heroesByRace[race] = []; 
-        heroesByRace[race].push({ data: h, originalIndex: idx }); 
-    });
-    
-    Object.keys(heroesByRace).forEach(race => 
-        heroesByRace[race].sort((a, b) => a.data[0].localeCompare(b.data[0]))
-    );
-    
-    const tempHeroes = new Array(RAW_HEROES.length);
-    
-    Object.keys(heroesByRace).forEach(race => {
-        const items = heroesByRace[race]; 
-        const [minPower, maxPower] = RACE_POWER_RANGE[race];
+    ALL_HEROES = RAW_HEROES.map((h, originalIndex) => {
+        // Формат RAW_HEROES: [Имя, Раса, Профессия, Сага, МОЩЬ, HP, DMG, ARM, GOLD]
+        const name = h[0];
+        const race = h[1];
+        const prof = h[2];
+        const saga = h[3];
+        const power = h[4];
+        const hp = h[5];
+        const dmg = h[6];
+        const arm = h[7];
+        const gold = h[8];
         
-        items.forEach((item, idx) => {
-            const [name, race, prof, saga] = item.data; 
-            const originalIndex = item.originalIndex;
-            const power = Math.round(minPower + (idx / Math.max(1, items.length - 1)) * (maxPower - minPower));
-            
-            let hp = 0, dmg = 0, arm = 0;
-            if (race === 'Дракон') { hp = Math.floor(power*0.35); dmg = Math.floor(power*0.40); arm = Math.floor(power*0.25); }
-            else if (race === 'Орк') { hp = Math.floor(power*0.30); dmg = Math.floor(power*0.45); arm = Math.floor(power*0.25); }
-            else if (race === 'Гном') { hp = Math.floor(power*0.30); dmg = Math.floor(power*0.25); arm = Math.floor(power*0.45); }
-            else if (race === 'Человек' || race === 'Эльф') { hp = Math.floor(power*0.35); dmg = Math.floor(power*0.35); arm = Math.floor(power*0.30); }
-            else if (race === 'Лайтар') { hp = Math.floor(power*0.30); dmg = Math.floor(power*0.45); arm = Math.floor(power*0.25); }
-            else { hp = Math.floor(power*0.25); dmg = Math.floor(power*0.40); arm = Math.floor(power*0.35); }
-            
-            const profMod = { hp: 0, dmg: 0, arm: 0 };
-            if (prof.includes('Гладиатор') || prof === 'Воин' || prof === 'Вождь') { profMod.hp = 5; profMod.dmg = 10; profMod.arm = 5; }
-            else if (prof === 'Кулачный боец') { profMod.dmg = 15; } 
-            else if (prof.includes('Охотник') || prof === 'Волхв смерти') { profMod.dmg = 15; profMod.arm = -5; }
-            else if (prof === 'Кузнец') { profMod.arm = 20; profMod.dmg = -5; } 
-            else if (prof.includes('Колдун')) { profMod.dmg = 15; profMod.hp = -5; }
-            else if (prof.includes('Знахарь')) { profMod.hp = 20; profMod.dmg = -10; } 
-            else if (prof.includes('Вор') || prof === 'Искатель древностей') { profMod.dmg = 10; profMod.arm = -5; }
-            else if (prof === 'Лучник') { profMod.dmg = 10; profMod.hp = -5; }
-            
-            hp = Math.max(1, hp + profMod.hp); 
-            dmg = Math.max(1, dmg + profMod.dmg); 
-            arm = Math.max(0, arm + profMod.arm);
-            
-            if (saga === 'Вулканор') { dmg += 3; arm += 2; } 
-            else if (saga === 'Корона Короля Вампиров') { hp += 5; dmg += 5; } 
-            else if (saga === 'Золотое Яйцо Дракона') { hp += 8; dmg += 8; } 
-            else if (saga === 'Амулет') { arm += 8; } 
-            else if (saga === 'Колодец с золотом') { hp += 4; dmg += 4; arm += 4; }
-            
-            const total = hp + dmg + arm, scale = power / total;
-            hp = Math.max(1, Math.floor(hp * scale)); 
-            dmg = Math.max(1, Math.floor(dmg * scale)); 
-            arm = Math.max(0, Math.floor(arm * scale));
-            
-            let diff = power - (hp + dmg + arm); 
-            if (diff > 0) hp += diff;
-            
-            let gold = (race === 'Дракон' ? 50 : race === 'Гном' ? 45 : race === 'Человек' ? 30 : 
-                       race === 'Эльф' ? 25 : race === 'Орк' ? 20 : race === 'Лайтар' ? 15 : 10);
-            if (prof.includes('Торговец')) gold += 30; 
-            else if (prof.includes('Кузнец')) gold += 20; 
-            else if (prof.includes('Вор')) gold += 15; 
-            else if (prof.includes('Искатель древностей')) gold += 15; 
-            else if (prof.includes('Вождь')) gold += 20; 
-            else if (prof.includes('Колдун')) gold += 10;
-            if (saga === 'Колодец с золотом') gold += 40; 
-            else if (saga === 'Золотое Яйцо Дракона') gold += 25; 
-            else if (saga === 'Корона Короля Вампиров') gold += 15; 
-            else if (saga === 'Питомцы') gold += 5;
-            gold = Math.max(5, gold);
-            
-            tempHeroes[originalIndex] = { 
-                id: `hero_${originalIndex}`, name, race, prof, saga, 
-                imageFile: `${IMAGE_BASE_URL}${originalIndex + 1}.jpg`, 
-                iconRace: RACE_ICONS[race], 
-                iconProf: PROF_ICONS[prof] || '📜', 
-                iconSaga: SAGA_ICONS[saga] || '✨', 
-                hp, dmg, arm, gold, power, 
-                maxHp: hp, maxDmg: dmg, maxArm: arm, maxGold: gold 
-            };
-        });
+        return { 
+            id: `hero_${originalIndex}`, 
+            name, 
+            race, 
+            prof, 
+            saga, 
+            power,
+            hp, 
+            dmg, 
+            arm, 
+            gold,
+            maxHp: hp, 
+            maxDmg: dmg, 
+            maxArm: arm, 
+            maxGold: gold,
+            imageFile: `${IMAGE_BASE_URL}${originalIndex + 1}.jpg`, 
+            iconRace: RACE_ICONS[race] || '❓', 
+            iconProf: PROF_ICONS[prof] || '📜', 
+            iconSaga: SAGA_ICONS[saga] || '✨'
+        };
     });
-    
-    ALL_HEROES = tempHeroes.filter(h => h);
 })();
 
 // Класс игрока
 class Player {
     constructor(id, isAI = false) { 
-        this.id = id; this.isAI = isAI; this.deck = []; this.hand = []; 
-        this.lazaret = []; this.score = 0; this.selectedHeroes = []; this.hasConfirmed = false; 
+        this.id = id; 
+        this.isAI = isAI; 
+        this.deck = []; 
+        this.hand = []; 
+        this.lazaret = []; 
+        this.score = 0; 
+        this.selectedHeroes = []; 
+        this.hasConfirmed = false; 
     }
 }
 
 // Глобальные переменные
 let players = [];
 let currentPlayerIndex = 0;
-let round = 1, gameWinner = null, battlePhase = 'select', gameMode = 2;
+let round = 1;
+let gameWinner = null;
+let battlePhase = 'select';
+let gameMode = 2;
 let eventDecks = { locations: [], kingdoms: [], professions: [], sagas: [] };
 let currentEvent = { location: null, kingdom: null, profession: null, saga: null };
 let aiTimeout = null;
@@ -145,8 +102,10 @@ function addLog(msg) {
     let p = document.createElement('div'); 
     p.innerHTML = msg; 
     const logEl = document.getElementById('log'); 
-    logEl.appendChild(p); 
-    logEl.scrollTop = 9999; 
+    if (logEl) {
+        logEl.appendChild(p); 
+        logEl.scrollTop = 9999;
+    }
 }
 
 function shuffle(arr) { 
@@ -185,6 +144,7 @@ function canAddToGroup(player, hero) {
 // Рендеринг арены
 function renderArena() {
     const container = document.getElementById('arenaContainer');
+    if (!container) return;
     container.innerHTML = '';
     players.forEach((p, idx) => {
         const card = document.createElement('div'); 
@@ -208,10 +168,12 @@ function initGame(mode = gameMode) {
     gameMode = mode;
     players = [];
     const numPlayers = (mode === 'pc') ? 2 : mode;
-    for (let i = 0; i < numPlayers; i++) players.push(new Player(i, (mode === 'pc' && i === 1)));
+    for (let i = 0; i < numPlayers; i++) {
+        players.push(new Player(i, (mode === 'pc' && i === 1)));
+    }
     
     const allHeroesCopy = shuffle([...ALL_HEROES]);
-    const cardsPerPlayer = Math.floor(106 / numPlayers);
+    const cardsPerPlayer = Math.floor(ALL_HEROES.length / numPlayers);
     players.forEach((p, idx) => {
         p.deck = allHeroesCopy.slice(idx * cardsPerPlayer, (idx + 1) * cardsPerPlayer);
         p.hand = p.deck.splice(0, 5);
@@ -240,54 +202,69 @@ function initGame(mode = gameMode) {
 
 // Обновление UI
 function updateUI() {
-    document.getElementById('roundDisplay').innerText = `${round}/5`;
-    const scores = players.map(p => p.score).join(' : ');
-    document.getElementById('scoreDisplay').innerText = scores;
+    const roundDisplay = document.getElementById('roundDisplay');
+    if (roundDisplay) roundDisplay.innerText = `${round}/5`;
+    
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    if (scoreDisplay) {
+        const scores = players.map(p => p.score).join(' : ');
+        scoreDisplay.innerText = scores;
+    }
     
     const actionBtn = document.getElementById('actionBtn');
+    const turnIndicator = document.getElementById('turnIndicator');
+    
     if (gameWinner !== null) {
-        document.getElementById('turnIndicator').innerText = '🏁 ИГРА ОКОНЧЕНА';
-        actionBtn.textContent = '🏆 ИГРА ЗАВЕРШЕНА';
-        actionBtn.disabled = true;
+        if (turnIndicator) turnIndicator.innerText = '🏁 ИГРА ОКОНЧЕНА';
+        if (actionBtn) {
+            actionBtn.textContent = '🏆 ИГРА ЗАВЕРШЕНА';
+            actionBtn.disabled = true;
+        }
     } else if (battlePhase === 'select') {
-        document.getElementById('turnIndicator').innerText = `🎲 Ход Фронта ${currentPlayerIndex + 1}`;
-        actionBtn.textContent = '✅ ЗАКОНЧИТЬ ВЫБОР';
-        actionBtn.disabled = false;
+        if (turnIndicator) turnIndicator.innerText = `🎲 Ход Фронта ${currentPlayerIndex + 1}`;
+        if (actionBtn) {
+            actionBtn.textContent = '✅ ЗАКОНЧИТЬ ВЫБОР';
+            actionBtn.disabled = false;
+        }
     } else {
-        document.getElementById('turnIndicator').innerText = '⚔️ БОЙ ИДЁТ...';
-        actionBtn.textContent = '⚔️ БОЙ ИДЁТ...';
-        actionBtn.disabled = true;
+        if (turnIndicator) turnIndicator.innerText = '⚔️ БОЙ ИДЁТ...';
+        if (actionBtn) {
+            actionBtn.textContent = '⚔️ БОЙ ИДЁТ...';
+            actionBtn.disabled = true;
+        }
     }
     
     // Карты событий
     const eventsContainer = document.getElementById('eventCardsContainer');
-    eventsContainer.innerHTML = '';
-    
-    const events = [
-        { type: 'location', data: currentEvent.location, defaultText: 'Локация (Раунд 2)' },
-        { type: 'kingdom', data: currentEvent.kingdom, defaultText: 'Королевство (Раунд 3)' },
-        { type: 'profession', data: currentEvent.profession, defaultText: 'Местность (Раунд 4)' },
-        { type: 'saga', data: currentEvent.saga, defaultText: 'Сага (Раунд 5)' }
-    ];
-    
-    events.forEach(event => {
-        const card = document.createElement('div');
-        card.className = 'event-card';
-        const imageNum = event.data?.imageNum;
-        const imagePath = imageNum ? `${IMAGE_BASE_URL}${imageNum}.jpg` : '';
+    if (eventsContainer) {
+        eventsContainer.innerHTML = '';
         
-        card.innerHTML = `
-            <div class="event-portrait">
-                ${imagePath ? `<img src="${imagePath}" alt="${event.data?.name || ''}" onerror="this.style.opacity='0.3'">` : ''}
-            </div>
-            <div class="event-info">
-                <div class="event-icon">${EVENT_ICONS[event.type]}</div>
-                <div class="event-name">${event.data?.name || '—'}</div>
-                <div class="event-desc">${event.data?.desc || event.defaultText}</div>
-            </div>
-        `;
-        eventsContainer.appendChild(card);
-    });
+        const events = [
+            { type: 'location', data: currentEvent.location, defaultText: 'Локация (Раунд 2)' },
+            { type: 'kingdom', data: currentEvent.kingdom, defaultText: 'Королевство (Раунд 3)' },
+            { type: 'profession', data: currentEvent.profession, defaultText: 'Местность (Раунд 4)' },
+            { type: 'saga', data: currentEvent.saga, defaultText: 'Сага (Раунд 5)' }
+        ];
+        
+        events.forEach(event => {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            const imageNum = event.data?.imageNum;
+            const imagePath = imageNum ? `${IMAGE_BASE_URL}${imageNum}.jpg` : '';
+            
+            card.innerHTML = `
+                <div class="event-portrait">
+                    ${imagePath ? `<img src="${imagePath}" alt="${event.data?.name || ''}" onerror="this.style.opacity='0.3'">` : ''}
+                </div>
+                <div class="event-info">
+                    <div class="event-icon">${EVENT_ICONS[event.type] || '📦'}</div>
+                    <div class="event-name">${event.data?.name || '—'}</div>
+                    <div class="event-desc">${event.data?.desc || event.defaultText}</div>
+                </div>
+            `;
+            eventsContainer.appendChild(card);
+        });
+    }
     
     // Карты игроков
     players.forEach((pl, idx) => {
@@ -618,9 +595,14 @@ document.addEventListener('DOMContentLoaded', () => {
         initGame(mode);
     }));
     
-    document.getElementById('actionBtn').onclick = processAction;
-    document.getElementById('resetGame').onclick = () => initGame(gameMode);
-    document.getElementById('resetStatsBtn').onclick = resetAllStats;
+    const actionBtn = document.getElementById('actionBtn');
+    if (actionBtn) actionBtn.onclick = processAction;
+    
+    const resetGameBtn = document.getElementById('resetGame');
+    if (resetGameBtn) resetGameBtn.onclick = () => initGame(gameMode);
+    
+    const resetStatsBtn = document.getElementById('resetStatsBtn');
+    if (resetStatsBtn) resetStatsBtn.onclick = resetAllStats;
     
     initGame(2);
 });
