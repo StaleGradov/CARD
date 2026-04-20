@@ -229,8 +229,8 @@ body {
 /* ========= КАРТОЧКИ С ТОЧНЫМИ ПРОПОРЦИЯМИ А6 (1:1.414) ========= */
 .hero-card { 
     flex: 0 0 auto;
-    width: 280px;           /* Базовая ширина */
-    height: 396px;          /* 280 × 1.414 = 395.92 ≈ 396px */
+    width: 280px;
+    height: 396px;
     min-width: auto;
     max-width: none;
     background: #1a1a1a; 
@@ -255,10 +255,10 @@ body {
     border-color: gold !important; 
 }
 
-/* ПОРТРЕТ — занимает ровно 65% высоты карточки А6 */
+/* ПОРТРЕТ — занимает 60% высоты карточки */
 .hero-portrait { 
     width: 100%;
-    height: 65%;            /* 65% от 396px = ~257px */
+    height: 60%;
     position: relative;
     flex-shrink: 0;
     background: #0d0d0d;
@@ -266,7 +266,7 @@ body {
 .hero-portrait img { 
     width: 100%; 
     height: 100%; 
-    object-fit: cover;     /* картинка не растягивается, а обрезается */
+    object-fit: cover;
     display: block;
 }
 .hero-portrait::after { 
@@ -280,34 +280,25 @@ body {
     pointer-events: none;
 }
 
-/* ИНФОРМАЦИОННАЯ ЧАСТЬ — 35% высоты, компактно */
+/* ИНФОРМАЦИОННАЯ ЧАСТЬ — 40% высоты, без прокрутки */
 .hero-info { 
-    height: 35%;            /* 35% от 396px = ~139px */
-    padding: 6px 8px 8px;
+    height: 40%;
+    padding: 4px 6px 6px;
     background: var(--parchment-bg) center/cover no-repeat;
-    background-color: rgba(30, 25, 18, 0.8);
+    background-color: rgba(30, 25, 18, 0.85);
     background-blend-mode: multiply;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     position: relative;
     border-top: 2px solid rgba(199, 161, 91, 0.6);
     box-shadow: inset 0 0 15px rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.3);
-    overflow-y: auto;       /* если текста много — скролл */
-}
-
-/* Убираем скроллбар, если не нужно (чисто для эстетики) */
-.hero-info::-webkit-scrollbar {
-    width: 3px;
-}
-.hero-info::-webkit-scrollbar-thumb {
-    background: #c9a45b;
-    border-radius: 3px;
+    overflow-y: visible;
 }
 
 .hero-name { 
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: bold; 
     text-align: center; 
     margin-bottom: 0px; 
@@ -315,15 +306,15 @@ body {
     text-transform: uppercase; 
     letter-spacing: 0.5px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    line-height: 1.2;
+    line-height: 1.1;
 }
 
 .hero-subtitle { 
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-weight: 500;
     opacity: 0.9; 
     text-align: center; 
-    margin-bottom: 2px;
+    margin-bottom: 1px;
     color: #f5e2b0;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
@@ -331,8 +322,8 @@ body {
 .hero-icons-row { 
     display: flex; 
     justify-content: center; 
-    gap: 6px;
-    margin: 1px 0;
+    gap: 4px;
+    margin: 0px;
     flex-wrap: wrap;
 }
 
@@ -340,38 +331,38 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(2px);
-    padding: 2px 6px;
-    border-radius: 30px; 
-    border: 1px solid rgba(201, 164, 91, 0.6);
-    gap: 1px;
-    min-width: 48px;
+    padding: 1px 4px;
+    border-radius: 20px; 
+    border: 1px solid rgba(201, 164, 91, 0.5);
+    gap: 0px;
+    min-width: 38px;
 }
 .hero-icon span:first-child {
-    font-size: 0.8rem;
+    font-size: 0.65rem;
     font-weight: normal;
 }
 .hero-icon span:last-child { 
-    font-size: 0.5rem;
+    font-size: 0.45rem;
     opacity: 0.9;
     font-weight: normal;
-    letter-spacing: 0.2px;
+    letter-spacing: 0px;
 }
 
 .hero-power-badge { 
     text-align: center; 
-    margin: 1px 0;
+    margin: 0px;
 }
 .power-value { 
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(2px);
-    padding: 2px 10px;
-    border-radius: 40px; 
+    padding: 1px 8px;
+    border-radius: 30px; 
     font-weight: bold; 
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     border: 1px solid #ffd58c; 
     color: #ffd58c;
     display: inline-block;
@@ -382,8 +373,8 @@ body {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin: 1px 0 0px;
+    gap: 2px;
+    margin: 0px;
 }
 
 .stat-row { 
@@ -392,17 +383,17 @@ body {
 .label-group { 
     display: flex; 
     justify-content: space-between; 
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-weight: 500;
     margin-bottom: 1px; 
     opacity: 0.95;
-    letter-spacing: 0.2px;
+    letter-spacing: 0px;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
 .stat-value {
     font-weight: bold;
     color: #ffefb0;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
 }
 .bar-bg { 
     height: 3px;
@@ -676,27 +667,30 @@ body {
 @media (max-width: 900px) {
     .hero-card {
         width: 240px;
-        height: 339px;  /* 240 × 1.414 */
+        height: 339px;
     }
     .hero-icon {
-        min-width: 42px;
-        padding: 1px 4px;
+        min-width: 35px;
+        padding: 1px 3px;
     }
     .hero-icon span:first-child {
-        font-size: 0.7rem;
-    }
-    .hero-name {
-        font-size: 0.85rem;
-    }
-    .hero-subtitle {
         font-size: 0.6rem;
     }
+    .hero-icon span:last-child {
+        font-size: 0.4rem;
+    }
+    .hero-name {
+        font-size: 0.75rem;
+    }
+    .hero-subtitle {
+        font-size: 0.55rem;
+    }
     .power-value {
-        font-size: 0.7rem;
-        padding: 1px 8px;
+        font-size: 0.65rem;
+        padding: 1px 6px;
     }
     .label-group, .stat-value {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
     }
 }
 
@@ -721,7 +715,7 @@ body {
     }
 }
 
-/* Для печати / экспорта в А6 — идеальное соответствие */
+/* Для печати / экспорта в А6 */
 @media print {
     body {
         background: white;
