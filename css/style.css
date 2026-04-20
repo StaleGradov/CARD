@@ -252,9 +252,10 @@ body {
     border-color: gold !important; 
 }
 
+/* Увеличенный портрет героя - занимает больше места за счет убранной статистики */
 .hero-portrait { 
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2; /* Было 4/3, теперь 3/2 - портрет выше */
     position: relative;
     flex-shrink: 0;
     background: #0d0d0d;
@@ -392,18 +393,10 @@ body {
 .dmg-bar { background: var(--dmg-color); box-shadow: 0 0 4px var(--dmg-color); }
 .gold-bar { background: var(--gold-color); box-shadow: 0 0 4px var(--gold-color); }
 
+/* Скрытая статистика побед/поражений — полностью убрана */
 .hero-record { 
-    display: flex; 
-    justify-content: center; 
-    gap: 16px; 
-    margin-top: 8px; 
-    padding-top: 8px; 
-    border-top: 1px solid #444; 
-    font-size: 0.75rem;
-    font-weight: 500;
+    display: none; /* Полностью скрываем блок с побед/поражений */
 }
-.record-win { color: #4caf50; } 
-.record-loss { color: #f44336; }
 
 .actions-row {
     display: flex;
@@ -654,7 +647,8 @@ body {
 /* Адаптивность */
 @media (max-width: 1100px) {
     .hero-card { min-width: 250px; }
-    .hero-portrait { aspect-ratio: 4 / 3; }
+    /* Портрет остается увеличенным 3/2 на всех разрешениях */
+    .hero-portrait { aspect-ratio: 3 / 2; }
     .hero-icon { min-width: 55px; padding: 4px 8px; }
     .hero-icon span:first-child { font-size: 1rem; }
     .hero-icon span:last-child { font-size: 0.6rem; }
@@ -670,9 +664,16 @@ body {
     .game-container { padding: 12px 16px; }
     .hero-cards { flex-wrap: wrap; justify-content: center; }
     .hero-card { flex: 0 1 260px; min-width: 260px; }
+    .hero-portrait { aspect-ratio: 3 / 2; } /* Сохраняем увеличенную высоту */
     .hero-icon { min-width: 60px; }
     .stats-container { gap: 8px; }
     .event-card { width: 100%; min-width: 260px; }
     .top-bar { flex-direction: column; align-items: stretch; }
     .actions-row { flex-direction: column; }
 }
+    </style>
+</head>
+<body>
+    <!-- Этот файл содержит ТОЛЬКО стили, HTML разметка не менялась -->
+</body>
+</html>
