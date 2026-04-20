@@ -185,7 +185,10 @@ body {
     backdrop-filter: blur(4px); 
     border: 2px solid #c9a45b; 
     box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3); 
-    position: relative; 
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
 }
 .player-name { 
     display: flex; 
@@ -201,6 +204,7 @@ body {
     color: #ffda99; 
     text-shadow: 0 1px 0 #5a3a1a; 
     border: 1px solid #b47c48; 
+    flex-shrink: 0;
 }
 .score-badge { 
     font-size: 1rem; 
@@ -211,23 +215,25 @@ body {
     border: 1px solid #e7bc7e; 
 }
 
-/* Контейнер героев: центрирование и заполнение ширины */
+/* Контейнер героев: заполнение ширины и высоты без прокрутки */
 .hero-cards { 
     display: flex; 
     flex-wrap: nowrap;
     gap: 12px; 
-    justify-content: center;   /* центрирование, если героев мало */
+    justify-content: center;
     align-items: stretch;
-    margin-top: 8px; 
-    min-height: 340px;
+    margin-top: 8px;
+    flex: 1;
+    min-height: 0;
     overflow-x: auto;
+    overflow-y: visible;
     padding: 5px 2px;
 }
 /* Каждый герой растягивается, но не мельче 200px */
 .hero-card { 
-    flex: 1 1 0;          /* занимает равномерно доступную ширину */
-    min-width: 200px;     /* минимальная ширина для читаемости */
-    max-width: 300px;     /* но не слишком огромный */
+    flex: 1 1 0;
+    min-width: 200px;
+    max-width: 300px;
     background: #1a1a1a; 
     border-radius: 20px; 
     overflow: hidden; 
@@ -237,7 +243,8 @@ body {
     cursor: pointer; 
     transition: all 0.2s ease; 
     display: flex; 
-    flex-direction: column; 
+    flex-direction: column;
+    height: auto;
 }
 .hero-card:hover { 
     transform: translateY(-4px); 
@@ -250,14 +257,17 @@ body {
     border-color: gold !important; 
 }
 .hero-portrait { 
-    width: 100%; 
-    height: 220px;
-    position: relative; 
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: none;
+    position: relative;
+    flex-shrink: 0;
 }
 .hero-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
+    display: block;
 }
 .hero-portrait::after { 
     content: ''; 
@@ -267,10 +277,12 @@ body {
     right: 0; 
     height: 40px; 
     background: linear-gradient(to top, #1a1a1a, transparent); 
+    pointer-events: none;
 }
 .hero-info { 
     padding: 8px 10px 10px; 
-    background: #1a1a1a; 
+    background: #1a1a1a;
+    flex-shrink: 0;
 }
 .hero-name { 
     font-size: 0.9rem; 
@@ -408,9 +420,8 @@ body {
     font-size: 0.8rem; 
 }
 .deck-counter { 
-    display: none; /* скрываем старый счётчик героев, чтобы не мешал */
+    display: none;
 }
-/* Убираем визуально надпись "Выбрано героев: 0/3" */
 .player-card .deck-counter {
     display: none;
 }
@@ -622,7 +633,7 @@ body {
 /* Адаптивность */
 @media (max-width: 1100px) {
     .hero-card { min-width: 170px; }
-    .hero-portrait { height: 190px; }
+    .hero-portrait { aspect-ratio: 1 / 1; }
     .event-card { width: 380px; min-width: 320px; }
     .event-portrait { height: 180px; }
     .player-card { min-width: 300px; }
@@ -635,4 +646,3 @@ body {
     .top-bar { flex-direction: column; align-items: stretch; }
     .actions-row { flex-direction: column; }
 }
-    </style>
