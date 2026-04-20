@@ -603,7 +603,7 @@ const playlist = [
     {
         name: 'Раса Феи',
         file: '3.mp3',
-        duration: '1:12'
+        duration: '2:43'
     },
     {
         name: 'Сага Вампиры',
