@@ -10,6 +10,15 @@
     --gold-color: #ffd700; 
     --bg-dark: #0d0d0d; 
     --parchment-bg: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/parchment.jpg');
+    
+    /* Новые переменные для фонов */
+    --bg-main: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/main_bg.jpg');
+    --bg-forest: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/forest.jpg');
+    --bg-mountains: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/mountains.jpg');
+    --bg-swamp: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/swamp.jpg');
+    --bg-cave: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/cave.jpg');
+    --bg-ruins: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/ruins.jpg');
+    --bg-village: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/village.jpg');
 }
 
 body { 
@@ -23,16 +32,46 @@ body {
     padding: 12px; 
 }
 
+/* === ОБЩИЙ ФОН КОНТЕЙНЕРА (по умолчанию main_bg) === */
 .game-container { 
     max-width: 3200px; 
     width: 100%; 
-    background: rgba(0, 0, 0, 0.75); 
+    background: var(--bg-main) center/cover no-repeat; /* <-- ФОН ДОБАВЛЕН */
+    background-color: rgba(0, 0, 0, 0.5); /* fallback если картинка не грузится */
+    background-blend-mode: overlay; /* Затемняем фон для читаемости */
     backdrop-filter: blur(4px); 
     border-radius: 48px; 
     padding: 16px 24px 20px; 
     border: 1px solid #e7bc7e; 
     box-shadow: 0 20px 35px rgba(0, 0, 0, 0.6); 
     position: relative; 
+    transition: background-image 0.5s ease-in-out;
+}
+
+/* === КЛАССЫ ДЛЯ СМЕНЫ ФОНА ПРИ ПОЯВЛЕНИИ ЛОКАЦИИ === */
+.game-container.bg-forest {
+    background: var(--bg-forest) center/cover no-repeat;
+    background-blend-mode: overlay;
+}
+.game-container.bg-mountains {
+    background: var(--bg-mountains) center/cover no-repeat;
+    background-blend-mode: overlay;
+}
+.game-container.bg-swamp {
+    background: var(--bg-swamp) center/cover no-repeat;
+    background-blend-mode: overlay;
+}
+.game-container.bg-cave {
+    background: var(--bg-cave) center/cover no-repeat;
+    background-blend-mode: overlay;
+}
+.game-container.bg-ruins {
+    background: var(--bg-ruins) center/cover no-repeat;
+    background-blend-mode: overlay;
+}
+.game-container.bg-village {
+    background: var(--bg-village) center/cover no-repeat;
+    background-blend-mode: overlay;
 }
 
 .title { 
