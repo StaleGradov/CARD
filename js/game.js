@@ -37,7 +37,7 @@ function resetAllStats() {
 let ALL_HEROES = [];
 (function generateHeroes() {
     ALL_HEROES = RAW_HEROES.map((h, originalIndex) => {
-        // Формат RAW_HEROES: [Имя, Раса, Профессия, Сага, МОЩЬ, HP, DMG, ARM, GOLD]
+        // Формат RAW_HEROES: [Имя, Раса, Профессия, Сага, МОЩЬ, HP, DMG, ARM, GOLD, IMAGE_NUM]
         const name = h[0];
         const race = h[1];
         const prof = h[2];
@@ -47,6 +47,7 @@ let ALL_HEROES = [];
         const dmg = h[6];
         const arm = h[7];
         const gold = h[8];
+        const imageNum = h[9];
         
         return { 
             id: `hero_${originalIndex}`, 
@@ -63,7 +64,7 @@ let ALL_HEROES = [];
             maxDmg: dmg, 
             maxArm: arm, 
             maxGold: gold,
-            imageFile: `${IMAGE_BASE_URL}${originalIndex + 1}.jpg`, 
+            imageFile: `${IMAGE_BASE_URL}${imageNum}.jpg`,
             iconRace: RACE_ICONS[race] || '❓', 
             iconProf: PROF_ICONS[prof] || '📜', 
             iconSaga: SAGA_ICONS[saga] || '✨'
