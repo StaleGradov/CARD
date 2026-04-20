@@ -687,3 +687,22 @@ body {
     .top-bar { flex-direction: column; align-items: stretch; }
     .actions-row { flex-direction: column; }
 }
+
+
+/* Режим для экспорта в А6 - временно включите этот класс на body */
+.a6-export-mode .hero-card {
+    width: 300px;
+    height: 424px;  /* 300 × 1.414 = 424 */
+    min-width: auto;
+    max-width: none;
+}
+
+.a6-export-mode .hero-portrait {
+    height: 65%;
+    aspect-ratio: auto;
+}
+
+.a6-export-mode .hero-info {
+    height: 35%;
+    overflow-y: auto;
+}
