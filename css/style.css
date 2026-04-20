@@ -1,3 +1,6 @@
+/* ============================================
+   БЛОК 1: ГЛОБАЛЬНЫЕ СТИЛИ И ПЕРЕМЕННЫЕ
+   ============================================ */
 * { 
     box-sizing: border-box; 
     user-select: none; 
@@ -34,7 +37,9 @@ body {
     position: relative; 
 }
 
-/* Уменьшенный заголовок */
+/* ============================================
+   БЛОК 2: ЗАГОЛОВКИ И ТОП-БАР
+   ============================================ */
 .title { 
     text-align: center; 
     font-size: 1.8rem; 
@@ -52,7 +57,6 @@ body {
     font-weight: bold; 
 }
 
-/* Компактная строка счётчика и кнопок */
 .top-bar {
     display: flex;
     justify-content: space-between;
@@ -64,6 +68,7 @@ body {
     padding: 6px 15px;
     border-radius: 60px;
 }
+
 .round-info {
     font-size: 1.1rem;
     font-weight: bold;
@@ -72,6 +77,7 @@ body {
     padding: 4px 16px;
     border-radius: 40px;
 }
+
 .reset-stats-btn {
     background: #4a3a2a;
     border: 1px solid #a77b44;
@@ -81,10 +87,12 @@ body {
     font-size: 0.75rem;
     cursor: pointer;
 }
+
 .mode-selector { 
     display: flex; 
     gap: 8px; 
 }
+
 .mode-btn { 
     background: #3a2a1a; 
     border: 1px solid #a77b44; 
@@ -94,13 +102,16 @@ body {
     font-size: 0.8rem; 
     cursor: pointer; 
 }
+
 .mode-btn.active { 
     background: #b3470c; 
     color: white; 
     box-shadow: 0 0 8px orange; 
 }
 
-/* Увеличенные карточки событий */
+/* ============================================
+   БЛОК 3: КАРТОЧКИ СОБЫТИЙ
+   ============================================ */
 .event-cards-row { 
     display: flex; 
     gap: 20px; 
@@ -110,6 +121,7 @@ body {
     overflow-x: auto;
     padding: 5px 0;
 }
+
 .event-card { 
     width: 480px;
     min-width: 420px;
@@ -123,20 +135,24 @@ body {
     display: flex; 
     flex-direction: column; 
 }
+
 .event-card:hover { 
     transform: translateY(-4px); 
     box-shadow: 0 10px 0 #7a4a1f, 0 0 25px rgba(201, 164, 91, 0.4); 
 }
+
 .event-portrait { 
     width: 100%; 
     height: 220px;
     position: relative; 
 }
+
 .event-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
 }
+
 .event-portrait::after { 
     content: ''; 
     position: absolute; 
@@ -146,10 +162,12 @@ body {
     height: 40px; 
     background: linear-gradient(to top, #1a1a1a, transparent); 
 }
+
 .event-info { 
     padding: 12px 14px; 
     background: #1a1a1a; 
 }
+
 .event-name { 
     font-size: 1rem; 
     font-weight: bold; 
@@ -157,25 +175,30 @@ body {
     color: #ffdfa5; 
     text-transform: uppercase; 
 }
+
 .event-desc { 
     font-size: 0.8rem; 
     opacity: 0.9; 
     text-align: center; 
     color: #ecd690; 
 }
+
 .event-icon { 
     font-size: 1.8rem; 
     text-align: center; 
     margin-bottom: 5px; 
 }
 
-/* Арена - компактнее, но герои растягиваются */
+/* ============================================
+   БЛОК 4: АРЕНА И КАРТОЧКИ ИГРОКОВ (ФРОНТЫ)
+   ============================================ */
 .arena { 
     display: flex; 
     flex-wrap: wrap; 
     gap: 20px; 
     justify-content: center; 
 }
+
 .player-card { 
     flex: 1 1 400px; 
     min-width: 360px; 
@@ -190,6 +213,7 @@ body {
     flex-direction: column;
     max-height: 100%;
 }
+
 .player-name { 
     display: flex; 
     align-items: center; 
@@ -206,6 +230,7 @@ body {
     border: 1px solid #b47c48; 
     flex-shrink: 0;
 }
+
 .score-badge { 
     font-size: 1rem; 
     color: gold; 
@@ -215,27 +240,32 @@ body {
     border: 1px solid #e7bc7e; 
 }
 
-/* Контейнер героев: заполнение ширины и высоты без прокрутки */
+/* ============================================
+   БЛОК 5: КАРТЫ ГЕРОЕВ (УКРУПНЕННЫЕ)
+   ============================================ */
+/* Контейнер героев - заполняет всю ширину Фронта */
 .hero-cards { 
     display: flex; 
     flex-wrap: nowrap;
-    gap: 12px; 
-    justify-content: center;
+    gap: 16px; 
+    justify-content: space-between;
     align-items: stretch;
     margin-top: 8px;
     flex: 1;
     min-height: 0;
-    overflow-x: auto;
+    overflow-x: visible;
     overflow-y: visible;
-    padding: 5px 2px;
+    padding: 5px 0;
+    width: 100%;
 }
-/* Каждый герой растягивается, но не мельче 200px */
+
+/* Карта героя - максимально крупная */
 .hero-card { 
     flex: 1 1 0;
-    min-width: 200px;
-    max-width: 300px;
+    min-width: 0;
+    max-width: none;
     background: #1a1a1a; 
-    border-radius: 20px; 
+    border-radius: 24px;
     overflow: hidden; 
     border: 3px solid;
     box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(0,0,0,0.5); 
@@ -246,135 +276,165 @@ body {
     flex-direction: column;
     height: auto;
 }
+
 .hero-card:hover { 
     transform: translateY(-4px); 
     box-shadow: 0 10px 0 #3a2a1a, 0 0 25px rgba(201, 164, 91, 0.4); 
 }
+
 .hero-card.selected { 
     transform: scale(1.01) translateY(-3px); 
     box-shadow: 0 8px 0 #3a2a1a, 0 0 30px gold; 
     border-width: 4px; 
     border-color: gold !important; 
 }
+
+/* Портрет героя */
 .hero-portrait { 
     width: 100%;
-    aspect-ratio: 1 / 1;
-    max-height: none;
+    aspect-ratio: 3 / 4;
     position: relative;
     flex-shrink: 0;
+    background: #0d0d0d;
 }
+
 .hero-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
     display: block;
 }
+
 .hero-portrait::after { 
     content: ''; 
     position: absolute; 
     bottom: 0; 
     left: 0; 
     right: 0; 
-    height: 40px; 
+    height: 60px;
     background: linear-gradient(to top, #1a1a1a, transparent); 
     pointer-events: none;
 }
+
+/* Информационная часть */
 .hero-info { 
-    padding: 8px 10px 10px; 
+    padding: 12px 12px 14px; 
     background: #1a1a1a;
     flex-shrink: 0;
 }
+
 .hero-name { 
-    font-size: 0.9rem; 
+    font-size: 1.2rem;
     font-weight: bold; 
     text-align: center; 
-    margin-bottom: 2px; 
+    margin-bottom: 4px; 
     color: inherit; 
     text-transform: uppercase; 
+    letter-spacing: 1px;
 }
+
 .hero-subtitle { 
-    font-size: 0.6rem; 
-    opacity: 0.7; 
+    font-size: 0.75rem;
+    opacity: 0.8; 
     text-align: center; 
-    margin-bottom: 6px; 
+    margin-bottom: 10px; 
 }
+
+/* Иконки */
 .hero-icons-row { 
     display: flex; 
     justify-content: center; 
-    gap: 6px; 
-    margin-bottom: 6px; 
+    gap: 10px; 
+    margin-bottom: 10px; 
 }
+
 .hero-icon { 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    font-size: 1rem; 
+    font-size: 1.1rem; 
     background: #2a2a2a; 
-    padding: 2px 5px; 
+    padding: 4px 8px; 
     border-radius: 20px; 
     border: 1px solid #555; 
     cursor: pointer; 
 }
+
 .hero-icon span:last-child { 
-    font-size: 0.4rem; 
-    opacity: 0.6; 
+    font-size: 0.55rem; 
+    opacity: 0.7; 
 }
+
+/* Бейдж силы */
 .hero-power-badge { 
     text-align: center; 
-    margin-bottom: 6px; 
+    margin-bottom: 10px; 
 }
+
 .power-value { 
     background: #2a2a2a; 
-    padding: 2px 10px; 
+    padding: 4px 14px; 
     border-radius: 30px; 
     font-weight: bold; 
-    font-size: 0.75rem; 
+    font-size: 0.9rem;
     border: 1px solid #ffd58c; 
     color: #ffd58c; 
 }
+
+/* Характеристики */
 .stat-row { 
-    margin-bottom: 4px; 
+    margin-bottom: 8px;
 }
+
 .label-group { 
     display: flex; 
     justify-content: space-between; 
-    font-size: 0.55rem; 
-    margin-bottom: 2px; 
-    opacity: 0.8; 
+    font-size: 0.7rem;
+    margin-bottom: 4px; 
+    opacity: 0.85; 
 }
+
 .bar-bg { 
-    height: 4px; 
+    height: 6px;
     background: #333; 
     border-radius: 3px; 
     overflow: hidden; 
 }
+
 .bar-fill { 
     height: 100%; 
     width: 0; 
     transition: width 0.3s ease-out; 
 }
+
 .hp-bar { background: var(--hp-color); box-shadow: 0 0 4px var(--hp-color); }
 .armor-bar { background: var(--armor-color); box-shadow: 0 0 4px var(--armor-color); }
 .dmg-bar { background: var(--dmg-color); box-shadow: 0 0 4px var(--dmg-color); }
 .gold-bar { background: var(--gold-color); box-shadow: 0 0 4px var(--gold-color); }
+
+/* Рекорды */
 .hero-record { 
     display: flex; 
     justify-content: center; 
-    gap: 12px; 
-    margin-top: 6px; 
-    padding-top: 4px; 
+    gap: 16px; 
+    margin-top: 10px; 
+    padding-top: 8px; 
     border-top: 1px solid #444; 
-    font-size: 0.6rem; 
+    font-size: 0.7rem; 
 }
+
 .record-win { color: #4caf50; } 
 .record-loss { color: #f44336; }
 
-/* Кнопка боя и сброса — компактные */
+/* ============================================
+   БЛОК 6: КНОПКИ ДЕЙСТВИЙ
+   ============================================ */
 .actions-row {
     display: flex;
     gap: 15px;
     margin: 15px 0 8px;
 }
+
 .fight-btn { 
     background: linear-gradient(145deg, #b3470c, #8a3509); 
     border: none; 
@@ -391,22 +451,27 @@ body {
     text-transform: uppercase; 
     letter-spacing: 1px; 
 }
+
 .fight-btn:active { 
     transform: translateY(2px); 
     box-shadow: 0 2px 0 #5a2a0a; 
 }
+
 .fight-btn.disabled { 
     background: #5e4b36; 
     pointer-events: none; 
     opacity: 0.6; 
 }
+
 .reset-btn { 
     background: linear-gradient(145deg, #2a471f, #1a3012); 
     box-shadow: 0 4px 0 #1a2a0a; 
     flex: 1;
 }
 
-/* Лог уменьшен, чтобы не вылезать */
+/* ============================================
+   БЛОК 7: ЛОГ И СКРЫТЫЕ ЭЛЕМЕНТЫ
+   ============================================ */
 .log { 
     background: #090c07e0; 
     border-radius: 20px; 
@@ -419,14 +484,15 @@ body {
     border: 1px solid #c9a45b; 
     font-size: 0.8rem; 
 }
+
 .deck-counter { 
     display: none;
 }
+
 .player-card .deck-counter {
     display: none;
 }
 
-/* Сброс статистики мелкий */
 .reset-stats-btn { 
     background: #4a3a2a; 
     border: 1px solid #a77b44; 
@@ -438,7 +504,9 @@ body {
     margin-left: 8px; 
 }
 
-/* Цвета рамок */
+/* ============================================
+   БЛОК 8: ЦВЕТА РАМОК ПО РАСАМ
+   ============================================ */
 .hero-card[data-race="Полурослик"] { border-color: #808080; }
 .hero-card[data-race="Фея"] { border-color: #32cd32; }
 .hero-card[data-race="Лайтар"] { border-color: #4169e1; }
@@ -452,21 +520,27 @@ body {
     border-width: 4px;
     animation: fireGlow 1.5s infinite alternate;
 }
+
 @keyframes fireGlow {
     from { box-shadow: 0 6px 0 #3a2a1a, 0 0 12px #ff6600, 0 0 25px #ffaa00; }
     to { box-shadow: 0 6px 0 #3a2a1a, 0 0 22px #ff4400, 0 0 45px #ffcc00; }
 }
 
+/* ============================================
+   БЛОК 9: ИНДИКАТОР ХОДА И СКРЫТЫЕ КАРТЫ
+   ============================================ */
 .turn-indicator { 
     text-align: center; 
     font-size: 1.2rem; 
     color: gold; 
     margin: 5px 0; 
 }
+
 .hidden-card { 
     filter: brightness(0.15) blur(4px); 
     pointer-events: none; 
 }
+
 .hidden-card .hero-name, 
 .hidden-card .hero-subtitle, 
 .hidden-card .hero-power-badge, 
@@ -474,11 +548,14 @@ body {
 .hidden-card .hero-record { 
     visibility: hidden; 
 }
+
 .hidden-card .hero-icons-row { 
     visibility: hidden; 
 }
 
-/* Модальное окно */
+/* ============================================
+   БЛОК 10: МОДАЛЬНОЕ ОКНО РЕЗУЛЬТАТОВ
+   ============================================ */
 .result-modal { 
     position: fixed; 
     top: 0; 
@@ -492,6 +569,7 @@ body {
     align-items: center; 
     justify-content: center; 
 }
+
 .result-content { 
     max-width: 1000px; 
     width: 90%; 
@@ -500,18 +578,21 @@ body {
     border-radius: 40px; 
     padding: 25px; 
 }
+
 .result-title { 
     text-align: center; 
     font-size: 2rem; 
     color: #ffdfa5; 
     margin-bottom: 15px; 
 }
+
 .result-comparison { 
     display: flex; 
     gap: 25px; 
     justify-content: center; 
     flex-wrap: wrap;
 }
+
 .result-hero { 
     flex: 1; 
     background: #1a1a1a; 
@@ -520,14 +601,17 @@ body {
     border: 2px solid; 
     text-align: center; 
 }
+
 .result-hero.winner { 
     border-color: gold; 
     box-shadow: 0 0 25px gold; 
 }
+
 .result-hero.loser { 
     border-color: #8b0000; 
     opacity: 0.8; 
 }
+
 .result-portrait { 
     width: 100%; 
     height: 170px; 
@@ -536,11 +620,13 @@ body {
     margin-bottom: 12px; 
     border: 2px solid #a77b44; 
 }
+
 .result-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
 }
+
 .result-power-large { 
     font-size: 1.6rem; 
     font-weight: bold; 
@@ -551,12 +637,14 @@ body {
     border-radius: 40px; 
     margin: 8px 0; 
 }
+
 .result-stats { 
     display: grid; 
     grid-template-columns: 1fr 1fr; 
     gap: 8px; 
     margin: 12px 0; 
 }
+
 .result-stat { 
     display: flex; 
     justify-content: space-between; 
@@ -565,12 +653,14 @@ body {
     border-radius: 10px; 
     font-size: 0.9rem; 
 }
+
 .result-vs { 
     display: flex; 
     align-items: center; 
     font-size: 2.5rem; 
     color: gold; 
 }
+
 .result-close-btn { 
     display: block; 
     margin: 20px auto 0; 
@@ -583,6 +673,9 @@ body {
     cursor: pointer; 
 }
 
+/* ============================================
+   БЛОК 11: ЭКРАНЫ ПОБЕДЫ/ПОРАЖЕНИЯ
+   ============================================ */
 .victory-screen, .defeat-screen { 
     position: absolute; 
     top: 0; 
@@ -600,48 +693,54 @@ body {
     text-align: center; 
     padding: 20px; 
 }
+
 .victory-screen h2 { 
     font-size: 3rem; 
     color: gold; 
     text-shadow: 0 0 20px orange; 
     animation: pulse 1.5s infinite; 
 }
+
 .defeat-screen h2 { 
     font-size: 3rem; 
     color: #8b0000; 
     text-shadow: 0 0 20px red; 
 }
+
 @keyframes pulse { 
     0% { transform: scale(1); } 
     50% { transform: scale(1.03); text-shadow: 0 0 40px gold; } 
     100% { transform: scale(1); } 
 }
 
-/* Скроллбары */
+/* ============================================
+   БЛОК 12: СКРОЛЛБАРЫ И АДАПТИВНОСТЬ
+   ============================================ */
 .hero-cards::-webkit-scrollbar,
 .event-cards-row::-webkit-scrollbar {
     height: 5px;
     background: #1a1a1a;
     border-radius: 3px;
 }
+
 .hero-cards::-webkit-scrollbar-thumb,
 .event-cards-row::-webkit-scrollbar-thumb {
     background: #c9a45b;
     border-radius: 3px;
 }
 
-/* Адаптивность */
 @media (max-width: 1100px) {
-    .hero-card { min-width: 170px; }
-    .hero-portrait { aspect-ratio: 1 / 1; }
+    .hero-card { min-width: 200px; }
+    .hero-portrait { aspect-ratio: 3 / 4; }
     .event-card { width: 380px; min-width: 320px; }
     .event-portrait { height: 180px; }
     .player-card { min-width: 300px; }
 }
+
 @media (max-width: 800px) {
     .game-container { padding: 12px 16px; }
-    .hero-cards { flex-wrap: wrap; justify-content: center; }
-    .hero-card { flex: 0 1 220px; }
+    .hero-cards { flex-wrap: wrap; justify-content: center; overflow-x: visible; }
+    .hero-card { flex: 0 1 280px; min-width: 260px; }
     .event-card { width: 100%; min-width: 260px; }
     .top-bar { flex-direction: column; align-items: stretch; }
     .actions-row { flex-direction: column; }
