@@ -232,8 +232,8 @@ body {
 /* Каждый герой растягивается, но не мельче 200px */
 .hero-card { 
     flex: 1 1 0;
-    min-width: 200px;
-    max-width: 300px;
+    min-width: 300px;   /* ширина минимум */
+    max-width: 500px;   /* ширина максимум */
     background: #1a1a1a; 
     border-radius: 20px; 
     overflow: hidden; 
@@ -258,7 +258,7 @@ body {
 }
 .hero-portrait { 
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1 / 1;        /* портрет выше, чем квадрат */
     max-height: none;
     position: relative;
     flex-shrink: 0;
@@ -280,12 +280,12 @@ body {
     pointer-events: none;
 }
 .hero-info { 
-    padding: 8px 10px 10px; 
+    padding: 8px 10px 10px;  /* увеличить отступы внутри */
     background: #1a1a1a;
     flex-shrink: 0;
 }
 .hero-name { 
-    font-size: 0.9rem; 
+    font-size: 1.2rem;       /* крупнее имя */
     font-weight: bold; 
     text-align: center; 
     margin-bottom: 2px; 
@@ -293,7 +293,7 @@ body {
     text-transform: uppercase; 
 }
 .hero-subtitle { 
-    font-size: 0.6rem; 
+    font-size: 0.9rem;    /* крупнее подзаголовок */
     opacity: 0.7; 
     text-align: center; 
     margin-bottom: 6px; 
@@ -325,20 +325,20 @@ body {
 }
 .power-value { 
     background: #2a2a2a; 
-    padding: 2px 10px; 
+    padding: 4px 14px;             /* крупнее значение силы */
     border-radius: 30px; 
     font-weight: bold; 
-    font-size: 0.75rem; 
+    font-size: 1rem;                /* крупнее значение силы */
     border: 1px solid #ffd58c; 
     color: #ffd58c; 
 }
 .stat-row { 
-    margin-bottom: 4px; 
+    margin-bottom: 8px;              /* больше места между статами */
 }
 .label-group { 
     display: flex; 
     justify-content: space-between; 
-    font-size: 0.55rem; 
+    font-size: 0.8rem;                 /* крупнее текст статов */
     margin-bottom: 2px; 
     opacity: 0.8; 
 }
