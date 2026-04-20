@@ -63,8 +63,8 @@ body {
 }
 
 .event-card { 
-    width: 260px;
-    min-width: 240px;
+    width: 400px;
+    min-width: 380px;
     background: #1a1a1a; 
     border-radius: 20px; 
     overflow: hidden; 
