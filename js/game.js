@@ -2,6 +2,83 @@
 
 "use strict";
 
+// ========== ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ДОМИНИРУЮЩЕГО ПАРАМЕТРА ==========
+/**
+ * Определяет доминирующий параметр героя и возвращает CSS-класс
+ * Поддерживает обнаружение ГИБРИДОВ (равные доминанты)
+ * @param {Object} hero - объект героя с полями hp, dmg, arm, gold
+ * @returns {string} - CSS класс
+ */
+function getDominantClass(hero) {
+    const total = hero.hp + hero.dmg + hero.arm + hero.gold;
+    if (total === 0) return 'dominant-balanced';
+    
+    const hpPercent = (hero.hp / total) * 100;
+    const dmgPercent = (hero.dmg / total) * 100;
+    const armPercent = (hero.arm / total) * 100;
+    const goldPercent = (hero.gold / total) * 100;
+    
+    // Пороговые значения
+    const DOMINANT_THRESHOLD = 35;  // для HP, DMG, GOLD
+    const ARM_THRESHOLD = 30;        // для ARM
+    
+    // Собираем все статы, которые превышают порог
+    const dominantStats = [];
+    
+    if (dmgPercent >= DOMINANT_THRESHOLD) dominantStats.push('dmg');
+    if (hpPercent >= DOMINANT_THRESHOLD) dominantStats.push('hp');
+    if (goldPercent >= DOMINANT_THRESHOLD) dominantStats.push('gold');
+    if (armPercent >= ARM_THRESHOLD) dominantStats.push('arm');
+    
+    // === ПРОВЕРКА НА ГИБРИДА ===
+    // Если два или более стата превышают порог И их значения равны (с погрешностью ±5%)
+    if (dominantStats.length >= 2) {
+        // Получаем значения только доминирующих статов
+        const values = dominantStats.map(stat => {
+            if (stat === 'dmg') return dmgPercent;
+            if (stat === 'hp') return hpPercent;
+            if (stat === 'gold') return goldPercent;
+            if (stat === 'arm') return armPercent;
+        });
+        
+        // Находим максимальное значение среди доминантов
+        const maxValue = Math.max(...values);
+        
+        // Считаем, сколько статов близки к максимальному (в пределах 5%)
+        const nearMaxCount = values.filter(v => Math.abs(v - maxValue) <= 5).length;
+        
+        // Если есть хотя бы 2 стата с близкими значениями → ГИБРИД
+        if (nearMaxCount >= 2) {
+            return 'dominant-hybrid';
+        }
+    }
+    
+    // === ОДИНОЧНЫЕ ДОМИНАНТЫ ===
+    if (dominantStats.length === 1) {
+        const stat = dominantStats[0];
+        if (stat === 'dmg') return 'dominant-dmg';
+        if (stat === 'hp') return 'dominant-hp';
+        if (stat === 'gold') return 'dominant-gold';
+        if (stat === 'arm') return 'dominant-arm';
+    }
+    
+    // Если есть несколько доминантов, но они НЕ равны — берем самый сильный
+    if (dominantStats.length >= 2) {
+        const maxStat = dominantStats.reduce((a, b) => {
+            const valA = a === 'dmg' ? dmgPercent : a === 'hp' ? hpPercent : a === 'gold' ? goldPercent : armPercent;
+            const valB = b === 'dmg' ? dmgPercent : b === 'hp' ? hpPercent : b === 'gold' ? goldPercent : armPercent;
+            return valA > valB ? a : b;
+        });
+        
+        if (maxStat === 'dmg') return 'dominant-dmg';
+        if (maxStat === 'hp') return 'dominant-hp';
+        if (maxStat === 'gold') return 'dominant-gold';
+        if (maxStat === 'arm') return 'dominant-arm';
+    }
+    
+    return 'dominant-balanced';
+}
+
 // ========== ЗОЛОТО ИГРОКОВ (СОХРАНЕНИЕ) ==========
 let playersGold = JSON.parse(localStorage.getItem('tigrimionPlayersGold')) || {};
 
@@ -277,8 +354,9 @@ function showMarketModal() {
     container.innerHTML = '';
     
     currentPlayer.openMarket.forEach((hero, idx) => {
+        const dominantClass = getDominantClass(hero);
         const card = document.createElement('div');
-        card.className = 'market-card';
+        card.className = `market-card ${dominantClass}`;
         card.innerHTML = `
             <div class="market-card-portrait">
                 <img src="${hero.imageFile}" alt="${hero.name}" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'">
@@ -544,7 +622,11 @@ function updateUI() {
             const record = getHeroRecord(h.name);
             let card = document.createElement('div');
             const isHidden = (battlePhase === 'select' && (idx !== currentPlayerIndex || pl.isAI));
-            card.className = `hero-card ${pl.selectedHeroes.includes(h) ? 'selected' : ''} ${isHidden ? 'hidden-card' : ''}`;
+            
+            // === ПРИМЕНЯЕМ КЛАСС ДОМИНАНТЫ ===
+            const dominantClass = getDominantClass(h);
+            
+            card.className = `hero-card ${dominantClass} ${pl.selectedHeroes.includes(h) ? 'selected' : ''} ${isHidden ? 'hidden-card' : ''}`;
             card.setAttribute('data-race', h.race);
             card.setAttribute('draggable', 'true');
             
@@ -560,10 +642,12 @@ function updateUI() {
                         <div class="hero-icon" data-trait="saga"><span>${h.iconSaga}</span><span>Сага</span></div>
                     </div>
                     <div class="hero-power-badge"><span class="power-value">⚡ ${h.power}</span></div>
-                    <div class="stat-row"><div class="label-group"><span>❤️ Здоровье</span><span>${h.hp}</span></div><div class="bar-bg"><div class="bar-fill hp-bar" style="width: ${(h.hp/maxStat)*100}%;"></div></div></div>
-                    <div class="stat-row"><div class="label-group"><span>🛡️ Броня</span><span>${h.arm}</span></div><div class="bar-bg"><div class="bar-fill armor-bar" style="width: ${(h.arm/maxStat)*100}%;"></div></div></div>
-                    <div class="stat-row"><div class="label-group"><span>⚔️ Урон</span><span>${h.dmg}</span></div><div class="bar-bg"><div class="bar-fill dmg-bar" style="width: ${(h.dmg/maxStat)*100}%;"></div></div></div>
-                    <div class="stat-row"><div class="label-group"><span>💰 Золото</span><span>${h.gold}</span></div><div class="bar-bg"><div class="bar-fill gold-bar" style="width: ${(h.gold/maxStat)*100}%;"></div></div></div>
+                    <div class="stats-container">
+                        <div class="stat-row"><div class="label-group"><span>❤️ Здоровье</span><span class="stat-value hp-value">${h.hp}</span></div><div class="bar-bg"><div class="bar-fill hp-bar" style="width: ${(h.hp/maxStat)*100}%;"></div></div></div>
+                        <div class="stat-row"><div class="label-group"><span>🛡️ Броня</span><span class="stat-value arm-value">${h.arm}</span></div><div class="bar-bg"><div class="bar-fill armor-bar" style="width: ${(h.arm/maxStat)*100}%;"></div></div></div>
+                        <div class="stat-row"><div class="label-group"><span>⚔️ Урон</span><span class="stat-value dmg-value">${h.dmg}</span></div><div class="bar-bg"><div class="bar-fill dmg-bar" style="width: ${(h.dmg/maxStat)*100}%;"></div></div></div>
+                        <div class="stat-row"><div class="label-group"><span>💰 Золото</span><span class="stat-value gold-value">${h.gold}</span></div><div class="bar-bg"><div class="bar-fill gold-bar" style="width: ${(h.gold/maxStat)*100}%;"></div></div></div>
+                    </div>
                     <div class="hero-record"><span class="record-win">🏆 ${record.wins}</span><span class="record-loss">💀 ${record.losses}</span></div>
                 </div>
             `;
