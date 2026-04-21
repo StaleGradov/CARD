@@ -1610,3 +1610,196 @@ body {
     border-color: gold !important;
     box-shadow: 0 8px 0 #3a2a1a, 0 0 30px gold !important;
 }
+/* ============================================================
+   ПОДСВЕТКА ПО ДОМИНИРУЮЩЕМУ ПАРАМЕТРУ (ДЛЯ ПЕЧАТИ)
+   И ИСПРАВЛЕНИЕ ОТСТУПА ЗОЛОТА
+   ============================================================ */
+
+/* === ИСПРАВЛЕНИЕ ОТСТУПА ДЛЯ ПОЛОСКИ ЗОЛОТА === */
+.stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 2px 0 0;
+}
+
+.stat-row:last-child {
+    margin-top: 3px;  /* Чуть-чуть отодвигаем золото от урона */
+}
+
+.stat-row .bar-bg {
+    margin-bottom: 1px;
+}
+
+.stat-row:last-child .bar-bg {
+    margin-bottom: 0;
+}
+
+/* === БАЗОВАЯ РАМКА ГЕРОЯ — ДЕЛАЕМ ТОЛЩЕ В 2 РАЗА === */
+.hero-card {
+    border-width: 6px !important;
+    border-style: solid;
+}
+
+/* === ДОМИНАНТА: УРОН (Агрессор) — Красная рамка === */
+.hero-card.dominant-dmg {
+    border-color: #dc143c !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px rgba(220, 20, 60, 0.6);
+}
+
+/* === ДОМИНАНТА: ЗДОРОВЬЕ (Танк) — Зеленая рамка === */
+.hero-card.dominant-hp {
+    border-color: #228b22 !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px rgba(34, 139, 34, 0.6);
+}
+
+/* === ДОМИНАНТА: БРОНЯ (Защитник) — Синяя рамка === */
+.hero-card.dominant-arm {
+    border-color: #4169e1 !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px rgba(65, 105, 225, 0.6);
+}
+
+/* === ДОМИНАНТА: ЗОЛОТО (Богач) — Золотая рамка === */
+.hero-card.dominant-gold {
+    border-color: #ffd700 !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px rgba(255, 215, 0, 0.7);
+}
+
+/* === ДОМИНАНТА: ГИБРИД (два или более равных доминанта) — Фиолетовая рамка === */
+.hero-card.dominant-hybrid {
+    border-color: #9b30ff !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 20px rgba(155, 48, 255, 0.7), 0 0 35px rgba(155, 48, 255, 0.3);
+}
+
+/* === НЕТ ЯВНОЙ ДОМИНАНТЫ (Сбалансированный) — Серая рамка === */
+.hero-card.dominant-balanced {
+    border-color: #a0a0a0 !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 12px rgba(160, 160, 160, 0.4);
+}
+
+/* === ДРАКОНЫ: СОХРАНЯЕМ АНИМАЦИЮ И УСИЛИВАЕМ ПОДСВЕТКУ === */
+
+/* Дракон-Гибрид */
+.hero-card[data-race="Дракон"].dominant-hybrid {
+    border-color: #9b30ff !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 25px #9b30ff, 0 0 50px #cc88ff;
+    animation: hybridGlow 2s infinite alternate;
+}
+
+@keyframes hybridGlow {
+    from { box-shadow: 0 8px 0 #3a2a1a, 0 0 20px #9b30ff, 0 0 40px #bb66ff; }
+    to { box-shadow: 0 8px 0 #3a2a1a, 0 0 30px #cc66ff, 0 0 60px #ee99ff; }
+}
+
+/* Дракон-Агрессор */
+.hero-card[data-race="Дракон"].dominant-dmg {
+    border-color: #dc143c !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 20px #ff4444, 0 0 40px #ff8888;
+    animation: fireGlowDmg 1.5s infinite alternate;
+}
+
+@keyframes fireGlowDmg {
+    from { box-shadow: 0 8px 0 #3a2a1a, 0 0 12px #ff4444, 0 0 25px #ff6666; }
+    to { box-shadow: 0 8px 0 #3a2a1a, 0 0 22px #ff2222, 0 0 45px #ff4444; }
+}
+
+/* Дракон-Танк */
+.hero-card[data-race="Дракон"].dominant-hp {
+    border-color: #228b22 !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 20px #44ff44, 0 0 40px #88ff88;
+    animation: fireGlowHp 1.5s infinite alternate;
+}
+
+@keyframes fireGlowHp {
+    from { box-shadow: 0 8px 0 #3a2a1a, 0 0 12px #44ff44, 0 0 25px #66ff66; }
+    to { box-shadow: 0 8px 0 #3a2a1a, 0 0 22px #22ff22, 0 0 45px #44ff44; }
+}
+
+/* Дракон-Защитник */
+.hero-card[data-race="Дракон"].dominant-arm {
+    border-color: #4169e1 !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 20px #4444ff, 0 0 40px #8888ff;
+    animation: fireGlowArm 1.5s infinite alternate;
+}
+
+@keyframes fireGlowArm {
+    from { box-shadow: 0 8px 0 #3a2a1a, 0 0 12px #4444ff, 0 0 25px #6666ff; }
+    to { box-shadow: 0 8px 0 #3a2a1a, 0 0 22px #2222ff, 0 0 45px #4444ff; }
+}
+
+/* Дракон-Богач */
+.hero-card[data-race="Дракон"].dominant-gold {
+    border-color: #ffd700 !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 25px gold, 0 0 50px #ffee88;
+    animation: fireGlowGold 1.5s infinite alternate;
+}
+
+@keyframes fireGlowGold {
+    from { box-shadow: 0 8px 0 #3a2a1a, 0 0 18px gold, 0 0 35px #ffdd55; }
+    to { box-shadow: 0 8px 0 #3a2a1a, 0 0 30px #ffcc00, 0 0 60px #ffeeaa; }
+}
+
+/* Дракон-Сбалансированный */
+.hero-card[data-race="Дракон"].dominant-balanced {
+    border-color: #a0a0a0 !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px #aaaaaa;
+    animation: fireGlow 1.5s infinite alternate;
+}
+
+/* === ПРИ ВЫДЕЛЕНИИ КАРТЫ ЗОЛОТАЯ РАМКА ПЕРЕКРЫВАЕТ ДОМИНАНТУ === */
+.hero-card.selected {
+    border-color: gold !important;
+    box-shadow: 0 8px 0 #3a2a1a, 0 0 30px gold !important;
+    animation: none !important;
+}
+
+/* === ПРИМЕНЯЕМ ДОМИНАНТЫ К КАРТАМ РЫНКА === */
+.market-card {
+    border-width: 6px !important;
+    border-style: solid;
+}
+
+.market-card.dominant-dmg { 
+    border-color: #dc143c !important; 
+    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(220, 20, 60, 0.4);
+}
+.market-card.dominant-hp { 
+    border-color: #228b22 !important; 
+    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(34, 139, 34, 0.4);
+}
+.market-card.dominant-arm { 
+    border-color: #4169e1 !important; 
+    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(65, 105, 225, 0.4);
+}
+.market-card.dominant-gold { 
+    border-color: #ffd700 !important; 
+    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(255, 215, 0, 0.5);
+}
+.market-card.dominant-hybrid { 
+    border-color: #9b30ff !important; 
+    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(155, 48, 255, 0.5);
+}
+.market-card.dominant-balanced { 
+    border-color: #a0a0a0 !important; 
+    box-shadow: 0 6px 0 #3a2a1a, 0 0 10px rgba(160, 160, 160, 0.3);
+}
+
+/* === АДАПТИВНОСТЬ ДЛЯ РАМОК === */
+@media (max-width: 900px) {
+    .hero-card {
+        border-width: 5px !important;
+    }
+    .hero-card.selected {
+        border-width: 7px !important;
+    }
+}
+
+/* === СТИЛИ ДЛЯ ПЕЧАТИ (CMYK-оптимизированные цвета) === */
+@media print {
+    .hero-card.dominant-dmg { border-color: #crimson !important; }
+    .hero-card.dominant-hp { border-color: #forestgreen !important; }
+    .hero-card.dominant-arm { border-color: #royalblue !important; }
+    .hero-card.dominant-gold { border-color: #gold !important; }
+    .hero-card.dominant-hybrid { border-color: #darkviolet !important; }
+    .hero-card.dominant-balanced { border-color: #gray !important; }
+}
