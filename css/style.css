@@ -1515,7 +1515,7 @@ body {
 
 /* Базовая рамка героя — делаем толще, но не слишком (4px вместо 6px) */
 .hero-card {
-    border-width: 4px !important;
+    border-width: 3px !important;
     border-style: solid;
 }
 
