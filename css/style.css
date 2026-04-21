@@ -1511,3 +1511,43 @@ body {
         width: 140px;
     }
 }
+/* === СДВИГАЕМ ВСЕ ПОЛОСКИ ВВЕРХ === */
+
+/* Уменьшаем внутренние отступы в информационном блоке */
+.hero-info {
+    padding-top: 2px !important;
+}
+
+/* Уменьшаем отступ после имени и подзаголовка */
+.hero-name {
+    margin-bottom: 0 !important;
+}
+
+.hero-subtitle {
+    margin-bottom: 0 !important;
+}
+
+/* Уменьшаем отступ после иконок */
+.hero-icons-row {
+    margin: 0 0 1px 0 !important;
+}
+
+/* Уменьшаем отступ после мощи */
+.hero-power-badge {
+    margin: 0 0 2px 0 !important;
+}
+
+/* Сдвигаем сам контейнер статов вверх */
+.stats-container {
+    margin-top: 0 !important;
+    gap: 2px !important;  /* Уменьшаем зазор между полосками */
+}
+
+/* Уменьшаем отступы у каждой строки статов */
+.stat-row {
+    margin-top: -1px !important;
+}
+
+.stat-row:first-child {
+    margin-top: 0 !important;
+}
