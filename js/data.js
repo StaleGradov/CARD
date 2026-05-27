@@ -168,7 +168,7 @@ const LOCATIONS = [
     { name: 'Земля Стойкости', desc: 'ПОБЕДА ПО ЗДОРОВЬЮ (❤️)', imageNum: 202, rule: (h0, h1) => (h0.hp > h1.hp) ? 0 : (h0.hp < h1.hp ? 1 : null) },
     { name: 'Земля Мужества', desc: 'ПОБЕДА ПО БРОНЕ (🛡️)', imageNum: 203, rule: (h0, h1) => (h0.arm > h1.arm) ? 0 : (h0.arm < h1.arm ? 1 : null) },
     { name: 'Земля Богатства', desc: 'ПОБЕДА ПО ЗОЛОТУ (💰)', imageNum: 204, rule: (h0, h1) => (h0.gold > h1.gold) ? 0 : (h0.gold < h1.gold ? 1 : null) },
-    { name: 'Земля Равновесия', desc: 'ПОБЕДА ПО СУММЕ ВСЕХ СТАТОВ', imageNum: 205, rule: (h0, h1) => { let s0 = h0.hp + h0.dmg + h0.arm + h0.gold, s1 = h1.hp + h1.dmg + h1.arm + h1.gold; return (s0 > s1) ? 0 : (s0 < s1 ? 1 : null); } }
+    { name: 'Земля Равновесия', desc: 'ПОБЕДА ПО СУММЕ БОЕВЫХ СТАТОВ (❤️+🛡️+⚔️)', imageNum: 205, rule: (h0, h1) => { let s0 = h0.hp + h0.dmg + h0.arm, s1 = h1.hp + h1.dmg + h1.arm; return (s0 > s1) ? 0 : (s0 < s1 ? 1 : null); } }
 ];
 
 // Королевства
