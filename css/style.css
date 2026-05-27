@@ -194,7 +194,7 @@ body {
 
 .player-card { 
     flex: 1 1 500px; 
-    min-width: 420px; 
+    min-width: 440px; 
     background: #1e261ae0; 
     border-radius: 32px; 
     padding: 16px 20px; 
@@ -317,7 +317,7 @@ body {
 .hero-card { 
     flex: 0 0 auto;
     width: 340px;
-    height: 480px;
+    height: 500px;
     background: #1a1a1a; 
     border-radius: 22px; 
     overflow: hidden; 
@@ -345,7 +345,7 @@ body {
 
 .hero-portrait { 
     width: 100%;
-    height: 46%;
+    height: 45%;
     position: relative;
     flex-shrink: 0;
     background: #0d0d0d;
@@ -371,15 +371,15 @@ body {
 }
 
 .hero-info { 
-    height: 54%;
-    padding: 6px 10px 7px;
+    height: 55%;
+    padding: 6px 10px 8px;
     background: var(--parchment-bg) center/cover no-repeat;
     background-color: rgba(30, 25, 18, 0.85);
     background-blend-mode: multiply;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
     position: relative;
     border-top: 2px solid rgba(199, 161, 91, 0.6);
     box-shadow: inset 0 0 15px rgba(0,0,0,0.4);
@@ -478,8 +478,8 @@ body {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin: 3px 0 0;
+    gap: 7px;
+    margin: 4px 0 0;
 }
 
 .stat-row { 
@@ -539,13 +539,14 @@ body {
 .rank-badge.rank-global { color: gold; font-weight: bold; }
 .rank-badge.top1 { text-shadow: 0 0 4px currentColor; font-weight: bold; }
 
-/* ПОЛОСКИ — УВЕЛИЧЕННЫЕ */
+/* ПОЛОСКИ */
 .bar-bg { 
-    height: 7px;
+    height: 8px;
     background: rgba(0, 0, 0, 0.7); 
     border-radius: 4px; 
     overflow: hidden;
     position: relative;
+    margin-top: 1px;
 }
 
 .bar-fill { 
@@ -559,7 +560,10 @@ body {
 .hp-bar { background: linear-gradient(90deg, #881122 0%, #cc3355 70%, #ff2d55 100%); }
 .armor-bar { background: linear-gradient(90deg, #0e3d6e 0%, #1a6dd4 70%, #2196f3 100%); }
 .dmg-bar { background: linear-gradient(90deg, #662200 0%, #994400 70%, #cc5500 100%); }
-.gold-bar { background: linear-gradient(90deg, #664400 0%, #b8860b 50%, #ffd700 80%, #ffed4a 100%); }
+.gold-bar { 
+    background: linear-gradient(90deg, #886600 0%, #cc9900 30%, #ffd700 60%, #ffed4a 85%, #fff8b0 100%);
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+}
 
 .bar-fill.glowing::after {
     content: '';
@@ -583,8 +587,14 @@ body {
 .bar-fill.dmg-bar.glowing { background: linear-gradient(90deg, #993300 0%, #cc5500 40%, #ff7722 80%, #ff9944 100%); }
 .bar-fill.dmg-bar.glowing::after { background: #ff9944; box-shadow: 0 0 12px #cc5500, 0 0 22px #ff7722; }
 
-.bar-fill.gold-bar.glowing { background: linear-gradient(90deg, #997700 0%, #d4a017 50%, #ffd700 80%, #ffed4a 100%); }
-.bar-fill.gold-bar.glowing::after { background: #fff8b0; box-shadow: 0 0 12px #ffd700, 0 0 22px #ffed4a; }
+.bar-fill.gold-bar.glowing { 
+    background: linear-gradient(90deg, #aa8800 0%, #e6b800 30%, #ffe44d 60%, #fff07a 85%, #ffffcc 100%);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+.bar-fill.gold-bar.glowing::after { 
+    background: #ffff99;
+    box-shadow: 0 0 14px #ffd700, 0 0 28px #ffed4a, 0 0 42px #fff8b0;
+}
 
 .bar-fill.record { animation: recordGlow 1.2s ease-in-out infinite; }
 
@@ -1050,29 +1060,29 @@ body {
 
 /* ========= АДАПТИВНОСТЬ ========= */
 @media (max-width: 1200px) {
-    .hero-card { width: 300px; height: 425px; }
+    .hero-card { width: 300px; height: 440px; }
     .event-card { width: 360px; height: 505px; }
 }
 
 @media (max-width: 1000px) {
-    .hero-card { width: 270px; height: 380px; }
+    .hero-card { width: 270px; height: 395px; }
     .event-card { width: 320px; height: 450px; }
     .hero-name { font-size: 0.95rem; }
     .hero-subtitle { font-size: 0.7rem; }
     .hero-icon { min-width: 46px; padding: 2px 6px; }
     .hero-icon span:first-child { font-size: 0.75rem; }
     .hero-icon span:last-child { font-size: 0.5rem; }
-    .bar-bg { height: 5px; }
+    .bar-bg { height: 6px; }
 }
 
 @media (max-width: 800px) {
     .hero-cards { flex-wrap: wrap; justify-content: center; }
-    .hero-card { width: 320px; height: 450px; }
+    .hero-card { width: 340px; height: 500px; }
     .player-card { min-width: auto; }
 }
 
 @media (max-width: 600px) {
-    .hero-card { width: 270px; height: 380px; }
+    .hero-card { width: 280px; height: 410px; }
     .event-card { width: 290px; height: 410px; }
     .playlist-panel { width: 290px; }
 }
