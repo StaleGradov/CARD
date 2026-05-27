@@ -1,4 +1,4 @@
-// ---------- ИГРОВАЯ ЛОГИКА (v7 — всё исправлено) ----------
+// ---------- ИГРОВАЯ ЛОГИКА (v8 — фикс рендеринга) ----------
 
 "use strict";
 
@@ -243,7 +243,10 @@ function getRelicBonus(player) {
 // ========== РЕНДЕРИНГ АРЕНЫ ==========
 function renderArena() {
     const container = document.getElementById('arenaContainer');
-    if (!container) return;
+    if (!container) {
+        console.error('arenaContainer не найден!');
+        return;
+    }
     container.innerHTML = '';
     players.forEach((p, idx) => {
         const card = document.createElement('div'); 
@@ -267,6 +270,7 @@ function renderArena() {
 
 // ========== ИНИЦИАЛИЗАЦИЯ ИГРЫ ==========
 function initGame(mode = gameMode) {
+    console.log('initGame called, mode:', mode);
     if (aiTimeout) clearTimeout(aiTimeout);
     gameMode = mode;
     players = [];
@@ -301,10 +305,6 @@ function initGame(mode = gameMode) {
     eventDecks.relics = shuffle([...RELICS]);
     
     currentEvent = { location: null, kingdom: null, profession: null, saga: null };
-    
-    // Скрываем модальные окна при новой игре
-    document.getElementById('inventoryModal').style.display = 'none';
-    document.getElementById('relicChoiceModal').style.display = 'none';
     
     renderArena();
     updateUI(); 
@@ -551,7 +551,6 @@ function showInventoryModal(playerId) {
     
     invPlayerIdSpan.innerText = playerId + 1;
     
-    // Слоты экипировки
     equipSlotsContainer.innerHTML = '';
     EQUIP_SLOTS.forEach(slot => {
         const equipped = player.equippedRelics[slot.id];
@@ -594,7 +593,6 @@ function showInventoryModal(playerId) {
         equipSlotsContainer.appendChild(slotDiv);
     });
     
-    // Бонусы
     const equippedArray = player.getEquippedRelicsArray();
     const totalBonus = getActiveSetBonus(equippedArray);
     const setGroups = {};
@@ -616,7 +614,6 @@ function showInventoryModal(playerId) {
     }
     equipBonusInfo.innerHTML = bonusHTML;
     
-    // Список реликвий
     relicTotalCount.innerText = player.relics.length;
     relicsListContainer.innerHTML = '';
     
@@ -665,7 +662,6 @@ function showInventoryModal(playerId) {
         showInventoryModal(playerId);
     };
     
-    // ПОКАЗЫВАЕМ
     modal.style.display = 'flex';
 }
 
@@ -835,7 +831,6 @@ function startBattle() {
     battlePhase = 'result';
     updateUI();
     
-    // Проверка конца игры
     for (let i = 0; i < players.length; i++) {
         if (players[i].hand.length === 0) {
             gameWinner = i;
@@ -855,7 +850,6 @@ function startBattle() {
             
             updateUI();
             
-            // Показываем модалку выбора реликвии с задержкой
             setTimeout(() => {
                 showRelicChoiceModal(winner, loser);
             }, 600);
@@ -864,7 +858,6 @@ function startBattle() {
         }
     }
     
-    // Скрываем итог раунда через 3 секунды
     setTimeout(() => {
         lastRoundWinner = undefined;
         updateUI();
@@ -916,8 +909,6 @@ function showRelicChoiceModal(winner, loser) {
     `;
     
     content.innerHTML = html;
-    
-    // ПОКАЗЫВАЕМ
     modal.style.display = 'flex';
     
     const closeModal = () => {
@@ -993,8 +984,6 @@ function showStealRelicModal(winner, loser, allLoserRelics) {
     
     html += `</div>`;
     content.innerHTML = html;
-    
-    // ПОКАЗЫВАЕМ
     modal.style.display = 'flex';
     
     content.querySelectorAll('.steal-option').forEach(opt => {
@@ -1116,23 +1105,34 @@ document.addEventListener('click', (e) => { if (playlistPanel && !playlistPanel.
 
 // ========== СТАРТ ==========
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM готов, запускаю инициализацию...');
     initMusic();
     bindMusicEvents();
     
-    // Закрытие инвентаря по кнопке
-    document.getElementById('closeInventoryBtn').addEventListener('click', () => {
-        document.getElementById('inventoryModal').style.display = 'none';
-    });
+    // Закрытие инвентаря
+    const closeInvBtn = document.getElementById('closeInventoryBtn');
+    if (closeInvBtn) {
+        closeInvBtn.addEventListener('click', () => {
+            document.getElementById('inventoryModal').style.display = 'none';
+        });
+    }
     
-    // Закрытие инвентаря по клику на фон
-    document.getElementById('inventoryModal').addEventListener('click', function(e) {
-        if (e.target === this) this.style.display = 'none';
-    });
+    // Закрытие по фону
+    const invModal = document.getElementById('inventoryModal');
+    if (invModal) {
+        invModal.style.display = 'none';
+        invModal.addEventListener('click', function(e) {
+            if (e.target === this) this.style.display = 'none';
+        });
+    }
     
-    // Закрытие модалки реликвии по клику на фон
-    document.getElementById('relicChoiceModal').addEventListener('click', function(e) {
-        if (e.target === this) this.style.display = 'none';
-    });
+    const relicModal = document.getElementById('relicChoiceModal');
+    if (relicModal) {
+        relicModal.style.display = 'none';
+        relicModal.addEventListener('click', function(e) {
+            if (e.target === this) this.style.display = 'none';
+        });
+    }
     
     document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', (e) => {
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
@@ -1140,12 +1140,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initGame(btn.dataset.mode === 'pc' ? 'pc' : parseInt(btn.dataset.mode));
     }));
     
-    document.getElementById('actionBtn').onclick = processAction;
-    document.getElementById('resetGame').onclick = () => initGame(gameMode);
+    const actionBtn = document.getElementById('actionBtn');
+    if (actionBtn) actionBtn.onclick = processAction;
     
-    // Скрываем модалки при старте
-    document.getElementById('inventoryModal').style.display = 'none';
-    document.getElementById('relicChoiceModal').style.display = 'none';
+    const resetBtn = document.getElementById('resetGame');
+    if (resetBtn) resetBtn.onclick = () => initGame(gameMode);
     
     initGame(2);
 });
