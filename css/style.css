@@ -317,7 +317,7 @@ body {
 .hero-card { 
     flex: 0 0 auto;
     width: 340px;
-    height: 500px;
+    height: 520px;
     background: #1a1a1a; 
     border-radius: 22px; 
     overflow: hidden; 
@@ -345,7 +345,7 @@ body {
 
 .hero-portrait { 
     width: 100%;
-    height: 45%;
+    height: 44%;
     position: relative;
     flex-shrink: 0;
     background: #0d0d0d;
@@ -371,22 +371,23 @@ body {
 }
 
 .hero-info { 
-    height: 55%;
-    padding: 6px 10px 8px;
+    height: 56%;
+    padding: 5px 8px 6px;
     background: var(--parchment-bg) center/cover no-repeat;
     background-color: rgba(30, 25, 18, 0.85);
     background-blend-mode: multiply;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
     position: relative;
     border-top: 2px solid rgba(199, 161, 91, 0.6);
     box-shadow: inset 0 0 15px rgba(0,0,0,0.4);
+    overflow: hidden;
 }
 
 .hero-name { 
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: bold; 
     text-align: center; 
     margin-bottom: 1px; 
@@ -398,7 +399,7 @@ body {
 }
 
 .hero-subtitle { 
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 500;
     opacity: 0.9; 
     text-align: center; 
@@ -411,8 +412,8 @@ body {
 .hero-icons-row { 
     display: flex; 
     justify-content: center; 
-    gap: 8px;
-    margin: 3px 0;
+    gap: 6px;
+    margin: 2px 0;
     flex-wrap: wrap;
 }
 
@@ -420,15 +421,15 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: bold;
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(2px);
-    padding: 3px 8px;
+    padding: 2px 7px;
     border-radius: 20px; 
     border: 1px solid rgba(201, 164, 91, 0.5);
     gap: 2px;
-    min-width: 54px;
+    min-width: 50px;
     transition: all 0.3s ease;
 }
 
@@ -446,28 +447,28 @@ body {
 }
 
 .hero-icon span:first-child {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: normal;
 }
 
 .hero-icon span:last-child { 
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     opacity: 0.9;
     font-weight: normal;
 }
 
 .hero-power-badge { 
     text-align: center; 
-    margin: 3px 0;
+    margin: 2px 0;
 }
 
 .power-value { 
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(2px);
-    padding: 3px 12px;
+    padding: 3px 10px;
     border-radius: 30px; 
     font-weight: bold; 
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     border: 1px solid #ffd58c; 
     color: #ffd58c;
     display: inline-block;
@@ -478,8 +479,10 @@ body {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 7px;
-    margin: 4px 0 0;
+    gap: 5px;
+    margin: 2px 0 0;
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 .stat-row { 
@@ -490,7 +493,7 @@ body {
     display: flex; 
     justify-content: space-between; 
     align-items: flex-end;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: bold;
     margin-bottom: 2px; 
     opacity: 0.95;
@@ -512,8 +515,14 @@ body {
 .stat-value {
     font-weight: bold;
     color: #ffefb0;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     line-height: 1;
+}
+
+.stat-bonus {
+    color: #4caf50;
+    font-size: 0.58rem;
+    font-weight: bold;
 }
 
 .stat-ranks {
@@ -527,7 +536,7 @@ body {
 }
 
 .rank-badge {
-    font-size: 0.48rem;
+    font-size: 0.45rem;
     white-space: nowrap;
     opacity: 0.9;
     line-height: 1;
@@ -541,12 +550,12 @@ body {
 
 /* ПОЛОСКИ */
 .bar-bg { 
-    height: 8px;
+    height: 7px;
     background: rgba(0, 0, 0, 0.7); 
-    border-radius: 4px; 
+    border-radius: 3px; 
     overflow: hidden;
     position: relative;
-    margin-top: 1px;
+    flex-shrink: 0;
 }
 
 .bar-fill { 
@@ -561,7 +570,7 @@ body {
 .armor-bar { background: linear-gradient(90deg, #0e3d6e 0%, #1a6dd4 70%, #2196f3 100%); }
 .dmg-bar { background: linear-gradient(90deg, #662200 0%, #994400 70%, #cc5500 100%); }
 .gold-bar { 
-    background: linear-gradient(90deg, #886600 0%, #cc9900 30%, #ffd700 60%, #ffed4a 85%, #fff8b0 100%);
+    background: linear-gradient(90deg, #997700 0%, #cc9900 30%, #ffd700 60%, #ffed4a 85%, #fff8b0 100%);
     box-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
 }
 
@@ -571,8 +580,8 @@ body {
     right: -2px;
     top: 50%;
     transform: translateY(-50%);
-    width: 7px;
-    height: 12px;
+    width: 6px;
+    height: 10px;
     border-radius: 50%;
     filter: blur(3px);
     opacity: 0.8;
@@ -588,7 +597,7 @@ body {
 .bar-fill.dmg-bar.glowing::after { background: #ff9944; box-shadow: 0 0 12px #cc5500, 0 0 22px #ff7722; }
 
 .bar-fill.gold-bar.glowing { 
-    background: linear-gradient(90deg, #aa8800 0%, #e6b800 30%, #ffe44d 60%, #fff07a 85%, #ffffcc 100%);
+    background: linear-gradient(90deg, #bb8800 0%, #e6b800 30%, #ffe44d 60%, #fff07a 85%, #ffffcc 100%);
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 .bar-fill.gold-bar.glowing::after { 
@@ -613,7 +622,7 @@ body {
     gap: 6px;
     z-index: 5;
     background: rgba(0,0,0,0.7);
-    padding: 4px 14px;
+    padding: 4px 12px;
     border-radius: 20px;
     border: 1px solid rgba(201,164,91,0.4);
 }
@@ -621,7 +630,7 @@ body {
 .stars-combat, .stars-wealth { display: flex; gap: 3px; }
 
 .star {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #333;
     transition: all 0.3s;
 }
@@ -632,7 +641,7 @@ body {
 }
 
 .star.wealth {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .star.wealth.active {
@@ -642,7 +651,7 @@ body {
 
 .stars-divider {
     color: #555;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     margin: 0 3px;
 }
 
@@ -1060,12 +1069,12 @@ body {
 
 /* ========= АДАПТИВНОСТЬ ========= */
 @media (max-width: 1200px) {
-    .hero-card { width: 300px; height: 440px; }
+    .hero-card { width: 300px; height: 460px; }
     .event-card { width: 360px; height: 505px; }
 }
 
 @media (max-width: 1000px) {
-    .hero-card { width: 270px; height: 395px; }
+    .hero-card { width: 270px; height: 415px; }
     .event-card { width: 320px; height: 450px; }
     .hero-name { font-size: 0.95rem; }
     .hero-subtitle { font-size: 0.7rem; }
@@ -1077,12 +1086,12 @@ body {
 
 @media (max-width: 800px) {
     .hero-cards { flex-wrap: wrap; justify-content: center; }
-    .hero-card { width: 340px; height: 500px; }
+    .hero-card { width: 340px; height: 520px; }
     .player-card { min-width: auto; }
 }
 
 @media (max-width: 600px) {
-    .hero-card { width: 280px; height: 410px; }
+    .hero-card { width: 280px; height: 430px; }
     .event-card { width: 290px; height: 410px; }
     .playlist-panel { width: 290px; }
 }
