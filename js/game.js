@@ -1,6 +1,75 @@
-// ---------- ИГРОВАЯ ЛОГИКА (v2) ----------
+// ---------- ИГРОВАЯ ЛОГИКА (v3 — с рангами и звёздами) ----------
 
 "use strict";
+
+// ========== ГЛОБАЛЬНЫЕ МАКСИМУМЫ ДЛЯ РАНГОВ ==========
+const GLOBAL_MAX = {
+    hp: Math.max(...RAW_HEROES.map(h => h[5])),
+    dmg: Math.max(...RAW_HEROES.map(h => h[6])),
+    arm: Math.max(...RAW_HEROES.map(h => h[7])),
+    gold: Math.max(...RAW_HEROES.map(h => h[8])),
+    power: Math.max(...RAW_HEROES.map(h => h[5] + h[6] + h[7]))
+};
+
+// ========== ФУНКЦИИ РАНГОВ ==========
+function getPower(hero) { return hero.hp + hero.dmg + hero.arm; }
+
+function getStars(power) {
+    if (power <= 20) return 1;
+    if (power <= 40) return 2;
+    if (power <= 60) return 3;
+    if (power <= 80) return 4;
+    return 5;
+}
+
+function getWealthStars(gold) {
+    if (gold <= 20) return 1;
+    if (gold <= 40) return 2;
+    if (gold <= 60) return 3;
+    if (gold <= 80) return 4;
+    return 5;
+}
+
+function getRankInGroup(hero, group, key) {
+    const sorted = [...group].sort((a, b) => b[key] - a[key]);
+    return sorted.findIndex(h => h.name === hero.name && h.race === hero.race) + 1;
+}
+
+function getGlobalRank(hero, key) {
+    const sorted = [...ALL_HEROES].sort((a, b) => b[key] - a[key]);
+    return sorted.findIndex(h => h.name === hero.name && h.race === hero.race) + 1;
+}
+
+function getRanksForStat(hero, key) {
+    const ranks = [];
+    const raceMates = ALL_HEROES.filter(h => h.race === hero.race);
+    const raceRank = getRankInGroup(hero, raceMates, key);
+    if (raceRank <= 3) ranks.push({ icon: RACE_ICONS[hero.race], rank: raceRank, cls: 'rank-race' });
+    
+    const profMates = ALL_HEROES.filter(h => h.prof === hero.prof);
+    const profRank = getRankInGroup(hero, profMates, key);
+    if (profRank <= 3) ranks.push({ icon: PROF_ICONS[hero.prof], rank: profRank, cls: 'rank-prof' });
+    
+    const sagaMates = ALL_HEROES.filter(h => h.saga === hero.saga);
+    const sagaRank = getRankInGroup(hero, sagaMates, key);
+    if (sagaRank <= 3) ranks.push({ icon: SAGA_ICONS[hero.saga], rank: sagaRank, cls: 'rank-saga' });
+    
+    const globalRank = getGlobalRank(hero, key);
+    if (globalRank <= 15) ranks.push({ icon: '👑', rank: globalRank, cls: 'rank-global' });
+    
+    return ranks;
+}
+
+function ranksHTML(ranks) {
+    if (!ranks || ranks.length === 0) return '';
+    return ranks.map(r => 
+        `<span class="rank-badge ${r.cls} ${r.rank === 1 ? 'top1' : ''}">${r.icon}#${r.rank}</span>`
+    ).join('');
+}
+
+function isRecord(ranks) {
+    return ranks && ranks.some(r => r.rank === 1);
+}
 
 // ========== ГЕНЕРАЦИЯ ВСЕХ ГЕРОЕВ ==========
 let ALL_HEROES = [];
@@ -62,10 +131,8 @@ function shuffle(arr) {
     return arr; 
 }
 
-// Проверка возможности объединения героев
 function canMergeHeroes(heroes) {
     if (heroes.length <= 1) return true;
-    const first = heroes[0];
     if (round < 3) return heroes.length === 1;
     if (round === 3 && currentEvent.kingdom) {
         return heroes.every(h => h.race === currentEvent.kingdom.race);
@@ -84,7 +151,6 @@ function canMergeHeroes(heroes) {
     return false;
 }
 
-// Подсветка иконок
 function canMergeByTrait(player, traitType) {
     if (traitType === 'race' && currentEvent.kingdom && round >= 3) {
         return player.hand.filter(h => h.race === currentEvent.kingdom.race).length >= 2;
@@ -98,7 +164,6 @@ function canMergeByTrait(player, traitType) {
     return false;
 }
 
-// Суммирование статов группы
 function sumHeroStats(heroes) {
     if (!heroes.length) return null;
     const base = heroes.map(h => {
@@ -211,7 +276,6 @@ function updateUI() {
         if (actionBtn) { actionBtn.textContent = '⚔️ БОЙ ИДЁТ...'; actionBtn.disabled = true; }
     }
     
-    // Карточки событий
     const eventsContainer = document.getElementById('eventCardsContainer');
     if (eventsContainer) {
         eventsContainer.innerHTML = '';
@@ -237,7 +301,6 @@ function updateUI() {
         });
     }
     
-    // Руки игроков
     players.forEach((pl, idx) => {
         const titleBadge = document.getElementById(`titleP${idx}`);
         const relicsBadge = document.getElementById(`relicsP${idx}`);
@@ -292,27 +355,77 @@ function updateUI() {
             card.className = `hero-card ${pl.selectedHeroes.includes(h) ? 'selected' : ''} ${isHidden ? 'hidden-card' : ''}`;
             card.setAttribute('data-race', h.race);
             
-            const maxStat = Math.max(h.maxHp, h.maxDmg, h.maxArm, h.maxGold, 1);
             const raceHL = canMergeByTrait(pl, 'race') && h.race === currentEvent.kingdom?.race;
             const profHL = canMergeByTrait(pl, 'prof') && h.prof === currentEvent.profession?.prof;
             const sagaHL = canMergeByTrait(pl, 'saga') && h.saga === currentEvent.saga?.saga;
             
+            const power = getPower(h);
+            const stars = getStars(power);
+            const wStars = getWealthStars(h.gold);
+            
+            const ranksForStats = {
+                hp: getRanksForStat(h, 'hp'),
+                arm: getRanksForStat(h, 'arm'),
+                dmg: getRanksForStat(h, 'dmg'),
+                gold: getRanksForStat(h, 'gold')
+            };
+            
+            function statBarHTML(icon, label, value, maxVal, ranks, barClass) {
+                const pct = (value / maxVal) * 100;
+                const glowing = pct >= 70 ? ' glowing' : '';
+                const record = isRecord(ranks) ? ' record' : '';
+                return `
+                    <div class="stat-row">
+                        <div class="label-group">
+                            <span class="stat-label">${icon} ${label}</span>
+                            <div class="stat-right">
+                                <span class="stat-value">${value}</span>
+                                <span class="stat-ranks">${ranksHTML(ranks)}</span>
+                            </div>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill ${barClass}${glowing}${record}" style="width:${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Звёзды мощи
+            let starsHTML = '<div class="stars-row">';
+            starsHTML += '<div class="stars-combat">';
+            for (let i = 0; i < 5; i++) {
+                starsHTML += `<span class="star${i < stars ? ' active' : ''}">★</span>`;
+            }
+            starsHTML += '</div>';
+            if (stars > 0 && wStars > 0) {
+                starsHTML += '<span class="stars-divider">·</span>';
+            }
+            starsHTML += '<div class="stars-wealth">';
+            for (let i = 0; i < 5; i++) {
+                const symbol = i >= 4 ? '💎' : '💰';
+                starsHTML += `<span class="star wealth${i < wStars ? ' active' : ''}">${symbol}</span>`;
+            }
+            starsHTML += '</div></div>';
+            
             card.innerHTML = `
-                <div class="hero-portrait"><img src="${h.imageFile}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'"></div>
+                <div class="hero-portrait">
+                    <img src="${h.imageFile}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'">
+                    ${starsHTML}
+                </div>
                 <div class="hero-info">
                     <div class="hero-name">${h.name}</div>
-                    <div class="hero-subtitle">${h.race} · ${h.prof}</div>
+                    <div class="hero-subtitle">${h.race} · ${h.prof} · ${h.saga}</div>
                     <div class="hero-icons-row">
                         <div class="hero-icon ${raceHL ? 'icon-highlight' : ''}" data-trait="race"><span>${h.iconRace}</span><span>Раса</span></div>
                         <div class="hero-icon ${profHL ? 'icon-highlight' : ''}" data-trait="prof"><span>${h.iconProf}</span><span>Проф</span></div>
                         <div class="hero-icon ${sagaHL ? 'icon-highlight' : ''}" data-trait="saga"><span>${h.iconSaga}</span><span>Сага</span></div>
                     </div>
-                    <div class="hero-power-badge"><span class="power-value">⚡ ${h.power}</span></div>
+                    <div class="hero-power-badge"><span class="power-value">⚡ ${power}</span></div>
                     <div class="stats-container">
-                        <div class="stat-row"><div class="label-group"><span>❤️ Здоровье</span><span class="stat-value">${h.hp}</span></div><div class="bar-bg"><div class="bar-fill hp-bar" style="width:${(h.hp/maxStat)*100}%"></div></div></div>
-                        <div class="stat-row"><div class="label-group"><span>🛡️ Броня</span><span class="stat-value">${h.arm}</span></div><div class="bar-bg"><div class="bar-fill armor-bar" style="width:${(h.arm/maxStat)*100}%"></div></div></div>
-                        <div class="stat-row"><div class="label-group"><span>⚔️ Урон</span><span class="stat-value">${h.dmg}</span></div><div class="bar-bg"><div class="bar-fill dmg-bar" style="width:${(h.dmg/maxStat)*100}%"></div></div></div>
-                        <div class="stat-row"><div class="label-group"><span>💰 Золото</span><span class="stat-value">${h.gold}</span></div><div class="bar-bg"><div class="bar-fill gold-bar" style="width:${(h.gold/maxStat)*100}%"></div></div></div>
+                        ${statBarHTML('❤️', 'Здоровье', h.hp, GLOBAL_MAX.hp, ranksForStats.hp, 'hp-bar')}
+                        ${statBarHTML('🛡️', 'Броня', h.arm, GLOBAL_MAX.arm, ranksForStats.arm, 'armor-bar')}
+                        ${statBarHTML('⚔️', 'Урон', h.dmg, GLOBAL_MAX.dmg, ranksForStats.dmg, 'dmg-bar')}
+                        ${statBarHTML('💰', 'Золото', h.gold, GLOBAL_MAX.gold, ranksForStats.gold, 'gold-bar')}
                     </div>
                 </div>
             `;
@@ -340,7 +453,7 @@ function toggleHeroSelection(player, hero) {
     } else {
         const testGroup = [...player.selectedHeroes, hero];
         if (!canMergeHeroes(testGroup)) { 
-            addLog('⚠️ Нельзя объединить этих героев! Проверьте условия текущего раунда.'); 
+            addLog('⚠️ Нельзя объединить этих героев!'); 
             return; 
         }
         player.selectedHeroes.push(hero);
@@ -410,7 +523,7 @@ function aiMakeChoice() {
     ai.selectedHeroes = candidates.slice(0, Math.min(3, candidates.length));
     ai.hasConfirmed = true;
     updateUI();
-    addLog(`🤖 ИИ (Фронт ${currentPlayerIndex + 1}) выбрал ${ai.selectedHeroes.length} героя(ев).`);
+    addLog(`🤖 ИИ выбрал ${ai.selectedHeroes.length} героя(ев).`);
     processAction();
 }
 
@@ -470,7 +583,7 @@ function startBattle() {
         
         if (winner.winStreak > winner.titleLevel && winner.winStreak <= 10) {
             winner.titleLevel = winner.winStreak;
-            addLog(`🏅 Фронт ${winner.id + 1} получает звание: ${TITLES[winner.titleLevel - 1].name}! (+${TITLES[winner.titleLevel - 1].bonus})`);
+            addLog(`🏅 Звание: ${TITLES[winner.titleLevel - 1].name}! (+${TITLES[winner.titleLevel - 1].bonus})`);
         }
         
         addLog(`🏆 Раунд ${round}: Победил Фронт ${winner.id + 1}!`);
@@ -489,19 +602,15 @@ function startBattle() {
     battlePhase = 'result';
     updateUI();
     
-    // Проверка на конец игры (у кого-то пустая рука)
     for (let i = 0; i < players.length; i++) {
         if (players[i].hand.length === 0) {
             gameWinner = (i === 0) ? 1 : 0;
-            addLog(`👑 ФРОНТ ${gameWinner + 1} ПОБЕДИЛ! У противника не осталось героев!`);
-            
-            // Победитель получает реликвию
+            addLog(`👑 ФРОНТ ${gameWinner + 1} ПОБЕДИЛ!`);
             const winner = players[gameWinner];
-            const loser = players[1 - gameWinner];
             if (eventDecks.relics.length > 0) {
                 const newRelic = eventDecks.relics.pop();
                 winner.relics.push(newRelic);
-                addLog(`🔮 Фронт ${winner.id + 1} получает реликвию за победу: ${newRelic.name} (сет "${newRelic.setName}")`);
+                addLog(`🔮 Реликвия: ${newRelic.name} (сет "${newRelic.setName}")`);
             }
             updateUI();
             return;
@@ -525,10 +634,10 @@ function nextRound() {
     players.forEach(p => p.hasConfirmed = false);
     updateUI();
     
-    if (round === 2) addLog(`🌀 Раунд ${round}! Локация: ${currentEvent.location.name} — ${currentEvent.location.desc}`);
-    else if (round === 3) addLog(`🌀 Раунд ${round}! Королевство: ${currentEvent.kingdom.name} — объединение по расе ${currentEvent.kingdom.race}`);
-    else if (round === 4) addLog(`🌀 Раунд ${round}! Профессия: ${currentEvent.profession.name} — объединение по профессии ${currentEvent.profession.prof}`);
-    else if (round === 5) addLog(`🌀 Раунд ${round}! Сага: ${currentEvent.saga.name} — объединение по саге ${currentEvent.saga.saga}`);
+    if (round === 2) addLog(`🌀 Раунд ${round}! Локация: ${currentEvent.location.name}`);
+    else if (round === 3) addLog(`🌀 Раунд ${round}! Королевство: ${currentEvent.kingdom.name}`);
+    else if (round === 4) addLog(`🌀 Раунд ${round}! Профессия: ${currentEvent.profession.name}`);
+    else if (round === 5) addLog(`🌀 Раунд ${round}! Сага: ${currentEvent.saga.name}`);
     else addLog(`🌀 Раунд ${round} начался!`);
     
     checkAITurn();
