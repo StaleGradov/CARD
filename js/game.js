@@ -1,4 +1,4 @@
-// ---------- ИГРОВАЯ ЛОГИКА (v12 — бонусы на карточках, полоски видны) ----------
+// ---------- ИГРОВАЯ ЛОГИКА (v13 — 5 карт на старте, все бонусы на карточках) ----------
 
 "use strict";
 
@@ -279,7 +279,7 @@ function initGame(mode) {
     const cardsPerPlayer = Math.floor(ALL_HEROES.length / numPlayers);
     players.forEach((p, idx) => {
         p.deck = allHeroesCopy.slice(idx * cardsPerPlayer, (idx + 1) * cardsPerPlayer);
-        p.hand = p.deck.splice(0, 3);
+        p.hand = p.deck.splice(0, 5);
         p.selectedHeroes = [];
         p.hasConfirmed = false;
         p.relics = oldData[idx] ? oldData[idx].relics : [];
@@ -343,7 +343,6 @@ function updateUI() {
         }
     }
 
-    // События
     const eventsContainer = document.getElementById('eventCardsContainer');
     if (eventsContainer) {
         eventsContainer.innerHTML = '';
@@ -369,7 +368,6 @@ function updateUI() {
         });
     }
 
-    // Игроки
     players.forEach((pl, idx) => {
         const titleBadge = document.getElementById(`titleP${idx}`);
         const relicsBadge = document.getElementById(`relicsP${idx}`);
@@ -396,7 +394,6 @@ function updateUI() {
             streakBadge.style.display = pl.winStreak > 0 ? 'inline' : 'none';
         }
 
-        // Итог раунда
         const roundResult = document.getElementById(`roundResult${idx}`);
         if (roundResult) {
             if (lastRoundWinner === idx) {
@@ -411,7 +408,6 @@ function updateUI() {
             }
         }
 
-        // Кнопка инвентаря
         const invBtn = document.getElementById(`invBtn${idx}`);
         if (invBtn) {
             invBtn.onclick = function(e) {
@@ -448,10 +444,8 @@ function updateUI() {
             container.appendChild(emptyDiv);
         }
 
-        // Бонусы игрока
         const titleBonus = getTitleBonus(pl);
         const relicBonus = getRelicBonus(pl);
-        const totalBonus = titleBonus + relicBonus;
 
         pl.hand.forEach(h => {
             let card = document.createElement('div');
@@ -468,6 +462,22 @@ function updateUI() {
             const stars = getStars(power);
             const wStars = getWealthStars(h.gold);
 
+            let personalKingdomBonus = 0;
+            let personalProfessionBonus = 0;
+            let personalSagaBonus = 0;
+
+            if (currentEvent.kingdom && h.race === currentEvent.kingdom.race) {
+                personalKingdomBonus = 10;
+            }
+            if (currentEvent.profession && h.prof === currentEvent.profession.prof) {
+                personalProfessionBonus = 15;
+            }
+            if (currentEvent.saga && h.saga === currentEvent.saga.saga) {
+                personalSagaBonus = 20;
+            }
+
+            const totalBonus = titleBonus + relicBonus + personalKingdomBonus + personalProfessionBonus + personalSagaBonus;
+
             const ranksForStats = {
                 hp: getRanksForStat(h, 'hp'),
                 arm: getRanksForStat(h, 'arm'),
@@ -475,19 +485,19 @@ function updateUI() {
                 gold: getRanksForStat(h, 'gold')
             };
 
-            function statBarHTML(icon, label, baseValue, maxVal, ranks, barClass) {
-                const totalValue = baseValue + totalBonus;
+            function statBarHTML(icon, label, baseValue, maxVal, ranks, barClass, bonus) {
+                const totalValue = baseValue + bonus;
                 const pct = Math.min((totalValue / maxVal) * 100, 100);
                 const glowing = pct >= 70 ? ' glowing' : '';
                 const record = isRecord(ranks) ? ' record' : '';
-                
+
                 let valueHTML = '';
-                if (totalBonus > 0) {
-                    valueHTML = `${baseValue} <span class="stat-bonus">+${totalBonus}</span>`;
+                if (bonus > 0) {
+                    valueHTML = `${baseValue} <span class="stat-bonus">+${bonus}</span>`;
                 } else {
                     valueHTML = `${baseValue}`;
                 }
-                
+
                 return `
                     <div class="stat-row">
                         <div class="label-group">
@@ -534,10 +544,10 @@ function updateUI() {
                     </div>
                     <div class="hero-power-badge"><span class="power-value">⚡ ${power}${totalBonus > 0 ? ` <span class="stat-bonus">+${totalBonus}</span>` : ''}</span></div>
                     <div class="stats-container">
-                        ${statBarHTML('❤️', 'Здоровье', h.hp, GLOBAL_MAX.hp, ranksForStats.hp, 'hp-bar')}
-                        ${statBarHTML('🛡️', 'Броня', h.arm, GLOBAL_MAX.arm, ranksForStats.arm, 'armor-bar')}
-                        ${statBarHTML('⚔️', 'Урон', h.dmg, GLOBAL_MAX.dmg, ranksForStats.dmg, 'dmg-bar')}
-                        ${statBarHTML('💰', 'Золото', h.gold, GLOBAL_MAX.gold, ranksForStats.gold, 'gold-bar')}
+                        ${statBarHTML('❤️', 'Здоровье', h.hp, GLOBAL_MAX.hp, ranksForStats.hp, 'hp-bar', totalBonus)}
+                        ${statBarHTML('🛡️', 'Броня', h.arm, GLOBAL_MAX.arm, ranksForStats.arm, 'armor-bar', totalBonus)}
+                        ${statBarHTML('⚔️', 'Урон', h.dmg, GLOBAL_MAX.dmg, ranksForStats.dmg, 'dmg-bar', totalBonus)}
+                        ${statBarHTML('💰', 'Золото', h.gold, GLOBAL_MAX.gold, ranksForStats.gold, 'gold-bar', totalBonus)}
                     </div>
                 </div>
             `;
@@ -577,7 +587,6 @@ function showInventoryModal(playerId) {
 
     invPlayerIdSpan.innerText = playerId + 1;
 
-    // Слоты экипировки
     equipSlotsContainer.innerHTML = '';
     EQUIP_SLOTS.forEach(slot => {
         const equipped = player.equippedRelics[slot.id];
@@ -620,7 +629,6 @@ function showInventoryModal(playerId) {
         equipSlotsContainer.appendChild(slotDiv);
     });
 
-    // Бонусы
     const equippedArray = player.getEquippedRelicsArray();
     const totalBonus = getActiveSetBonus(equippedArray);
     const setGroups = {};
@@ -642,7 +650,6 @@ function showInventoryModal(playerId) {
     }
     equipBonusInfo.innerHTML = bonusHTML;
 
-    // Список реликвий
     relicTotalCount.innerText = player.relics.length;
     relicsListContainer.innerHTML = '';
 
@@ -868,7 +875,6 @@ function startBattle() {
     battlePhase = 'result';
     updateUI();
 
-    // Проверка конца игры
     for (let i = 0; i < players.length; i++) {
         if (players[i].hand.length === 0) {
             gameWinner = i;
@@ -1253,7 +1259,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initMusic();
     bindMusicEvents();
 
-    // Закрытие инвентаря по кнопке
     const closeInvBtn = document.getElementById('closeInventoryBtn');
     if (closeInvBtn) {
         closeInvBtn.addEventListener('click', function() {
@@ -1261,7 +1266,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Закрытие инвентаря по фону
     const invModal = document.getElementById('inventoryModal');
     if (invModal) {
         invModal.addEventListener('click', function(e) {
@@ -1269,7 +1273,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Закрытие модалки реликвии по фону
     const relicModal = document.getElementById('relicChoiceModal');
     if (relicModal) {
         relicModal.addEventListener('click', function(e) {
@@ -1277,7 +1280,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Кнопки режимов
     document.querySelectorAll('.mode-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             document.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -1287,11 +1289,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Кнопка действия
     const actionBtn = document.getElementById('actionBtn');
     if (actionBtn) actionBtn.onclick = processAction;
 
-    // Кнопка сброса
     const resetBtn = document.getElementById('resetGame');
     if (resetBtn) resetBtn.onclick = function() { initGame(gameMode); };
 
