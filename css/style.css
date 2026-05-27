@@ -10,8 +10,6 @@
     --gold-color: #ffd700; 
     --bg-dark: #0d0d0d; 
     --parchment-bg: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/parchment.jpg');
-    
-    /* Новые переменные для фонов */
     --bg-main: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/main_bg.jpg');
     --bg-forest: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/forest.jpg');
     --bg-mountains: url('https://raw.githubusercontent.com/StaleGradov/CARD/main/images/mountains.jpg');
@@ -32,13 +30,12 @@ body {
     padding: 12px; 
 }
 
-/* === ОБЩИЙ ФОН КОНТЕЙНЕРА (по умолчанию main_bg) === */
 .game-container { 
     max-width: 3200px; 
     width: 100%; 
-    background: var(--bg-main) center/cover no-repeat; /* <-- ФОН ДОБАВЛЕН */
-    background-color: rgba(0, 0, 0, 0.5); /* fallback если картинка не грузится */
-    background-blend-mode: overlay; /* Затемняем фон для читаемости */
+    background: var(--bg-main) center/cover no-repeat;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-blend-mode: overlay;
     backdrop-filter: blur(4px); 
     border-radius: 48px; 
     padding: 16px 24px 20px; 
@@ -48,31 +45,12 @@ body {
     transition: background-image 0.5s ease-in-out;
 }
 
-/* === КЛАССЫ ДЛЯ СМЕНЫ ФОНА ПРИ ПОЯВЛЕНИИ ЛОКАЦИИ === */
-.game-container.bg-forest {
-    background: var(--bg-forest) center/cover no-repeat;
-    background-blend-mode: overlay;
-}
-.game-container.bg-mountains {
-    background: var(--bg-mountains) center/cover no-repeat;
-    background-blend-mode: overlay;
-}
-.game-container.bg-swamp {
-    background: var(--bg-swamp) center/cover no-repeat;
-    background-blend-mode: overlay;
-}
-.game-container.bg-cave {
-    background: var(--bg-cave) center/cover no-repeat;
-    background-blend-mode: overlay;
-}
-.game-container.bg-ruins {
-    background: var(--bg-ruins) center/cover no-repeat;
-    background-blend-mode: overlay;
-}
-.game-container.bg-village {
-    background: var(--bg-village) center/cover no-repeat;
-    background-blend-mode: overlay;
-}
+.game-container.bg-forest { background: var(--bg-forest) center/cover no-repeat; background-blend-mode: overlay; }
+.game-container.bg-mountains { background: var(--bg-mountains) center/cover no-repeat; background-blend-mode: overlay; }
+.game-container.bg-swamp { background: var(--bg-swamp) center/cover no-repeat; background-blend-mode: overlay; }
+.game-container.bg-cave { background: var(--bg-cave) center/cover no-repeat; background-blend-mode: overlay; }
+.game-container.bg-ruins { background: var(--bg-ruins) center/cover no-repeat; background-blend-mode: overlay; }
+.game-container.bg-village { background: var(--bg-village) center/cover no-repeat; background-blend-mode: overlay; }
 
 .title { 
     text-align: center; 
@@ -102,6 +80,7 @@ body {
     padding: 6px 15px;
     border-radius: 60px;
 }
+
 .round-info {
     font-size: 1.1rem;
     font-weight: bold;
@@ -110,19 +89,12 @@ body {
     padding: 4px 16px;
     border-radius: 40px;
 }
-.reset-stats-btn {
-    background: #4a3a2a;
-    border: 1px solid #a77b44;
-    color: #ffcf8a;
-    padding: 4px 14px;
-    border-radius: 30px;
-    font-size: 0.75rem;
-    cursor: pointer;
-}
+
 .mode-selector { 
     display: flex; 
     gap: 8px; 
 }
+
 .mode-btn { 
     background: #3a2a1a; 
     border: 1px solid #a77b44; 
@@ -132,13 +104,14 @@ body {
     font-size: 0.8rem; 
     cursor: pointer; 
 }
+
 .mode-btn.active { 
     background: #b3470c; 
     color: white; 
     box-shadow: 0 0 8px orange; 
 }
 
-/* ========= КАРТОЧКИ СОБЫТИЙ И ЛОКАЦИЙ (крупнее, пропорции А6 1:1.414) ========= */
+/* ========= КАРТОЧКИ СОБЫТИЙ ========= */
 .event-cards-row { 
     display: flex; 
     gap: 20px; 
@@ -148,12 +121,11 @@ body {
     overflow-x: auto;
     padding: 5px 0;
 }
+
 .event-card { 
     flex: 0 0 auto;
     width: 340px;
-    height: 481px;  /* 340 × 1.414 = 480.76 ≈ 481px */
-    min-width: auto;
-    max-width: none;
+    height: 481px;
     background: #1a1a1a; 
     border-radius: 24px; 
     overflow: hidden; 
@@ -164,23 +136,25 @@ body {
     display: flex; 
     flex-direction: column; 
 }
+
 .event-card:hover { 
     transform: translateY(-4px); 
     box-shadow: 0 10px 0 #7a4a1f, 0 0 25px rgba(201, 164, 91, 0.4); 
 }
 
-/* Портрет события/локации — 55% высоты */
 .event-portrait { 
     width: 100%;
     height: 55%;
     position: relative; 
     background: #0d0d0d;
 }
+
 .event-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
 }
+
 .event-portrait::after { 
     content: ''; 
     position: absolute; 
@@ -191,7 +165,6 @@ body {
     background: linear-gradient(to top, #1a1a1a, transparent); 
 }
 
-/* Информационная часть события/локации — 45% высоты */
 .event-info { 
     height: 45%;
     padding: 12px 14px;
@@ -204,13 +177,9 @@ body {
     border-top: 2px solid rgba(199, 161, 91, 0.6);
     overflow-y: auto;
 }
-.event-info::-webkit-scrollbar {
-    width: 3px;
-}
-.event-info::-webkit-scrollbar-thumb {
-    background: #c9a45b;
-    border-radius: 3px;
-}
+
+.event-info::-webkit-scrollbar { width: 3px; }
+.event-info::-webkit-scrollbar-thumb { background: #c9a45b; border-radius: 3px; }
 
 .event-name { 
     font-size: 1.2rem; 
@@ -221,6 +190,7 @@ body {
     letter-spacing: 1px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
+
 .event-desc { 
     font-size: 0.85rem; 
     opacity: 0.9; 
@@ -228,18 +198,21 @@ body {
     color: #ecd690; 
     line-height: 1.3;
 }
+
 .event-icon { 
     font-size: 2rem; 
     text-align: center; 
     margin: 5px 0;
 }
 
+/* ========= АРЕНА ========= */
 .arena { 
     display: flex; 
     flex-wrap: wrap; 
     gap: 20px; 
     justify-content: center; 
 }
+
 .player-card { 
     flex: 1 1 400px; 
     min-width: 360px; 
@@ -254,6 +227,7 @@ body {
     flex-direction: column;
     max-height: 100%;
 }
+
 .player-name { 
     display: flex; 
     align-items: center; 
@@ -264,21 +238,54 @@ body {
     background: linear-gradient(145deg, #2d261b, #1a150e); 
     border-radius: 50px; 
     padding: 6px 12px; 
-    margin-bottom: 12px; 
+    margin-bottom: 8px; 
     color: #ffda99; 
     text-shadow: 0 1px 0 #5a3a1a; 
     border: 1px solid #b47c48; 
     flex-shrink: 0;
 }
-.score-badge { 
-    font-size: 1rem; 
-    color: gold; 
-    background: #3a2a1a; 
-    padding: 2px 10px; 
-    border-radius: 40px; 
-    border: 1px solid #e7bc7e; 
+
+/* Строка с инфой игрока */
+.player-info-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
+.title-badge {
+    background: linear-gradient(145deg, #4a3000, #2a1a00);
+    border: 1px solid #ffd700;
+    color: #ffd700;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.relic-count {
+    background: rgba(100, 60, 200, 0.4);
+    border: 1px solid #9b30ff;
+    color: #d4b8ff;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.streak-badge {
+    background: rgba(200, 100, 0, 0.4);
+    border: 1px solid #ff6600;
+    color: #ff9933;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* ========= КАРТОЧКИ ГЕРОЕВ ========= */
 .hero-cards { 
     display: flex; 
     flex-wrap: nowrap;
@@ -293,7 +300,6 @@ body {
     padding: 5px 2px;
 }
 
-/* ========= КАРТОЧКИ ГЕРОЕВ (пропорции А6 1:1.414) ========= */
 .hero-card { 
     flex: 0 0 auto;
     width: 280px;
@@ -303,7 +309,7 @@ body {
     background: #1a1a1a; 
     border-radius: 20px; 
     overflow: hidden; 
-    border: 3px solid;
+    border: 3px solid #6b5b3a;
     box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(0,0,0,0.5); 
     color: white; 
     cursor: pointer; 
@@ -311,18 +317,18 @@ body {
     display: flex; 
     flex-direction: column;
 }
+
 .hero-card:hover { 
     transform: translateY(-4px); 
     box-shadow: 0 10px 0 #3a2a1a, 0 0 25px rgba(201, 164, 91, 0.4); 
 }
+
 .hero-card.selected { 
     transform: scale(1.01) translateY(-3px); 
     box-shadow: 0 8px 0 #3a2a1a, 0 0 30px gold; 
-    border-width: 8px; 
     border-color: gold !important; 
 }
 
-/* Портрет героя — 48% высоты */
 .hero-portrait { 
     width: 100%;
     height: 48%;
@@ -330,12 +336,14 @@ body {
     flex-shrink: 0;
     background: #0d0d0d;
 }
+
 .hero-portrait img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover;
     display: block;
 }
+
 .hero-portrait::after { 
     content: ''; 
     position: absolute; 
@@ -347,7 +355,6 @@ body {
     pointer-events: none;
 }
 
-/* Информационная часть героя — 52% высоты */
 .hero-info { 
     height: 52%;
     padding: 4px 7px 5px;
@@ -368,7 +375,7 @@ body {
     font-size: 0.95rem;
     font-weight: bold; 
     text-align: center; 
-    margin-bottom: 1px; 
+    margin-bottom: 0; 
     color: #ffefc0; 
     text-transform: uppercase; 
     letter-spacing: 0.5px;
@@ -381,7 +388,7 @@ body {
     font-weight: 500;
     opacity: 0.9; 
     text-align: center; 
-    margin-bottom: 2px;
+    margin-bottom: 0;
     color: #f5e2b0;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
@@ -390,7 +397,7 @@ body {
     display: flex; 
     justify-content: center; 
     gap: 5px;
-    margin: 1px 0;
+    margin: 0 0 1px 0;
     flex-wrap: wrap;
 }
 
@@ -407,11 +414,28 @@ body {
     border: 1px solid rgba(201, 164, 91, 0.5);
     gap: 1px;
     min-width: 45px;
+    transition: all 0.3s ease;
 }
+
+/* Подсветка иконок когда можно объединять */
+.hero-icon.icon-highlight {
+    border-color: #ffd700 !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    background: rgba(50, 30, 0, 0.8);
+    animation: iconPulse 1.5s infinite;
+}
+
+@keyframes iconPulse {
+    0% { box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
+    50% { box-shadow: 0 0 18px rgba(255, 215, 0, 0.8); }
+    100% { box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
+}
+
 .hero-icon span:first-child {
     font-size: 0.75rem;
     font-weight: normal;
 }
+
 .hero-icon span:last-child { 
     font-size: 0.5rem;
     opacity: 0.9;
@@ -421,8 +445,9 @@ body {
 
 .hero-power-badge { 
     text-align: center; 
-    margin: 1px 0;
+    margin: 0 0 2px 0;
 }
+
 .power-value { 
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(2px);
@@ -440,13 +465,16 @@ body {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin: 2px 0 0;
+    gap: 2px;
+    margin: 0;
 }
 
 .stat-row { 
-    margin-bottom: 0;
+    margin-top: -1px;
 }
+
+.stat-row:first-child { margin-top: 0; }
+
 .label-group { 
     display: flex; 
     justify-content: space-between; 
@@ -457,50 +485,39 @@ body {
     letter-spacing: 0px;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
+
 .stat-value {
     font-weight: bold;
     color: #ffefb0;
     font-size: 0.6rem;
 }
+
 .bar-bg { 
     height: 5px;
     background: rgba(0, 0, 0, 0.5); 
     border-radius: 3px; 
     overflow: hidden; 
 }
+
 .bar-fill { 
     height: 100%; 
     width: 0; 
     transition: width 0.3s ease-out; 
     border-radius: 2px;
 }
-.hp-bar { 
-    background: linear-gradient(90deg, #ff2d55, #ff5e7e); 
-    box-shadow: 0 0 4px #ff2d55;
-}
-.armor-bar { 
-    background: linear-gradient(90deg, #2196f3, #64b5f6); 
-    box-shadow: 0 0 4px #2196f3;
-}
-.dmg-bar { 
-    background: linear-gradient(90deg, #ffc107, #ffd54f); 
-    box-shadow: 0 0 4px #ffc107;
-}
-.gold-bar { 
-    background: linear-gradient(90deg, #ffd700, #ffed4a); 
-    box-shadow: 0 0 5px #ffd700;
-}
 
-/* Скрытая статистика побед/поражений */
-.hero-record { 
-    display: none;
-}
+.hp-bar { background: linear-gradient(90deg, #ff2d55, #ff5e7e); box-shadow: 0 0 4px #ff2d55; }
+.armor-bar { background: linear-gradient(90deg, #2196f3, #64b5f6); box-shadow: 0 0 4px #2196f3; }
+.dmg-bar { background: linear-gradient(90deg, #ffc107, #ffd54f); box-shadow: 0 0 4px #ffc107; }
+.gold-bar { background: linear-gradient(90deg, #ffd700, #ffed4a); box-shadow: 0 0 5px #ffd700; }
 
+/* ========= КНОПКИ ДЕЙСТВИЙ ========= */
 .actions-row {
     display: flex;
     gap: 15px;
     margin: 15px 0 8px;
 }
+
 .fight-btn { 
     background: linear-gradient(145deg, #b3470c, #8a3509); 
     border: none; 
@@ -517,21 +534,25 @@ body {
     text-transform: uppercase; 
     letter-spacing: 1px; 
 }
+
 .fight-btn:active { 
     transform: translateY(2px); 
     box-shadow: 0 2px 0 #5a2a0a; 
 }
+
 .fight-btn.disabled { 
     background: #5e4b36; 
     pointer-events: none; 
     opacity: 0.6; 
 }
+
 .reset-btn { 
     background: linear-gradient(145deg, #2a471f, #1a3012); 
     box-shadow: 0 4px 0 #1a2a0a; 
     flex: 1;
 }
 
+/* ========= ЛОГ ========= */
 .log { 
     background: #090c07e0; 
     border-radius: 20px; 
@@ -544,30 +565,12 @@ body {
     border: 1px solid #c9a45b; 
     font-size: 0.8rem; 
 }
-.deck-counter { 
-    display: none;
-}
-.player-card .deck-counter {
-    display: none;
-}
 
-/* Цвета рамок героев */
-.hero-card[data-race="Полурослик"] { border-color: #808080; }
-.hero-card[data-race="Фея"] { border-color: #32cd32; }
-.hero-card[data-race="Лайтар"] { border-color: #4169e1; }
-.hero-card[data-race="Эльф"] { border-color: #9370db; }
-.hero-card[data-race="Человек"] { border-color: #ff8c00; }
-.hero-card[data-race="Гном"] { border-color: #cd7f32; }
-.hero-card[data-race="Орк"] { border-color: #ff4444; }
-.hero-card[data-race="Дракон"] { 
-    border-color: #ffd700; 
-    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px #ff6600, 0 0 30px #ffaa00;
-    border-width: 4px;
-    animation: fireGlow 1.5s infinite alternate;
-}
-@keyframes fireGlow {
-    from { box-shadow: 0 6px 0 #3a2a1a, 0 0 12px #ff6600, 0 0 25px #ffaa00; }
-    to { box-shadow: 0 6px 0 #3a2a1a, 0 0 22px #ff4400, 0 0 45px #ffcc00; }
+.deck-counter { 
+    text-align: center;
+    color: #ffd58c;
+    font-size: 0.8rem;
+    margin-top: 8px;
 }
 
 .turn-indicator { 
@@ -576,21 +579,22 @@ body {
     color: gold; 
     margin: 5px 0; 
 }
+
 .hidden-card { 
     filter: brightness(0.15) blur(4px); 
     pointer-events: none; 
 }
+
 .hidden-card .hero-name, 
 .hidden-card .hero-subtitle, 
 .hidden-card .hero-power-badge, 
 .hidden-card .stat-row, 
-.hidden-card .hero-record, 
 .hidden-card .hero-icons-row,
 .hidden-card .stats-container { 
     visibility: hidden; 
 }
 
-/* Модальное окно */
+/* ========= МОДАЛЬНЫЕ ОКНА ========= */
 .result-modal { 
     position: fixed; 
     top: 0; 
@@ -604,6 +608,7 @@ body {
     align-items: center; 
     justify-content: center; 
 }
+
 .result-content { 
     max-width: 1000px; 
     width: 90%; 
@@ -612,89 +617,65 @@ body {
     border-radius: 40px; 
     padding: 25px; 
 }
+
 .result-title { 
     text-align: center; 
     font-size: 2rem; 
     color: #ffdfa5; 
     margin-bottom: 15px; 
 }
-.result-comparison { 
-    display: flex; 
-    gap: 25px; 
-    justify-content: center; 
-    flex-wrap: wrap;
-}
-.result-hero { 
-    flex: 1; 
-    background: #1a1a1a; 
-    border-radius: 20px; 
-    padding: 15px; 
-    border: 2px solid; 
-    text-align: center; 
-}
-.result-hero.winner { 
-    border-color: gold; 
-    box-shadow: 0 0 25px gold; 
-}
-.result-hero.loser { 
-    border-color: #8b0000; 
-    opacity: 0.8; 
-}
-.result-portrait { 
-    width: 100%; 
-    height: 170px; 
-    border-radius: 16px; 
-    overflow: hidden; 
-    margin-bottom: 12px; 
-    border: 2px solid #a77b44; 
-}
-.result-portrait img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-}
-.result-power-large { 
-    font-size: 1.6rem; 
-    font-weight: bold; 
-    color: gold; 
-    background: #2a2a2a; 
-    display: inline-block; 
-    padding: 4px 20px; 
-    border-radius: 40px; 
-    margin: 8px 0; 
-}
-.result-stats { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 8px; 
-    margin: 12px 0; 
-}
-.result-stat { 
-    display: flex; 
-    justify-content: space-between; 
-    padding: 6px 10px; 
-    background: #2a2a2a; 
-    border-radius: 10px; 
-    font-size: 0.9rem; 
-}
-.result-vs { 
-    display: flex; 
-    align-items: center; 
-    font-size: 2.5rem; 
-    color: gold; 
-}
-.result-close-btn { 
-    display: block; 
-    margin: 20px auto 0; 
-    padding: 10px 30px; 
-    font-size: 1rem; 
-    background: linear-gradient(145deg, #b3470c, #8a3509); 
-    border: 2px solid #e7bc7e; 
-    color: #ffefb9; 
-    border-radius: 40px; 
-    cursor: pointer; 
+
+/* ========= ОПЦИИ РЕЛИКВИЙ ========= */
+.relic-option {
+    flex: 0 0 auto;
+    width: 220px;
+    background: linear-gradient(145deg, #2a1a3a, #1a0a2a);
+    border: 2px solid #9b30ff;
+    border-radius: 20px;
+    padding: 20px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #d4b8ff;
 }
 
+.relic-option:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 25px rgba(155, 48, 255, 0.5);
+    border-color: #cc66ff;
+}
+
+.relic-option-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.relic-option-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ffdfa5;
+    margin-bottom: 8px;
+}
+
+.relic-option-desc {
+    font-size: 0.75rem;
+    color: #a0a0a0;
+}
+
+.steal-option {
+    width: 160px;
+    padding: 15px 10px;
+    background: linear-gradient(145deg, #3a1a1a, #2a0a0a);
+    border-color: #ff4444;
+    color: #ffaaaa;
+}
+
+.steal-option:hover {
+    border-color: #ff6666;
+    box-shadow: 0 0 25px rgba(255, 68, 68, 0.5);
+}
+
+/* ========= ЭКРАНЫ ПОБЕДЫ/ПОРАЖЕНИЯ ========= */
 .victory-screen, .defeat-screen { 
     position: absolute; 
     top: 0; 
@@ -712,134 +693,27 @@ body {
     text-align: center; 
     padding: 20px; 
 }
+
 .victory-screen h2 { 
     font-size: 3rem; 
     color: gold; 
     text-shadow: 0 0 20px orange; 
     animation: pulse 1.5s infinite; 
 }
+
 .defeat-screen h2 { 
     font-size: 3rem; 
     color: #8b0000; 
     text-shadow: 0 0 20px red; 
 }
+
 @keyframes pulse { 
     0% { transform: scale(1); } 
     50% { transform: scale(1.03); text-shadow: 0 0 40px gold; } 
     100% { transform: scale(1); } 
 }
 
-/* Скроллбары */
-.hero-cards::-webkit-scrollbar,
-.event-cards-row::-webkit-scrollbar {
-    height: 5px;
-    background: #1a1a1a;
-    border-radius: 3px;
-}
-.hero-cards::-webkit-scrollbar-thumb,
-.event-cards-row::-webkit-scrollbar-thumb {
-    background: #c9a45b;
-    border-radius: 3px;
-}
-
-/* Адаптивность */
-@media (max-width: 900px) {
-    .hero-card {
-        width: 240px;
-        height: 339px;
-    }
-    .event-card {
-        width: 280px;
-        height: 396px;
-    }
-    .hero-icon {
-        min-width: 40px;
-        padding: 1px 4px;
-    }
-    .hero-icon span:first-child {
-        font-size: 0.65rem;
-    }
-    .hero-icon span:last-child {
-        font-size: 0.45rem;
-    }
-    .hero-name {
-        font-size: 0.8rem;
-    }
-    .hero-subtitle {
-        font-size: 0.55rem;
-    }
-    .power-value {
-        font-size: 0.65rem;
-        padding: 1px 6px;
-    }
-    .label-group, .stat-value {
-        font-size: 0.55rem;
-    }
-    .bar-bg {
-        height: 4px;
-    }
-    .event-name {
-        font-size: 1rem;
-    }
-    .event-desc {
-        font-size: 0.7rem;
-    }
-    .event-icon {
-        font-size: 1.6rem;
-    }
-}
-
-@media (max-width: 700px) {
-    .hero-cards {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    .hero-card {
-        width: 260px;
-        height: 368px;
-    }
-    .event-card {
-        width: 300px;
-        height: 424px;
-    }
-    .player-card {
-        min-width: auto;
-    }
-}
-
-@media (max-width: 550px) {
-    .hero-card {
-        width: 220px;
-        height: 311px;
-    }
-    .event-card {
-        width: 260px;
-        height: 368px;
-    }
-}
-
-/* Для печати / экспорта в А6 */
-@media print {
-    body {
-        background: white;
-        padding: 0;
-        margin: 0;
-    }
-    .game-container {
-        padding: 0;
-        background: none;
-        box-shadow: none;
-    }
-    .hero-card, .event-card {
-        width: 105mm;
-        height: 148mm;
-        page-break-inside: avoid;
-        break-inside: avoid;
-    }
-}
-
-/* ========== МУЗЫКАЛЬНЫЙ ПЛЕЕР ========== */
-
+/* ========= МУЗЫКАЛЬНЫЙ ПЛЕЕР ========= */
 .music-player {
     position: fixed;
     bottom: 20px;
@@ -923,10 +797,7 @@ body {
     transition: all 0.2s;
 }
 
-.playlist-close-btn:hover {
-    color: gold;
-    transform: scale(1.2);
-}
+.playlist-close-btn:hover { color: gold; transform: scale(1.2); }
 
 .now-playing {
     display: flex;
@@ -939,9 +810,7 @@ body {
     border: 1px solid rgba(201, 164, 91, 0.2);
 }
 
-.now-playing-icon {
-    font-size: 20px;
-}
+.now-playing-icon { font-size: 20px; }
 
 .now-playing-text {
     color: #ecd690;
@@ -973,11 +842,7 @@ body {
     justify-content: center;
 }
 
-.player-btn:hover {
-    background: linear-gradient(145deg, #3d362b, #2a241a);
-    color: gold;
-    transform: scale(1.05);
-}
+.player-btn:hover { background: linear-gradient(145deg, #3d362b, #2a241a); color: gold; transform: scale(1.05); }
 
 .player-btn-play {
     width: 55px;
@@ -997,10 +862,7 @@ body {
     margin-bottom: 15px;
 }
 
-.volume-icon {
-    font-size: 18px;
-    color: #ffdfa5;
-}
+.volume-icon { font-size: 18px; color: #ffdfa5; }
 
 .volume-slider {
     flex: 1;
@@ -1045,14 +907,8 @@ body {
     border-radius: 10px;
 }
 
-.playlist-tracks::-webkit-scrollbar {
-    width: 4px;
-}
-
-.playlist-tracks::-webkit-scrollbar-thumb {
-    background: #c9a45b;
-    border-radius: 2px;
-}
+.playlist-tracks::-webkit-scrollbar { width: 4px; }
+.playlist-tracks::-webkit-scrollbar-thumb { background: #c9a45b; border-radius: 2px; }
 
 .playlist-track {
     display: flex;
@@ -1067,586 +923,59 @@ body {
     border: 1px solid transparent;
 }
 
-.playlist-track:hover {
-    background: rgba(201, 164, 91, 0.2);
-    border-color: rgba(201, 164, 91, 0.3);
-}
+.playlist-track:hover { background: rgba(201, 164, 91, 0.2); border-color: rgba(201, 164, 91, 0.3); }
+.playlist-track.active { background: rgba(201, 164, 91, 0.3); border-color: #c9a45b; }
 
-.playlist-track.active {
-    background: rgba(201, 164, 91, 0.3);
-    border-color: #c9a45b;
-}
+.playlist-track-icon { font-size: 18px; }
+.playlist-track-info { flex: 1; }
+.playlist-track-name { color: #ffdfa5; font-size: 0.85rem; font-weight: 500; }
+.playlist-track-duration { color: #a0a0a0; font-size: 0.7rem; }
+.playlist-track-playing { color: gold; font-size: 14px; }
 
-.playlist-track-icon {
-    font-size: 18px;
-}
-
-.playlist-track-info {
-    flex: 1;
-}
-
-.playlist-track-name {
-    color: #ffdfa5;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.playlist-track-duration {
-    color: #a0a0a0;
-    font-size: 0.7rem;
-}
-
-.playlist-track-playing {
-    color: gold;
-    font-size: 14px;
-}
-
-/* Адаптивность для плеера */
-@media (max-width: 500px) {
-    .playlist-panel {
-        width: 280px;
-    }
-    
-    .music-toggle-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 20px;
-    }
-}
-/* ========== РЫНОК И ЗОЛОТО ========== */
-
-.top-market-row {
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    gap: 15px;
-    margin: 12px 0 18px;
-}
-
-/* Зона продажи (слева) */
-.sell-zone {
-    flex: 0 0 auto;
-    width: 200px;
-    background: linear-gradient(145deg, #2d1a1a, #1a0e0e);
-    border: 3px dashed #c9a45b;
-    border-radius: 20px;
-    padding: 15px 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    transition: all 0.2s ease;
-    cursor: grab;
-    min-height: 200px;
-    align-self: center;
-}
-
-.sell-zone:hover {
-    background: linear-gradient(145deg, #3d2525, #2a1515);
-    border-color: #ff4444;
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
-}
-
-.sell-zone.drag-over {
-    background: linear-gradient(145deg, #4d2a2a, #3a1a1a);
-    border-color: #ff6666;
-    border-style: solid;
-    box-shadow: 0 0 30px rgba(255, 100, 100, 0.5);
-    transform: scale(1.02);
-}
-
-.sell-zone-icon {
-    font-size: 48px;
-    margin-bottom: 10px;
-}
-
-.sell-zone-text {
-    color: #ffdfa5;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.sell-zone-hint {
-    color: #a0a0a0;
-    font-size: 0.7rem;
-}
-
-/* Зона колоды (справа) */
-.deck-zone {
-    flex: 0 0 auto;
-    width: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    align-self: center;
-}
-
-.deck-card {
-    width: 160px;
-    height: 226px;
-    background: linear-gradient(145deg, #1a1a2e, #0d0d1a);
-    border: 3px solid #c9a45b;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 0 #3a2a1a, 0 0 15px rgba(201, 164, 91, 0.3);
-    transition: all 0.2s ease;
-}
-
-.deck-zone:hover .deck-card {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 0 #3a2a1a, 0 0 25px rgba(201, 164, 91, 0.5);
-    border-color: gold;
-}
-
-.deck-card-back {
-    font-size: 64px;
-    margin-bottom: 10px;
-}
-
-.deck-card-text {
-    color: #ffdfa5;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.deck-card-price {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px 15px;
-    border-radius: 20px;
-    color: gold;
-    font-weight: bold;
-    border: 1px solid #c9a45b;
-}
-
-.deck-hint {
-    color: #a0a0a0;
-    font-size: 0.7rem;
-    margin-top: 8px;
-    text-align: center;
-}
-
-/* Золото игроков */
-.players-gold-row {
-    display: flex;
-    justify-content: space-around;
-    margin: 10px 0;
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 40px;
-    border: 1px solid #c9a45b;
-}
-
-.player-gold {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.1rem;
-    color: #ffdfa5;
-    padding: 5px 20px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 30px;
-}
-
-.player-gold-icon {
-    font-size: 1.3rem;
-}
-
-.player-gold-value {
-    font-weight: bold;
-    color: gold;
-}
-
-/* Модальное окно рынка */
-.market-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(10px);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.market-modal.hidden {
-    display: none;
-}
-
-.market-modal-content {
-    max-width: 1200px;
-    width: 90%;
-    background: linear-gradient(145deg, #1e261a, #0a0f07);
-    border: 3px solid #c9a45b;
-    border-radius: 40px;
-    padding: 25px;
-}
-
-.market-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #ffdfa5;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #c9a45b;
-}
-
-.market-modal-close {
-    background: none;
-    border: none;
-    color: #ffdfa5;
-    font-size: 28px;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: all 0.2s;
-}
-
-.market-modal-close:hover {
-    color: gold;
-    transform: scale(1.2);
-}
-
-.market-cards-row {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.market-card {
-    flex: 0 0 auto;
-    width: 260px;
+/* ========= СКРОЛЛБАРЫ ========= */
+.hero-cards::-webkit-scrollbar,
+.event-cards-row::-webkit-scrollbar {
+    height: 5px;
     background: #1a1a1a;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 3px solid #c9a45b;
-    box-shadow: 0 6px 0 #3a2a1a;
-    transition: all 0.2s ease;
+    border-radius: 3px;
 }
 
-.market-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 0 #3a2a1a, 0 0 25px gold;
+.hero-cards::-webkit-scrollbar-thumb,
+.event-cards-row::-webkit-scrollbar-thumb {
+    background: #c9a45b;
+    border-radius: 3px;
 }
 
-.market-card-portrait {
-    width: 100%;
-    height: 180px;
-    position: relative;
-    background: #0d0d0d;
+/* ========= АДАПТИВНОСТЬ ========= */
+@media (max-width: 900px) {
+    .hero-card { width: 240px; height: 339px; }
+    .event-card { width: 280px; height: 396px; }
+    .hero-icon { min-width: 40px; padding: 1px 4px; }
+    .hero-icon span:first-child { font-size: 0.65rem; }
+    .hero-icon span:last-child { font-size: 0.45rem; }
+    .hero-name { font-size: 0.8rem; }
+    .hero-subtitle { font-size: 0.55rem; }
+    .power-value { font-size: 0.65rem; padding: 1px 6px; }
+    .label-group, .stat-value { font-size: 0.55rem; }
+    .bar-bg { height: 4px; }
+    .event-name { font-size: 1rem; }
+    .event-desc { font-size: 0.7rem; }
+    .event-icon { font-size: 1.6rem; }
 }
 
-.market-card-portrait img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+@media (max-width: 700px) {
+    .hero-cards { flex-wrap: wrap; justify-content: center; }
+    .hero-card { width: 260px; height: 368px; }
+    .event-card { width: 300px; height: 424px; }
+    .player-card { min-width: auto; }
 }
 
-.market-card-info {
-    padding: 12px;
-    background: var(--parchment-bg) center/cover;
-    background-color: rgba(30, 25, 18, 0.9);
-    background-blend-mode: multiply;
+@media (max-width: 550px) {
+    .hero-card { width: 220px; height: 311px; }
+    .event-card { width: 260px; height: 368px; }
 }
 
-.market-card-name {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #ffefc0;
-    text-align: center;
-    margin-bottom: 5px;
-}
-
-.market-card-subtitle {
-    font-size: 0.7rem;
-    color: #f5e2b0;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.market-card-power {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.market-card-power span {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 3px 15px;
-    border-radius: 20px;
-    color: #ffd58c;
-    font-weight: bold;
-    border: 1px solid #ffd58c;
-}
-
-.market-card-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    margin-bottom: 12px;
-    font-size: 0.75rem;
-    color: #ecd690;
-}
-
-.market-card-price {
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: gold;
-    margin-bottom: 10px;
-}
-
-.market-buy-btn {
-    width: 100%;
-    padding: 8px;
-    background: linear-gradient(145deg, #b3470c, #8a3509);
-    border: 2px solid #e7bc7e;
-    color: #ffefb9;
-    font-weight: bold;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.market-buy-btn:hover {
-    background: linear-gradient(145deg, #c3571c, #9a4519);
-    transform: scale(1.02);
-}
-
-.market-buy-btn.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-    background: #5e4b36;
-}
-
-.market-modal-footer {
-    text-align: center;
-}
-
-.market-btn {
-    padding: 12px 30px;
-    background: linear-gradient(145deg, #2d261b, #1a150e);
-    border: 2px solid #c9a45b;
-    color: #ffdfa5;
-    font-weight: bold;
-    border-radius: 40px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s;
-}
-
-.market-btn:hover {
-    background: linear-gradient(145deg, #3d362b, #2a241a);
-    color: gold;
-    border-color: gold;
-}
-
-/* Drag & Drop стили */
-.hero-card.dragging {
-    opacity: 0.6;
-    transform: scale(0.95);
-    cursor: grabbing;
-}
-
-.hero-card {
-    cursor: grab;
-    user-select: none;
-    -webkit-user-drag: element;
-}
-
-.hero-card:active {
-    cursor: grabbing;
-}
-
-/* Адаптивность для рынка */
-@media (max-width: 1300px) {
-    .sell-zone {
-        width: 160px;
-        min-height: 160px;
-        padding: 10px 5px;
-    }
-    
-    .deck-zone {
-        width: 160px;
-    }
-    
-    .deck-card {
-        width: 140px;
-        height: 198px;
-    }
-    
-    .sell-zone-icon {
-        font-size: 36px;
-    }
-    
-    .sell-zone-text {
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 1000px) {
-    .top-market-row {
-        flex-wrap: wrap;
-    }
-    
-    .sell-zone {
-        width: 140px;
-    }
-    
-    .deck-zone {
-        width: 140px;
-    }
-}
-/* === СДВИГАЕМ ВСЕ ПОЛОСКИ ВВЕРХ === */
-
-/* Уменьшаем внутренние отступы в информационном блоке */
-.hero-info {
-    padding-top: 2px !important;
-}
-
-/* Уменьшаем отступ после имени и подзаголовка */
-.hero-name {
-    margin-bottom: 0 !important;
-}
-
-.hero-subtitle {
-    margin-bottom: 0 !important;
-}
-
-/* Уменьшаем отступ после иконок */
-.hero-icons-row {
-    margin: 0 0 1px 0 !important;
-}
-
-/* Уменьшаем отступ после мощи */
-.hero-power-badge {
-    margin: 0 0 2px 0 !important;
-}
-
-/* Сдвигаем сам контейнер статов вверх */
-.stats-container {
-    margin-top: 0 !important;
-    gap: 2px !important;  /* Уменьшаем зазор между полосками */
-}
-
-/* Уменьшаем отступы у каждой строки статов */
-.stat-row {
-    margin-top: -1px !important;
-}
-
-.stat-row:first-child {
-    margin-top: 0 !important;
-}
-/* === ПОДСВЕТКА ПО ДОМИНИРУЮЩЕМУ ПАРАМЕТРУ (для печати) === */
-
-/* Базовая рамка героя — делаем толще в 2 раза */
-.hero-card {
-    border-width: 6px !important;
-    border-style: solid;
-}
-
-/* Доминанта: УРОН (Агрессор) — Красная рамка */
-.hero-card.dominant-dmg {
-    border-color: #dc143c !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px rgba(220, 20, 60, 0.6);
-}
-
-/* Доминанта: ЗДОРОВЬЕ (Танк) — Зеленая рамка */
-.hero-card.dominant-hp {
-    border-color: #228b22 !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px rgba(34, 139, 34, 0.6);
-}
-
-/* Доминанта: БРОНЯ (Защитник) — Синяя рамка */
-.hero-card.dominant-arm {
-    border-color: #4169e1 !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px rgba(65, 105, 225, 0.6);
-}
-
-/* Доминанта: ЗОЛОТО (Богач) — Золотая рамка */
-.hero-card.dominant-gold {
-    border-color: #ffd700 !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px rgba(255, 215, 0, 0.7);
-}
-
-/* Доминанта: ГИБРИД (два или более равных доминанта) — ФИОЛЕТОВАЯ рамка */
-.hero-card.dominant-hybrid {
-    border-color: #9b30ff !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 20px rgba(155, 48, 255, 0.7), 0 0 35px rgba(155, 48, 255, 0.3);
-}
-
-/* Нет явной доминанты (Сбалансированный) — Серая рамка */
-.hero-card.dominant-balanced {
-    border-color: #a0a0a0 !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 12px rgba(160, 160, 160, 0.4);
-}
-
-/* Для Драконов — с учетом гибрида */
-.hero-card[data-race="Дракон"].dominant-hybrid {
-    border-color: #9b30ff !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 25px #9b30ff, 0 0 50px #cc88ff;
-    animation: hybridGlow 2s infinite alternate;
-}
-
-@keyframes hybridGlow {
-    from { box-shadow: 0 8px 0 #3a2a1a, 0 0 20px #9b30ff, 0 0 40px #bb66ff; }
-    to { box-shadow: 0 8px 0 #3a2a1a, 0 0 30px #cc66ff, 0 0 60px #ee99ff; }
-}
-
-.hero-card[data-race="Дракон"].dominant-dmg {
-    border-color: #dc143c !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 20px #ff4444, 0 0 40px #ff8888;
-}
-
-.hero-card[data-race="Дракон"].dominant-hp {
-    border-color: #228b22 !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 20px #44ff44, 0 0 40px #88ff88;
-}
-
-.hero-card[data-race="Дракон"].dominant-arm {
-    border-color: #4169e1 !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 20px #4444ff, 0 0 40px #8888ff;
-}
-
-.hero-card[data-race="Дракон"].dominant-gold {
-    border-color: #ffd700 !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 25px gold, 0 0 50px #ffee88;
-}
-
-.hero-card[data-race="Дракон"].dominant-balanced {
-    border-color: #a0a0a0 !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 18px #aaaaaa;
-}
-
-/* Для market-card тоже применяем доминанты */
-.market-card {
-    border-width: 6px !important;
-    border-style: solid;
-}
-
-.market-card.dominant-dmg { border-color: #dc143c !important; }
-.market-card.dominant-hp { border-color: #228b22 !important; }
-.market-card.dominant-arm { border-color: #4169e1 !important; }
-.market-card.dominant-gold { border-color: #ffd700 !important; }
-.market-card.dominant-hybrid { border-color: #9b30ff !important; }
-.market-card.dominant-balanced { border-color: #a0a0a0 !important; }
-
-/* При выделении карты золотая рамка перекрывает доминанту */
-.hero-card.selected {
-    border-color: gold !important;
-    box-shadow: 0 8px 0 #3a2a1a, 0 0 30px gold !important;
+@media (max-width: 500px) {
+    .playlist-panel { width: 280px; }
+    .music-toggle-btn { width: 45px; height: 45px; font-size: 20px; }
 }
