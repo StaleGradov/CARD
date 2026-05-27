@@ -1,168 +1,8 @@
-// ---------- ИГРОВАЯ ЛОГИКА (ОБНОВЛЁННАЯ) ----------
+// ---------- ИГРОВАЯ ЛОГИКА (ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ) ----------
 
 "use strict";
 
-// ========== ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ДОМИНИРУЮЩЕГО ПАРАМЕТРА ==========
-/**
- * Определяет доминирующий параметр героя и возвращает CSS-класс
- * Поддерживает обнаружение ГИБРИДОВ (равные доминанты)
- * @param {Object} hero - объект героя с полями hp, dmg, arm, gold
- * @returns {string} - CSS класс
- */
-function getDominantClass(hero) {
-    const total = hero.hp + hero.dmg + hero.arm + hero.gold;
-    if (total === 0) return 'dominant-balanced';
-    
-    const hpPercent = (hero.hp / total) * 100;
-    const dmgPercent = (hero.dmg / total) * 100;
-    const armPercent = (hero.arm / total) * 100;
-    const goldPercent = (hero.gold / total) * 100;
-    
-    // Пороговые значения
-    const DOMINANT_THRESHOLD = 35;  // для HP, DMG, GOLD
-    const ARM_THRESHOLD = 30;        // для ARM
-    
-    // Собираем все статы, которые превышают порог
-    const dominantStats = [];
-    
-    if (dmgPercent >= DOMINANT_THRESHOLD) dominantStats.push('dmg');
-    if (hpPercent >= DOMINANT_THRESHOLD) dominantStats.push('hp');
-    if (goldPercent >= DOMINANT_THRESHOLD) dominantStats.push('gold');
-    if (armPercent >= ARM_THRESHOLD) dominantStats.push('arm');
-    
-    // === ПРОВЕРКА НА ГИБРИДА ===
-    // Если два или более стата превышают порог И их значения равны (с погрешностью ±5%)
-    if (dominantStats.length >= 2) {
-        // Получаем значения только доминирующих статов
-        const values = dominantStats.map(stat => {
-            if (stat === 'dmg') return dmgPercent;
-            if (stat === 'hp') return hpPercent;
-            if (stat === 'gold') return goldPercent;
-            if (stat === 'arm') return armPercent;
-        });
-        
-        // Находим максимальное значение среди доминантов
-        const maxValue = Math.max(...values);
-        
-        // Считаем, сколько статов близки к максимальному (в пределах 5%)
-        const nearMaxCount = values.filter(v => Math.abs(v - maxValue) <= 5).length;
-        
-        // Если есть хотя бы 2 стата с близкими значениями → ГИБРИД
-        if (nearMaxCount >= 2) {
-            return 'dominant-hybrid';
-        }
-    }
-    
-    // === ОДИНОЧНЫЕ ДОМИНАНТЫ ===
-    if (dominantStats.length === 1) {
-        const stat = dominantStats[0];
-        if (stat === 'dmg') return 'dominant-dmg';
-        if (stat === 'hp') return 'dominant-hp';
-        if (stat === 'gold') return 'dominant-gold';
-        if (stat === 'arm') return 'dominant-arm';
-    }
-    
-    // Если есть несколько доминантов, но они НЕ равны — берем самый сильный
-    if (dominantStats.length >= 2) {
-        const maxStat = dominantStats.reduce((a, b) => {
-            const valA = a === 'dmg' ? dmgPercent : a === 'hp' ? hpPercent : a === 'gold' ? goldPercent : armPercent;
-            const valB = b === 'dmg' ? dmgPercent : b === 'hp' ? hpPercent : b === 'gold' ? goldPercent : armPercent;
-            return valA > valB ? a : b;
-        });
-        
-        if (maxStat === 'dmg') return 'dominant-dmg';
-        if (maxStat === 'hp') return 'dominant-hp';
-        if (maxStat === 'gold') return 'dominant-gold';
-        if (maxStat === 'arm') return 'dominant-arm';
-    }
-    
-    return 'dominant-balanced';
-}
-
-// ========== ЗОЛОТО ИГРОКОВ (СОХРАНЕНИЕ) ==========
-let playersGold = JSON.parse(localStorage.getItem('tigrimionPlayersGold')) || {};
-
-function savePlayersGold() {
-    localStorage.setItem('tigrimionPlayersGold', JSON.stringify(playersGold));
-}
-
-function getPlayerGold(playerId) {
-    return playersGold[playerId] || 0;
-}
-
-function addPlayerGold(playerId, amount) {
-    if (!playersGold[playerId]) playersGold[playerId] = 0;
-    playersGold[playerId] += amount;
-    savePlayersGold();
-    updatePlayersGoldUI();
-}
-
-function spendPlayerGold(playerId, amount) {
-    if (!playersGold[playerId]) playersGold[playerId] = 0;
-    if (playersGold[playerId] < amount) return false;
-    playersGold[playerId] -= amount;
-    savePlayersGold();
-    updatePlayersGoldUI();
-    return true;
-}
-
-function resetAllGold() {
-    playersGold = {};
-    savePlayersGold();
-    updatePlayersGoldUI();
-    addLog('💰 Золото всех игроков сброшено.');
-}
-
-function updatePlayersGoldUI() {
-    const container = document.getElementById('playersGoldContainer');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    players.forEach((p, idx) => {
-        const gold = getPlayerGold(idx);
-        const goldEl = document.createElement('div');
-        goldEl.className = 'player-gold';
-        goldEl.innerHTML = `
-            <span class="player-gold-icon">💰</span>
-            <span>Фронт ${idx + 1}:</span>
-            <span class="player-gold-value">${gold}</span>
-        `;
-        container.appendChild(goldEl);
-    });
-}
-
-// Хранилище статистики
-let heroStats = JSON.parse(localStorage.getItem('tigrimionHeroStats')) || {};
-
-function saveHeroStats() { 
-    localStorage.setItem('tigrimionHeroStats', JSON.stringify(heroStats)); 
-}
-
-function getHeroRecord(heroName) { 
-    const stats = heroStats[heroName] || { wins: 0, losses: 0 }; 
-    return { wins: stats.wins || 0, losses: stats.losses || 0 }; 
-}
-
-function addHeroWin(heroName) { 
-    if (!heroStats[heroName]) heroStats[heroName] = { wins: 0, losses: 0 }; 
-    heroStats[heroName].wins++; 
-    saveHeroStats(); 
-}
-
-function addHeroLoss(heroName) { 
-    if (!heroStats[heroName]) heroStats[heroName] = { wins: 0, losses: 0 }; 
-    heroStats[heroName].losses++; 
-    saveHeroStats(); 
-}
-
-function resetAllStats() { 
-    heroStats = {}; 
-    saveHeroStats(); 
-    addLog('📊 Статистика всех героев сброшена.'); 
-    updateUI();
-}
-
-// Генерация всех героев (ИСПОЛЬЗУЕТ ГОТОВЫЕ СТАТЫ ИЗ RAW_HEROES)
+// ========== ГЕНЕРАЦИЯ ВСЕХ ГЕРОЕВ ==========
 let ALL_HEROES = [];
 (function generateHeroes() {
     ALL_HEROES = RAW_HEROES.map((h, originalIndex) => {
@@ -200,35 +40,35 @@ let ALL_HEROES = [];
     });
 })();
 
-// Класс игрока
+// ========== КЛАСС ИГРОКА ==========
 class Player {
     constructor(id, isAI = false) { 
         this.id = id; 
         this.isAI = isAI; 
         this.deck = []; 
         this.hand = []; 
-        this.lazaret = []; 
-        this.score = 0; 
         this.selectedHeroes = []; 
         this.hasConfirmed = false;
-        this.marketDeck = [];
-        this.openMarket = [];
+        this.relics = [];          // Реликвии игрока
+        this.activeRelicSet = null; // Активный сет реликвий
+        this.winStreak = 0;        // Серия побед (для званий)
+        this.titleLevel = 0;       // Уровень звания (0 = нет звания)
     }
 }
 
-// Глобальные переменные
+// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let players = [];
 let currentPlayerIndex = 0;
 let round = 1;
 let gameWinner = null;
 let battlePhase = 'select';
 let gameMode = 2;
-let eventDecks = { locations: [], kingdoms: [], professions: [], sagas: [] };
+let eventDecks = { locations: [], kingdoms: [], professions: [], sagas: [], relics: [] };
 let currentEvent = { location: null, kingdom: null, profession: null, saga: null };
 let aiTimeout = null;
 let lastBattleResult = null;
 
-// Вспомогательные функции
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 function addLog(msg) { 
     let p = document.createElement('div'); 
     p.innerHTML = msg; 
@@ -247,8 +87,62 @@ function shuffle(arr) {
     return arr; 
 }
 
+// ========== ПРОВЕРКА ВОЗМОЖНОСТИ ОБЪЕДИНЕНИЯ ==========
+function canMergeHeroes(heroes) {
+    if (heroes.length <= 1) return true;
+    
+    const first = heroes[0];
+    
+    // Раунд 1-2: только 1 герой
+    if (round < 3) return heroes.length === 1;
+    
+    // Раунд 3 (королевство): можно объединять только героев той же расы, что и королевство
+    if (round === 3 && currentEvent.kingdom) {
+        return heroes.every(h => h.race === currentEvent.kingdom.race);
+    }
+    
+    // Раунд 4 (профессия): можно объединять по расе королевства ИЛИ по профессии
+    if (round === 4 && currentEvent.profession) {
+        const sameRace = currentEvent.kingdom ? heroes.every(h => h.race === currentEvent.kingdom.race) : false;
+        const sameProf = heroes.every(h => h.prof === currentEvent.profession.prof);
+        return sameRace || sameProf;
+    }
+    
+    // Раунд 5+ (сага): можно объединять по расе ИЛИ профессии ИЛИ саге
+    if (round >= 5 && currentEvent.saga) {
+        const sameRace = currentEvent.kingdom ? heroes.every(h => h.race === currentEvent.kingdom.race) : false;
+        const sameProf = currentEvent.profession ? heroes.every(h => h.prof === currentEvent.profession.prof) : false;
+        const sameSaga = heroes.every(h => h.saga === currentEvent.saga.saga);
+        return sameRace || sameProf || sameSaga;
+    }
+    
+    return false;
+}
+
+// ========== ПРОВЕРКА УСЛОВИЙ ДЛЯ ПОДСВЕТКИ ИКОНОК ==========
+function canMergeByTrait(player, traitType) {
+    if (round < 3 && traitType === 'race') return false;
+    
+    if (traitType === 'race' && currentEvent.kingdom && round >= 3) {
+        return player.hand.filter(h => h.race === currentEvent.kingdom.race).length >= 2;
+    }
+    
+    if (traitType === 'prof' && currentEvent.profession && round >= 4) {
+        return player.hand.filter(h => h.prof === currentEvent.profession.prof).length >= 2;
+    }
+    
+    if (traitType === 'saga' && currentEvent.saga && round >= 5) {
+        return player.hand.filter(h => h.saga === currentEvent.saga.saga).length >= 2;
+    }
+    
+    return false;
+}
+
+// ========== СУММИРОВАНИЕ СТАТОВ ГРУППЫ ГЕРОЕВ ==========
 function sumHeroStats(heroes) {
     if (!heroes.length) return null;
+    
+    // Применяем модификаторы событий
     const base = heroes.map(h => {
         let copy = { ...h, hp: h.hp, dmg: h.dmg, arm: h.arm, gold: h.gold };
         if (currentEvent.kingdom?.mod) currentEvent.kingdom.mod(copy);
@@ -256,6 +150,7 @@ function sumHeroStats(heroes) {
         if (currentEvent.saga?.mod) currentEvent.saga.mod(copy);
         return copy;
     });
+    
     return { 
         hp: base.reduce((s, h) => s + h.hp, 0), 
         dmg: base.reduce((s, h) => s + h.dmg, 0), 
@@ -266,201 +161,19 @@ function sumHeroStats(heroes) {
     };
 }
 
-function canAddToGroup(player, hero) {
-    if (player.selectedHeroes.length === 0) return true;
-    const first = player.selectedHeroes[0];
-    return (first.race === hero.race && first.prof === hero.prof && first.saga === hero.saga);
+// ========== ПОЛУЧЕНИЕ БОНУСА ОТ ЗВАНИЯ ==========
+function getTitleBonus(player) {
+    if (player.titleLevel <= 0) return 0;
+    const title = TITLES[player.titleLevel - 1];
+    return title ? title.bonus : 0;
 }
 
-// ========== ФУНКЦИИ РЫНКА ==========
-
-function initMarketDeck() {
-    const allHeroesCopy = shuffle([...ALL_HEROES]);
-    players.forEach(p => {
-        p.marketDeck = shuffle([...allHeroesCopy]);
-        p.openMarket = [];
-        for (let i = 0; i < 3; i++) {
-            if (p.marketDeck.length > 0) {
-                p.openMarket.push(p.marketDeck.pop());
-            }
-        }
-    });
+// ========== ПОЛУЧЕНИЕ БОНУСА ОТ АКТИВНОГО СЕТА РЕЛИКВИЙ ==========
+function getRelicBonus(player) {
+    return getActiveSetBonus(player.relics);
 }
 
-function sellHero(player, hero) {
-    const heroIndex = player.hand.findIndex(h => h.id === hero.id);
-    if (heroIndex === -1) {
-        addLog('⚠️ Герой не найден в руке!');
-        return false;
-    }
-    
-    const goldValue = hero.gold;
-    player.hand.splice(heroIndex, 1);
-    player.lazaret.push(hero);
-    addPlayerGold(player.id, goldValue);
-    addLog(`💰 Фронт ${player.id + 1} продал ${hero.name} за ${goldValue} золота!`);
-    updateUI();
-    return true;
-}
-
-function buyRandomHero(player) {
-    if (!spendPlayerGold(player.id, 100)) {
-        addLog(`⚠️ Фронт ${player.id + 1}: недостаточно золота! Нужно 100💰.`);
-        return false;
-    }
-    
-    if (player.marketDeck.length === 0) {
-        addLog(`⚠️ Колода рынка пуста!`);
-        addPlayerGold(player.id, 100);
-        return false;
-    }
-    
-    const newHero = player.marketDeck.pop();
-    player.hand.push(newHero);
-    addLog(`🎲 Фронт ${player.id + 1} купил случайного героя: ${newHero.name}!`);
-    updateUI();
-    return true;
-}
-
-function buyOpenHero(player, heroIndex) {
-    if (!spendPlayerGold(player.id, 200)) {
-        addLog(`⚠️ Фронт ${player.id + 1}: недостаточно золота! Нужно 200💰.`);
-        return false;
-    }
-    
-    if (heroIndex < 0 || heroIndex >= player.openMarket.length) {
-        addPlayerGold(player.id, 200);
-        return false;
-    }
-    
-    const boughtHero = player.openMarket.splice(heroIndex, 1)[0];
-    player.hand.push(boughtHero);
-    
-    if (player.marketDeck.length > 0) {
-        player.openMarket.push(player.marketDeck.pop());
-    }
-    
-    addLog(`🛒 Фронт ${player.id + 1} купил ${boughtHero.name} за 200💰!`);
-    updateUI();
-    return true;
-}
-
-function showMarketModal() {
-    const modal = document.getElementById('marketModal');
-    const container = document.getElementById('marketCardsContainer');
-    if (!modal || !container) return;
-    
-    const currentPlayer = players[currentPlayerIndex];
-    container.innerHTML = '';
-    
-    currentPlayer.openMarket.forEach((hero, idx) => {
-        const dominantClass = getDominantClass(hero);
-        const card = document.createElement('div');
-        card.className = `market-card ${dominantClass}`;
-        card.innerHTML = `
-            <div class="market-card-portrait">
-                <img src="${hero.imageFile}" alt="${hero.name}" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'">
-            </div>
-            <div class="market-card-info">
-                <div class="market-card-name">${hero.name}</div>
-                <div class="market-card-subtitle">${hero.race} · ${hero.prof}</div>
-                <div class="market-card-power"><span>⚡ ${hero.power}</span></div>
-                <div class="market-card-stats">
-                    <span>❤️ ${hero.hp}</span>
-                    <span>🛡️ ${hero.arm}</span>
-                    <span>⚔️ ${hero.dmg}</span>
-                    <span>💰 ${hero.gold}</span>
-                </div>
-                <div class="market-card-price">200 💰</div>
-                <button class="market-buy-btn ${getPlayerGold(currentPlayer.id) < 200 ? 'disabled' : ''}" data-hero-index="${idx}">
-                    КУПИТЬ
-                </button>
-            </div>
-        `;
-        
-        const buyBtn = card.querySelector('.market-buy-btn');
-        buyBtn.addEventListener('click', () => {
-            if (buyOpenHero(currentPlayer, idx)) {
-                modal.classList.add('hidden');
-            }
-        });
-        
-        container.appendChild(card);
-    });
-    
-    modal.classList.remove('hidden');
-}
-
-function initDragAndDrop() {
-    const sellZone = document.getElementById('sellZone');
-    if (!sellZone) return;
-    
-    document.addEventListener('dragstart', (e) => {
-        const card = e.target.closest('.hero-card');
-        if (!card) return;
-        
-        const handContainer = card.closest('[id^="handP"]');
-        if (!handContainer) return;
-        
-        const playerId = parseInt(handContainer.id.replace('handP', ''));
-        if (playerId !== currentPlayerIndex) {
-            e.preventDefault();
-            return;
-        }
-        
-        const heroName = card.querySelector('.hero-name')?.textContent;
-        const player = players[currentPlayerIndex];
-        const hero = player.hand.find(h => h.name === heroName);
-        
-        if (hero) {
-            e.dataTransfer.setData('text/plain', JSON.stringify({
-                playerId: currentPlayerIndex,
-                heroId: hero.id
-            }));
-            card.classList.add('dragging');
-        }
-    });
-    
-    document.addEventListener('dragend', (e) => {
-        const card = e.target.closest('.hero-card');
-        if (card) card.classList.remove('dragging');
-    });
-    
-    sellZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        sellZone.classList.add('drag-over');
-    });
-    
-    sellZone.addEventListener('dragleave', () => {
-        sellZone.classList.remove('drag-over');
-    });
-    
-    sellZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        sellZone.classList.remove('drag-over');
-        
-        const data = e.dataTransfer.getData('text/plain');
-        if (!data) return;
-        
-        try {
-            const { playerId, heroId } = JSON.parse(data);
-            if (playerId !== currentPlayerIndex) {
-                addLog('⚠️ Сейчас не ваш ход!');
-                return;
-            }
-            
-            const player = players[playerId];
-            const hero = player.hand.find(h => h.id === heroId);
-            if (hero) {
-                sellHero(player, hero);
-            }
-        } catch (err) {
-            console.error('Ошибка продажи:', err);
-        }
-    });
-}
-
-// Рендеринг арены
+// ========== РЕНДЕРИНГ АРЕНЫ ==========
 function renderArena() {
     const container = document.getElementById('arenaContainer');
     if (!container) return;
@@ -471,17 +184,21 @@ function renderArena() {
         card.id = `player${idx}Card`;
         card.innerHTML = `
             <div class="player-name">
-                <span style="font-size:1.8rem;">⚔️ ФРОНТ ${idx+1}</span> 
-                <span class="score-badge" id="scoreP${idx}">0</span>
+                <span style="font-size:1.8rem;">⚔️ ФРОНТ ${idx+1}</span>
+            </div>
+            <div class="player-info-row">
+                <span class="title-badge" id="titleP${idx}"></span>
+                <span class="relic-count" id="relicsP${idx}"></span>
+                <span class="streak-badge" id="streakP${idx}"></span>
             </div>
             <div class="hero-cards" id="handP${idx}"></div>
-            <div class="deck-counter" id="deckInfo${idx}">📚 Колода: 0 · Лазарет: 0</div>
+            <div class="deck-counter" id="deckInfo${idx}">📚 Колода: 0</div>
         `;
         container.appendChild(card);
     });
 }
 
-// Инициализация игры
+// ========== ИНИЦИАЛИЗАЦИЯ ИГРЫ ==========
 function initGame(mode = gameMode) {
     if (aiTimeout) clearTimeout(aiTimeout);
     gameMode = mode;
@@ -495,67 +212,66 @@ function initGame(mode = gameMode) {
     const cardsPerPlayer = Math.floor(ALL_HEROES.length / numPlayers);
     players.forEach((p, idx) => {
         p.deck = allHeroesCopy.slice(idx * cardsPerPlayer, (idx + 1) * cardsPerPlayer);
-        p.hand = p.deck.splice(0, 5);
-        p.lazaret = []; 
-        p.score = 0; 
+        p.hand = p.deck.splice(0, 3);  // Каждый получает по 3 карты
         p.selectedHeroes = []; 
         p.hasConfirmed = false;
+        p.relics = [];
+        p.activeRelicSet = null;
+        p.winStreak = 0;
+        p.titleLevel = 0;
     });
     
     currentPlayerIndex = 0; 
     round = 1; 
     gameWinner = null; 
     battlePhase = 'select';
+    
     eventDecks.locations = shuffle([...LOCATIONS]); 
     eventDecks.kingdoms = shuffle([...KINGDOMS]);
     eventDecks.professions = shuffle([...PROFESSIONS]); 
     eventDecks.sagas = shuffle([...SAGAS]);
+    eventDecks.relics = shuffle([...RELICS]);
+    
     currentEvent = { location: null, kingdom: null, profession: null, saga: null };
     lastBattleResult = null;
     
     renderArena();
-    initMarketDeck();
     updateUI(); 
-    updatePlayersGoldUI();
-    initDragAndDrop();
-    addLog(`✨ Новая кампания! Режим: ${numPlayers} игрока. Раунд 1.`);
+    addLog(`✨ Новая кампания! Режим: ${numPlayers} игрока. Раунд 1. Сравнение по МОЩИ (⚡).`);
     checkAITurn();
 }
 
-// Обновление UI
+// ========== ОБНОВЛЕНИЕ UI ==========
 function updateUI() {
     const roundDisplay = document.getElementById('roundDisplay');
-    if (roundDisplay) roundDisplay.innerText = `${round}/5`;
+    if (roundDisplay) roundDisplay.innerText = `${round}`;
     
-    const scoreDisplay = document.getElementById('scoreDisplay');
-    if (scoreDisplay) {
-        const scores = players.map(p => p.score).join(' : ');
-        scoreDisplay.innerText = scores;
-    }
-    
-    const actionBtn = document.getElementById('actionBtn');
     const turnIndicator = document.getElementById('turnIndicator');
     
     if (gameWinner !== null) {
         if (turnIndicator) turnIndicator.innerText = '🏁 ИГРА ОКОНЧЕНА';
+        const actionBtn = document.getElementById('actionBtn');
         if (actionBtn) {
             actionBtn.textContent = '🏆 ИГРА ЗАВЕРШЕНА';
             actionBtn.disabled = true;
         }
     } else if (battlePhase === 'select') {
         if (turnIndicator) turnIndicator.innerText = `🎲 Ход Фронта ${currentPlayerIndex + 1}`;
+        const actionBtn = document.getElementById('actionBtn');
         if (actionBtn) {
             actionBtn.textContent = '✅ ЗАКОНЧИТЬ ВЫБОР';
             actionBtn.disabled = false;
         }
     } else {
         if (turnIndicator) turnIndicator.innerText = '⚔️ БОЙ ИДЁТ...';
+        const actionBtn = document.getElementById('actionBtn');
         if (actionBtn) {
             actionBtn.textContent = '⚔️ БОЙ ИДЁТ...';
             actionBtn.disabled = true;
         }
     }
     
+    // Отображение событий
     const eventsContainer = document.getElementById('eventCardsContainer');
     if (eventsContainer) {
         eventsContainer.innerHTML = '';
@@ -563,7 +279,7 @@ function updateUI() {
         const events = [
             { type: 'location', data: currentEvent.location, defaultText: 'Локация (Раунд 2)' },
             { type: 'kingdom', data: currentEvent.kingdom, defaultText: 'Королевство (Раунд 3)' },
-            { type: 'profession', data: currentEvent.profession, defaultText: 'Местность (Раунд 4)' },
+            { type: 'profession', data: currentEvent.profession, defaultText: 'Профессия (Раунд 4)' },
             { type: 'saga', data: currentEvent.saga, defaultText: 'Сага (Раунд 5)' }
         ];
         
@@ -587,9 +303,32 @@ function updateUI() {
         });
     }
     
+    // Отображение рук игроков
     players.forEach((pl, idx) => {
-        const scoreSpan = document.getElementById(`scoreP${idx}`); 
-        if (scoreSpan) scoreSpan.innerText = pl.score;
+        // Обновляем инфо-строку игрока
+        const titleBadge = document.getElementById(`titleP${idx}`);
+        const relicsBadge = document.getElementById(`relicsP${idx}`);
+        const streakBadge = document.getElementById(`streakP${idx}`);
+        
+        if (titleBadge) {
+            if (pl.titleLevel > 0) {
+                const title = TITLES[pl.titleLevel - 1];
+                titleBadge.innerHTML = `🏅 ${title.name} (+${title.bonus})`;
+                titleBadge.style.display = 'inline';
+            } else {
+                titleBadge.style.display = 'none';
+            }
+        }
+        
+        if (relicsBadge) {
+            const relicBonus = getRelicBonus(pl);
+            relicsBadge.innerHTML = `🔮 Реликвии: ${pl.relics.length} ${relicBonus > 0 ? `(+${relicBonus})` : ''}`;
+        }
+        
+        if (streakBadge) {
+            streakBadge.innerHTML = `🔥 Серия: ${pl.winStreak}`;
+            streakBadge.style.display = pl.winStreak > 0 ? 'inline' : 'none';
+        }
         
         let container = document.getElementById(`handP${idx}`); 
         if (!container) return;
@@ -606,40 +345,43 @@ function updateUI() {
         }
 
         container.innerHTML = '';
+        
+        // Счетчик выбранных героев
         const counterDiv = document.createElement('div');
         counterDiv.style.cssText = 'width:100%;text-align:center;margin-bottom:10px;color:#ffd58c';
-        counterDiv.innerHTML = `Выбрано героев: ${pl.selectedHeroes.length} / 3 ${pl.hasConfirmed ? '✅' : ''}`;
+        counterDiv.innerHTML = `Выбрано героев: ${pl.selectedHeroes.length} ${pl.hasConfirmed ? '✅' : ''}`;
         container.appendChild(counterDiv);
         
         if (pl.hand.length === 0) {
             const emptyDiv = document.createElement('div'); 
             emptyDiv.style.cssText = 'width:100%;text-align:center;color:#aaa;padding:40px'; 
-            emptyDiv.innerText = '😴 Войска отдыхают...';
+            emptyDiv.innerText = '😴 Нет героев...';
             container.appendChild(emptyDiv);
         }
         
         pl.hand.forEach(h => {
-            const record = getHeroRecord(h.name);
             let card = document.createElement('div');
             const isHidden = (battlePhase === 'select' && (idx !== currentPlayerIndex || pl.isAI));
             
-            // === ПРИМЕНЯЕМ КЛАСС ДОМИНАНТЫ ===
-            const dominantClass = getDominantClass(h);
-            
-            card.className = `hero-card ${dominantClass} ${pl.selectedHeroes.includes(h) ? 'selected' : ''} ${isHidden ? 'hidden-card' : ''}`;
+            card.className = `hero-card ${pl.selectedHeroes.includes(h) ? 'selected' : ''} ${isHidden ? 'hidden-card' : ''}`;
             card.setAttribute('data-race', h.race);
-            card.setAttribute('draggable', 'true');
             
             const maxStat = Math.max(h.maxHp, h.maxDmg, h.maxArm, h.maxGold, 1);
+            
+            // Определяем подсветку иконок
+            const raceHighlight = canMergeByTrait(pl, 'race') && h.race === currentEvent.kingdom?.race;
+            const profHighlight = canMergeByTrait(pl, 'prof') && h.prof === currentEvent.profession?.prof;
+            const sagaHighlight = canMergeByTrait(pl, 'saga') && h.saga === currentEvent.saga?.saga;
+            
             card.innerHTML = `
                 <div class="hero-portrait"><img src="${h.imageFile}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'"></div>
                 <div class="hero-info">
                     <div class="hero-name">${h.name}</div>
                     <div class="hero-subtitle">${h.race} · ${h.prof}</div>
                     <div class="hero-icons-row">
-                        <div class="hero-icon" data-trait="race"><span>${h.iconRace}</span><span>Раса</span></div>
-                        <div class="hero-icon" data-trait="prof"><span>${h.iconProf}</span><span>Проф</span></div>
-                        <div class="hero-icon" data-trait="saga"><span>${h.iconSaga}</span><span>Сага</span></div>
+                        <div class="hero-icon ${raceHighlight ? 'icon-highlight' : ''}" data-trait="race"><span>${h.iconRace}</span><span>Раса</span></div>
+                        <div class="hero-icon ${profHighlight ? 'icon-highlight' : ''}" data-trait="prof"><span>${h.iconProf}</span><span>Проф</span></div>
+                        <div class="hero-icon ${sagaHighlight ? 'icon-highlight' : ''}" data-trait="saga"><span>${h.iconSaga}</span><span>Сага</span></div>
                     </div>
                     <div class="hero-power-badge"><span class="power-value">⚡ ${h.power}</span></div>
                     <div class="stats-container">
@@ -648,14 +390,11 @@ function updateUI() {
                         <div class="stat-row"><div class="label-group"><span>⚔️ Урон</span><span class="stat-value dmg-value">${h.dmg}</span></div><div class="bar-bg"><div class="bar-fill dmg-bar" style="width: ${(h.dmg/maxStat)*100}%;"></div></div></div>
                         <div class="stat-row"><div class="label-group"><span>💰 Золото</span><span class="stat-value gold-value">${h.gold}</span></div><div class="bar-bg"><div class="bar-fill gold-bar" style="width: ${(h.gold/maxStat)*100}%;"></div></div></div>
                     </div>
-                    <div class="hero-record"><span class="record-win">🏆 ${record.wins}</span><span class="record-loss">💀 ${record.losses}</span></div>
                 </div>
             `;
             
             if (!isHidden && battlePhase === 'select' && idx === currentPlayerIndex && !pl.hasConfirmed && !pl.isAI) {
-                card.addEventListener('click', (e) => { 
-                    if (!e.target.closest('.hero-icon')) toggleSingleHero(pl, h); 
-                });
+                card.addEventListener('click', () => { toggleHeroSelection(pl, h); });
                 card.querySelectorAll('.hero-icon').forEach(icon => { 
                     icon.addEventListener('click', (e) => { 
                         e.stopPropagation(); 
@@ -667,56 +406,62 @@ function updateUI() {
         });
         
         const deckInfo = document.getElementById(`deckInfo${idx}`); 
-        if (deckInfo) deckInfo.innerText = `📚 Колода: ${pl.deck.length} · Лазарет: ${pl.lazaret.length}`;
+        if (deckInfo) deckInfo.innerText = `📚 Колода: ${pl.deck.length}`;
     });
-    
-    updatePlayersGoldUI();
 }
 
-function toggleSingleHero(player, hero) {
+// ========== ВЫБОР ГЕРОЯ ==========
+function toggleHeroSelection(player, hero) {
     if (battlePhase !== 'select' || player.isAI || player.hasConfirmed) return;
+    
     const index = player.selectedHeroes.indexOf(hero);
     if (index > -1) { 
         player.selectedHeroes.splice(index, 1); 
     } else {
-        if (player.selectedHeroes.length > 0 && !canAddToGroup(player, hero)) { 
-            addLog('⚠️ Нельзя смешивать героев с разными характеристиками!'); 
+        const testGroup = [...player.selectedHeroes, hero];
+        if (!canMergeHeroes(testGroup)) { 
+            addLog('⚠️ Нельзя объединить этих героев! Проверьте условия текущего раунда.'); 
             return; 
         }
-        if (player.selectedHeroes.length < 3) { 
-            player.selectedHeroes.push(hero); 
-        } else { 
-            addLog('⚠️ Можно выбрать не более 3 героев в группу!'); 
-            return; 
-        }
+        player.selectedHeroes.push(hero);
     }
     updateUI();
 }
 
 function selectByTrait(player, sourceHero, traitType) {
     if (battlePhase !== 'select' || player.isAI || player.hasConfirmed) return;
-    let traitValue = traitType === 'race' ? sourceHero.race : (traitType === 'prof' ? sourceHero.prof : sourceHero.saga);
+    
+    let traitValue;
+    if (traitType === 'race') {
+        if (!currentEvent.kingdom || round < 3) return;
+        traitValue = currentEvent.kingdom.race;
+    } else if (traitType === 'prof') {
+        if (!currentEvent.profession || round < 4) return;
+        traitValue = currentEvent.profession.prof;
+    } else if (traitType === 'saga') {
+        if (!currentEvent.saga || round < 5) return;
+        traitValue = currentEvent.saga.saga;
+    } else {
+        return;
+    }
+    
     const matchingHeroes = player.hand.filter(h => 
         (traitType === 'race' ? h.race : (traitType === 'prof' ? h.prof : h.saga)) === traitValue
     );
+    
     if (matchingHeroes.length === 0) return;
     
     const allSelected = matchingHeroes.every(h => player.selectedHeroes.includes(h));
     if (allSelected) {
         player.selectedHeroes = player.selectedHeroes.filter(h => !matchingHeroes.includes(h));
     } else {
-        if (player.selectedHeroes.length > 0 && !canAddToGroup(player, sourceHero)) { 
-            addLog('⚠️ Нельзя смешивать героев с разными характеристиками!'); 
-            return; 
-        }
-        matchingHeroes.forEach(h => { 
-            if (!player.selectedHeroes.includes(h) && player.selectedHeroes.length < 3) 
-                player.selectedHeroes.push(h); 
-        });
+        // Очищаем предыдущий выбор и выбираем всех подходящих
+        player.selectedHeroes = [...matchingHeroes];
     }
     updateUI();
 }
 
+// ========== ХОД AI ==========
 function checkAITurn() {
     if (gameWinner !== null) return;
     if (battlePhase !== 'select') return;
@@ -729,14 +474,51 @@ function aiMakeChoice() {
     if (battlePhase !== 'select' || !players[currentPlayerIndex]?.isAI) return;
     const ai = players[currentPlayerIndex];
     if (ai.hand.length === 0) return;
-    const randomHero = ai.hand[Math.floor(Math.random() * ai.hand.length)];
-    ai.selectedHeroes = [randomHero];
+    
+    if (round < 3) {
+        // Только 1 герой
+        ai.selectedHeroes = [ai.hand[Math.floor(Math.random() * ai.hand.length)]];
+    } else if (round === 3 && currentEvent.kingdom) {
+        // Можно объединять по расе королевства
+        const sameRace = ai.hand.filter(h => h.race === currentEvent.kingdom.race);
+        if (sameRace.length >= 2) {
+            ai.selectedHeroes = sameRace.slice(0, Math.min(3, sameRace.length));
+        } else {
+            ai.selectedHeroes = [ai.hand[Math.floor(Math.random() * ai.hand.length)]];
+        }
+    } else if (round === 4 && currentEvent.profession) {
+        const sameRace = currentEvent.kingdom ? ai.hand.filter(h => h.race === currentEvent.kingdom.race) : [];
+        const sameProf = ai.hand.filter(h => h.prof === currentEvent.profession.prof);
+        const candidates = sameRace.length >= 2 ? sameRace : (sameProf.length >= 2 ? sameProf : []);
+        if (candidates.length >= 2) {
+            ai.selectedHeroes = candidates.slice(0, Math.min(3, candidates.length));
+        } else {
+            ai.selectedHeroes = [ai.hand[Math.floor(Math.random() * ai.hand.length)]];
+        }
+    } else {
+        // Раунд 5+ с сагой
+        const sameRace = currentEvent.kingdom ? ai.hand.filter(h => h.race === currentEvent.kingdom.race) : [];
+        const sameProf = currentEvent.profession ? ai.hand.filter(h => h.prof === currentEvent.profession.prof) : [];
+        const sameSaga = currentEvent.saga ? ai.hand.filter(h => h.saga === currentEvent.saga.saga) : [];
+        let candidates = [];
+        if (sameRace.length >= 2) candidates = sameRace;
+        else if (sameProf.length >= 2) candidates = sameProf;
+        else if (sameSaga.length >= 2) candidates = sameSaga;
+        
+        if (candidates.length >= 2) {
+            ai.selectedHeroes = candidates.slice(0, Math.min(3, candidates.length));
+        } else {
+            ai.selectedHeroes = [ai.hand[Math.floor(Math.random() * ai.hand.length)]];
+        }
+    }
+    
     ai.hasConfirmed = true;
     updateUI();
-    addLog(`🤖 ИИ (Фронт ${currentPlayerIndex + 1}) выбрал героя.`);
+    addLog(`🤖 ИИ (Фронт ${currentPlayerIndex + 1}) выбрал ${ai.selectedHeroes.length} героя(ев).`);
     processAction();
 }
 
+// ========== ОБРАБОТКА ДЕЙСТВИЯ ==========
 function processAction() {
     const currentPlayer = players[currentPlayerIndex];
     if (battlePhase !== 'select') return;
@@ -761,6 +543,7 @@ function processAction() {
     }
 }
 
+// ========== БИТВА ==========
 function startBattle() {
     battlePhase = 'fight';
     if (aiTimeout) clearTimeout(aiTimeout);
@@ -770,21 +553,28 @@ function startBattle() {
     const group0 = sumHeroStats(p0.selectedHeroes);
     const group1 = sumHeroStats(p1.selectedHeroes);
     
+    // Добавляем бонусы от званий и реликвий
+    const titleBonus0 = getTitleBonus(p0);
+    const titleBonus1 = getTitleBonus(p1);
+    const relicBonus0 = getRelicBonus(p0);
+    const relicBonus1 = getRelicBonus(p1);
+    
+    if (group0) { group0.hp += titleBonus0 + relicBonus0; group0.dmg += titleBonus0 + relicBonus0; group0.arm += titleBonus0 + relicBonus0; group0.gold += titleBonus0 + relicBonus0; }
+    if (group1) { group1.hp += titleBonus1 + relicBonus1; group1.dmg += titleBonus1 + relicBonus1; group1.arm += titleBonus1 + relicBonus1; group1.gold += titleBonus1 + relicBonus1; }
+    
     let roundWinner = null;
-    if (currentEvent.location?.rule) {
+    
+    if (round === 1) {
+        // Первый раунд: сравнение по МОЩИ
+        const power0 = p0.selectedHeroes.reduce((s, h) => s + h.power, 0);
+        const power1 = p1.selectedHeroes.reduce((s, h) => s + h.power, 0);
+        roundWinner = (power0 > power1) ? 0 : (power0 < power1 ? 1 : null);
+        addLog(`⚡ Раунд 1: Сравнение по МОЩИ! ${power0} vs ${power1}`);
+    } else if (currentEvent.location?.rule) {
         roundWinner = currentEvent.location.rule(group0, group1);
         addLog(`📜 Локация "${currentEvent.location.name}" решает исход!`);
-    } else {
-        let hp0 = group0.hp, hp1 = group1.hp;
-        while (hp0 > 0 && hp1 > 0) {
-            hp1 -= Math.max(0, group0.dmg - group1.arm); 
-            if (hp1 <= 0) { roundWinner = 0; break; }
-            hp0 -= Math.max(0, group1.dmg - group0.arm); 
-            if (hp0 <= 0) { roundWinner = 1; break; }
-        }
-        if (roundWinner === null) roundWinner = (hp0 > hp1) ? 0 : (hp0 < hp1 ? 1 : null);
     }
-
+    
     lastBattleResult = {
         group0: { ...group0, playerId: 0, heroes: p0.selectedHeroes },
         group1: { ...group1, playerId: 1, heroes: p1.selectedHeroes },
@@ -793,126 +583,226 @@ function startBattle() {
     };
 
     if (roundWinner === null) {
-        addLog(`🤝 НИЧЬЯ! Оба фронта получают по очку.`);
-        p0.score++; p1.score++;
-        [p0, p1].forEach(p => { 
-            p.lazaret.push(...p.selectedHeroes); 
-            p.hand = p.hand.filter(h => !p.selectedHeroes.includes(h)); 
-            p.selectedHeroes.forEach(h => addHeroWin(h.name)); 
-            for (let j = 0; j < p.selectedHeroes.length; j++) 
-                if (p.deck.length) p.hand.push(p.deck.shift()); 
-        });
+        addLog(`🤝 НИЧЬЯ!`);
     } else {
         const winner = players[roundWinner], loser = players[1 - roundWinner];
-        winner.selectedHeroes.forEach(h => addHeroWin(h.name)); 
-        loser.selectedHeroes.forEach(h => addHeroLoss(h.name));
-        winner.score++; 
+        
+        // Обновляем серию побед
+        winner.winStreak++;
+        loser.winStreak = 0;
+        loser.titleLevel = 0;  // Звание сбрасывается при поражении
+        
+        // Обновляем звание победителя
+        if (winner.winStreak > winner.titleLevel && winner.winStreak <= 10) {
+            winner.titleLevel = winner.winStreak;
+            addLog(`🏅 Фронт ${winner.id + 1} получает звание: ${TITLES[winner.titleLevel - 1].name}! (+${TITLES[winner.titleLevel - 1].bonus} ко всем статам)`);
+        }
+        
         addLog(`🏆 Раунд ${round}: Победил Фронт ${winner.id + 1}!`);
-        loser.lazaret.push(...loser.selectedHeroes); 
-        loser.hand = loser.hand.filter(h => !loser.selectedHeroes.includes(h));
-        for (let i = 0; i < loser.selectedHeroes.length; i++) 
-            if (loser.deck.length) loser.hand.push(loser.deck.shift());
+        
+        // Победитель убирает героев из руки (они сброшены)
         winner.hand = winner.hand.filter(h => !winner.selectedHeroes.includes(h));
+        
+        // Проигравший теряет героев и добирает 1 карту из колоды
+        loser.hand = loser.hand.filter(h => !loser.selectedHeroes.includes(h));
+        if (loser.deck.length > 0) {
+            const newCard = loser.deck.shift();
+            loser.hand.push(newCard);
+            addLog(`📥 Фронт ${loser.id + 1} добирает карту: ${newCard.name}`);
+        } else {
+            addLog(`⚠️ Фронт ${loser.id + 1}: колода пуста!`);
+        }
+        
+        // Предлагаем победителю выбрать реликвию
+        showRelicChoiceModal(winner, loser);
     }
     
     players.forEach(p => { p.selectedHeroes = []; p.hasConfirmed = false; });
-    battlePhase = 'result'; 
-    checkEmptyHands(); 
+    battlePhase = 'result';
+    
+    // Проверка на победу (у кого-то закончились карты в руке)
+    checkGameEnd();
     updateUI();
-    
-    const maxScore = Math.max(...players.map(p => p.score));
-    if (maxScore >= 3) { 
-        gameWinner = players.findIndex(p => p.score >= 3); 
-        addLog(`👑 ФРОНТ ${gameWinner + 1} ПОБЕДИЛ В ВОЙНЕ!`); 
-    }
-    
-    showResultModal();
 }
 
-function showResultModal() {
-    if (!lastBattleResult) return;
-    
-    const { group0, group1, winner, location } = lastBattleResult;
-    const hero0 = group0.heroes?.[0] || { name: '—', imageFile: '', power: 0 };
-    const hero1 = group1.heroes?.[0] || { name: '—', imageFile: '', power: 0 };
+// ========== МОДАЛЬНОЕ ОКНО ВЫБОРА РЕЛИКВИИ ==========
+function showRelicChoiceModal(winner, loser) {
+    if (eventDecks.relics.length === 0 && loser.relics.length === 0) {
+        // Нет доступных реликвий
+        finishBattlePhase();
+        return;
+    }
     
     const modal = document.createElement('div');
     modal.className = 'result-modal';
+    modal.id = 'relicChoiceModal';
     
-    const winnerText = winner === null ? 'НИЧЬЯ!' : `ПОБЕДА ФРОНТА ${winner + 1}!`;
-    const winnerColor = winner === 0 ? '#4caf50' : (winner === 1 ? '#2196f3' : 'gold');
-    
-    modal.innerHTML = `
+    let html = `
         <div class="result-content">
-            <div class="result-title" style="color: ${winnerColor};">${winnerText}</div>
-            ${location ? `<div style="text-align:center;color:#ffd58c;margin-bottom:20px;">🏞️ ${location.name}: ${location.desc}</div>` : ''}
-            <div class="result-comparison">
-                <div class="result-hero ${winner === 0 ? 'winner' : (winner === 1 ? 'loser' : '')}">
-                    <div class="result-portrait"><img src="${hero0.imageFile}" alt="${hero0.name}" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'"></div>
-                    <h3>${hero0.name}</h3>
-                    <div class="result-power-large">⚡ ${hero0.power}</div>
-                    <div class="result-stats">
-                        <div class="result-stat"><span>❤️ Здоровье</span><span>${group0.hp}</span></div>
-                        <div class="result-stat"><span>🛡️ Броня</span><span>${group0.arm}</span></div>
-                        <div class="result-stat"><span>⚔️ Урон</span><span>${group0.dmg}</span></div>
-                        <div class="result-stat"><span>💰 Золото</span><span>${group0.gold}</span></div>
-                    </div>
-                </div>
-                <div class="result-vs">VS</div>
-                <div class="result-hero ${winner === 1 ? 'winner' : (winner === 0 ? 'loser' : '')}">
-                    <div class="result-portrait"><img src="${hero1.imageFile}" alt="${hero1.name}" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'"></div>
-                    <h3>${hero1.name}</h3>
-                    <div class="result-power-large">⚡ ${hero1.power}</div>
-                    <div class="result-stats">
-                        <div class="result-stat"><span>❤️ Здоровье</span><span>${group1.hp}</span></div>
-                        <div class="result-stat"><span>🛡️ Броня</span><span>${group1.arm}</span></div>
-                        <div class="result-stat"><span>⚔️ Урон</span><span>${group1.dmg}</span></div>
-                        <div class="result-stat"><span>💰 Золото</span><span>${group1.gold}</span></div>
-                    </div>
-                </div>
-            </div>
-            <button class="result-close-btn">ПРОДОЛЖИТЬ ➡️</button>
-        </div>
+            <div class="result-title" style="color: gold;">🏆 ПОБЕДА ФРОНТА ${winner.id + 1}!</div>
+            <div style="text-align:center;color:#ffd58c;margin-bottom:20px;">Выберите награду:</div>
+            <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
     `;
     
+    // Кнопка "Взять новую реликвию"
+    if (eventDecks.relics.length > 0) {
+        html += `
+            <div class="relic-option" id="takeNewRelic">
+                <div class="relic-option-icon">🔮</div>
+                <div class="relic-option-title">Взять новую реликвию</div>
+                <div class="relic-option-desc">Случайная из колоды (${eventDecks.relics.length} шт.)</div>
+            </div>
+        `;
+    }
+    
+    // Кнопка "Забрать реликвию противника" (если есть)
+    if (loser.relics.length > 0) {
+        html += `
+            <div class="relic-option" id="stealRelic">
+                <div class="relic-option-icon">💀</div>
+                <div class="relic-option-title">Забрать реликвию</div>
+                <div class="relic-option-desc">У противника: ${loser.relics.map(r => r.name).join(', ')}</div>
+            </div>
+        `;
+    }
+    
+    // Кнопка "Ничего не брать"
+    html += `
+            <div class="relic-option" id="skipRelic">
+                <div class="relic-option-icon">➡️</div>
+                <div class="relic-option-title">Продолжить</div>
+                <div class="relic-option-desc">Без награды</div>
+            </div>
+        </div></div>
+    `;
+    
+    modal.innerHTML = html;
     document.body.appendChild(modal);
-    modal.querySelector('.result-close-btn').onclick = () => {
+    
+    const closeModal = () => {
         modal.remove();
-        if (gameWinner !== null) {
-            updateUI();
-        } else {
-            nextRound();
-        }
+        finishBattlePhase();
     };
+    
+    if (eventDecks.relics.length > 0) {
+        modal.querySelector('#takeNewRelic')?.addEventListener('click', () => {
+            const newRelic = eventDecks.relics.pop();
+            winner.relics.push(newRelic);
+            addLog(`🔮 Фронт ${winner.id + 1} получает реликвию: ${newRelic.name} (сет "${newRelic.setName}")`);
+            closeModal();
+        });
+    }
+    
+    if (loser.relics.length > 0) {
+        modal.querySelector('#stealRelic')?.addEventListener('click', () => {
+            if (loser.relics.length === 1) {
+                const stolen = loser.relics.pop();
+                winner.relics.push(stolen);
+                addLog(`💀 Фронт ${winner.id + 1} забирает реликвию "${stolen.name}" у противника!`);
+            } else {
+                // Показываем выбор конкретной реликвии
+                showStealRelicModal(winner, loser, closeModal);
+                return;
+            }
+            closeModal();
+        });
+    }
+    
+    modal.querySelector('#skipRelic')?.addEventListener('click', closeModal);
 }
 
+function showStealRelicModal(winner, loser, closePrevious) {
+    const modal = document.createElement('div');
+    modal.className = 'result-modal';
+    modal.id = 'stealRelicModal';
+    
+    let html = `
+        <div class="result-content">
+            <div class="result-title" style="color: gold;">💀 ВЫБЕРИТЕ РЕЛИКВИЮ</div>
+            <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
+    `;
+    
+    loser.relics.forEach((relic, idx) => {
+        html += `
+            <div class="relic-option steal-option" data-relic-index="${idx}">
+                <div class="relic-option-icon">💎</div>
+                <div class="relic-option-title">${relic.name}</div>
+                <div class="relic-option-desc">Сет: ${relic.setName} (${relic.bonus}/стат)</div>
+            </div>
+        `;
+    });
+    
+    html += `</div></div>`;
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+    
+    if (closePrevious) {
+        const prevModal = document.getElementById('relicChoiceModal');
+        if (prevModal) prevModal.remove();
+    }
+    
+    modal.querySelectorAll('.steal-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const idx = parseInt(opt.dataset.relicIndex);
+            const stolen = loser.relics.splice(idx, 1)[0];
+            winner.relics.push(stolen);
+            addLog(`💀 Фронт ${winner.id + 1} забирает реликвию "${stolen.name}"!`);
+            modal.remove();
+            finishBattlePhase();
+        });
+    });
+}
+
+function finishBattlePhase() {
+    // Проверка на окончание игры
+    checkGameEnd();
+    updateUI();
+    
+    if (gameWinner === null) {
+        nextRound();
+    }
+}
+
+// ========== ПРОВЕРКА ОКОНЧАНИЯ ИГРЫ ==========
+function checkGameEnd() {
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].hand.length === 0) {
+            gameWinner = (i === 0) ? 1 : 0;  // У кого не осталось карт — проиграл
+            addLog(`👑 ФРОНТ ${gameWinner + 1} ПОБЕДИЛ! У противника не осталось героев!`);
+            return;
+        }
+    }
+}
+
+// ========== СЛЕДУЮЩИЙ РАУНД ==========
 function nextRound() {
     if (gameWinner !== null) return;
     round++;
+    
     if (round === 2) currentEvent.location = eventDecks.locations.shift();
     if (round === 3) currentEvent.kingdom = eventDecks.kingdoms.shift();
     if (round === 4) currentEvent.profession = eventDecks.professions.shift();
     if (round === 5) currentEvent.saga = eventDecks.sagas.shift();
+    
     battlePhase = 'select'; 
     currentPlayerIndex = 0;
     players.forEach(p => p.hasConfirmed = false);
-    checkEmptyHands(); 
+    
     updateUI(); 
-    addLog(`🌀 Раунд ${round} начался!`);
+    
+    if (round === 2) {
+        addLog(`🌀 Раунд ${round} начался! Открыта локация: ${currentEvent.location.name} — ${currentEvent.location.desc}`);
+    } else if (round === 3) {
+        addLog(`🌀 Раунд ${round} начался! Открыто королевство: ${currentEvent.kingdom.name} — можно объединять героев расы ${currentEvent.kingdom.race}`);
+    } else if (round === 4) {
+        addLog(`🌀 Раунд ${round} начался! Открыта профессия: ${currentEvent.profession.name} — можно объединять героев по профессии ${currentEvent.profession.prof}`);
+    } else if (round === 5) {
+        addLog(`🌀 Раунд ${round} начался! Открыта сага: ${currentEvent.saga.name} — можно объединять героев по саге ${currentEvent.saga.saga}`);
+    } else {
+        addLog(`🌀 Раунд ${round} начался!`);
+    }
+    
     checkAITurn();
-}
-
-function checkEmptyHands() {
-    players.forEach(p => { 
-        if (p.hand.length === 0 && p.deck.length === 0) { 
-            const randomHero = { 
-                ...ALL_HEROES[Math.floor(Math.random() * ALL_HEROES.length)], 
-                id: `hero_emergency_${Date.now()}_${Math.random()}` 
-            }; 
-            p.hand.push(randomHero); 
-            addLog(`🆘 Фронт ${p.id + 1} остался без войск! Призван ${randomHero.name}`); 
-        } 
-    });
 }
 
 // ========== МУЗЫКАЛЬНЫЙ ПЛЕЕР ==========
@@ -1019,23 +909,18 @@ function prevTrack() {
     currentTrackIndex--;
     if (currentTrackIndex < 0) currentTrackIndex = playlist.length - 1;
     loadTrack(currentTrackIndex);
-    if (isPlaying) {
-        playMusic();
-    }
+    if (isPlaying) playMusic();
 }
 
 function nextTrack() {
     currentTrackIndex++;
     if (currentTrackIndex >= playlist.length) currentTrackIndex = 0;
     loadTrack(currentTrackIndex);
-    if (isPlaying) {
-        playMusic();
-    }
+    if (isPlaying) playMusic();
 }
 
 function renderPlaylist() {
     if (!playlistTracks) return;
-    
     playlistTracks.innerHTML = '';
     
     playlist.forEach((track, index) => {
@@ -1052,11 +937,7 @@ function renderPlaylist() {
         
         trackEl.addEventListener('click', () => {
             loadTrack(index);
-            if (!isPlaying) {
-                playMusic();
-            } else {
-                playMusic();
-            }
+            if (!isPlaying) playMusic(); else playMusic();
         });
         
         playlistTracks.appendChild(trackEl);
@@ -1068,19 +949,17 @@ function updateActiveTrack() {
     tracks.forEach((track, index) => {
         if (index === currentTrackIndex) {
             track.classList.add('active');
-            const playingIndicator = track.querySelector('.playlist-track-playing');
-            if (!playingIndicator) {
-                const indicator = document.createElement('span');
-                indicator.className = 'playlist-track-playing';
-                indicator.textContent = '▶️';
-                track.appendChild(indicator);
+            const indicator = track.querySelector('.playlist-track-playing');
+            if (!indicator) {
+                const ind = document.createElement('span');
+                ind.className = 'playlist-track-playing';
+                ind.textContent = '▶️';
+                track.appendChild(ind);
             }
         } else {
             track.classList.remove('active');
-            const playingIndicator = track.querySelector('.playlist-track-playing');
-            if (playingIndicator) {
-                playingIndicator.remove();
-            }
+            const indicator = track.querySelector('.playlist-track-playing');
+            if (indicator) indicator.remove();
         }
     });
 }
@@ -1088,9 +967,7 @@ function updateActiveTrack() {
 function changeVolume(value) {
     musicVolume = value / 100;
     if (bgMusic) bgMusic.volume = musicVolume;
-    if (volumeValue) {
-        volumeValue.textContent = Math.round(musicVolume * 100) + '%';
-    }
+    if (volumeValue) volumeValue.textContent = Math.round(musicVolume * 100) + '%';
     localStorage.setItem('musicVolume', musicVolume);
 }
 
@@ -1099,77 +976,34 @@ function togglePlaylistPanel() {
 }
 
 function bindMusicEvents() {
-    if (togglePlaylistBtn) {
-        togglePlaylistBtn.addEventListener('click', togglePlaylistPanel);
-    }
-    
-    if (closePlaylistBtn) {
-        closePlaylistBtn.addEventListener('click', () => {
-            if (playlistPanel) playlistPanel.classList.add('hidden');
-        });
-    }
-    
-    if (playPauseBtn) {
-        playPauseBtn.addEventListener('click', togglePlayPause);
-    }
-    
-    if (prevTrackBtn) {
-        prevTrackBtn.addEventListener('click', prevTrack);
-    }
-    
-    if (nextTrackBtn) {
-        nextTrackBtn.addEventListener('click', nextTrack);
-    }
-    
-    if (volumeSlider) {
-        volumeSlider.addEventListener('input', (e) => {
-            changeVolume(e.target.value);
-        });
-    }
+    if (togglePlaylistBtn) togglePlaylistBtn.addEventListener('click', togglePlaylistPanel);
+    if (closePlaylistBtn) closePlaylistBtn.addEventListener('click', () => { if (playlistPanel) playlistPanel.classList.add('hidden'); });
+    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
+    if (prevTrackBtn) prevTrackBtn.addEventListener('click', prevTrack);
+    if (nextTrackBtn) nextTrackBtn.addEventListener('click', nextTrack);
+    if (volumeSlider) volumeSlider.addEventListener('input', (e) => { changeVolume(e.target.value); });
     
     if (bgMusic) {
-        bgMusic.addEventListener('ended', () => {
-            nextTrack();
-        });
-        
-        bgMusic.addEventListener('play', () => {
-            isPlaying = true;
-            updatePlayPauseButton();
-            if (togglePlaylistBtn) togglePlaylistBtn.classList.add('playing');
-        });
-        
-        bgMusic.addEventListener('pause', () => {
-            isPlaying = false;
-            updatePlayPauseButton();
-            if (togglePlaylistBtn) togglePlaylistBtn.classList.remove('playing');
-        });
-        
-        bgMusic.addEventListener('error', (e) => {
-            console.log('Ошибка загрузки трека:', e);
-            addLog('⚠️ Не удалось загрузить музыкальный трек');
-            nextTrack();
-        });
+        bgMusic.addEventListener('ended', () => { nextTrack(); });
+        bgMusic.addEventListener('play', () => { isPlaying = true; updatePlayPauseButton(); if (togglePlaylistBtn) togglePlaylistBtn.classList.add('playing'); });
+        bgMusic.addEventListener('pause', () => { isPlaying = false; updatePlayPauseButton(); if (togglePlaylistBtn) togglePlaylistBtn.classList.remove('playing'); });
+        bgMusic.addEventListener('error', () => { console.log('Ошибка загрузки трека'); nextTrack(); });
     }
 }
 
 document.addEventListener('click', function initMusicOnFirstClick() {
-    if (playlist.length > 0 && bgMusic && !bgMusic.src) {
-        loadTrack(currentTrackIndex);
-    }
+    if (playlist.length > 0 && bgMusic && !bgMusic.src) loadTrack(currentTrackIndex);
     document.removeEventListener('click', initMusicOnFirstClick);
 }, { once: true });
 
 document.addEventListener('click', (e) => {
     if (playlistPanel && !playlistPanel.classList.contains('hidden')) {
-        const isClickInside = playlistPanel.contains(e.target) || 
-                              (togglePlaylistBtn && togglePlaylistBtn.contains(e.target));
-        if (!isClickInside) {
-            playlistPanel.classList.add('hidden');
-        }
+        const isClickInside = playlistPanel.contains(e.target) || (togglePlaylistBtn && togglePlaylistBtn.contains(e.target));
+        if (!isClickInside) playlistPanel.classList.add('hidden');
     }
 });
 
-// ========== ПРИВЯЗКА ОСНОВНЫХ СОБЫТИЙ ИГРЫ ==========
+// ========== ПРИВЯЗКА СОБЫТИЙ ==========
 document.addEventListener('DOMContentLoaded', () => {
     initMusic();
     bindMusicEvents();
@@ -1186,46 +1020,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const resetGameBtn = document.getElementById('resetGame');
     if (resetGameBtn) resetGameBtn.onclick = () => initGame(gameMode);
-    
-    const resetStatsBtn = document.getElementById('resetStatsBtn');
-    if (resetStatsBtn) resetStatsBtn.onclick = resetAllStats;
-    
-    const resetGoldBtn = document.getElementById('resetGoldBtn');
-    if (resetGoldBtn) resetGoldBtn.onclick = resetAllGold;
-    
-    const deckZone = document.getElementById('deckZone');
-    if (deckZone) {
-        deckZone.addEventListener('click', () => {
-            if (battlePhase !== 'select') {
-                addLog('⚠️ Рынок доступен только в фазе выбора!');
-                return;
-            }
-            showMarketModal();
-        });
-    }
-    
-    const closeMarketModal = document.getElementById('closeMarketModal');
-    if (closeMarketModal) {
-        closeMarketModal.addEventListener('click', () => {
-            document.getElementById('marketModal').classList.add('hidden');
-        });
-    }
-    
-    const buyRandomFromModal = document.getElementById('buyRandomFromModal');
-    if (buyRandomFromModal) {
-        buyRandomFromModal.addEventListener('click', () => {
-            const player = players[currentPlayerIndex];
-            if (buyRandomHero(player)) {
-                document.getElementById('marketModal').classList.add('hidden');
-            }
-        });
-    }
-    
-    document.getElementById('marketModal')?.addEventListener('click', (e) => {
-        if (e.target.classList.contains('market-modal')) {
-            e.target.classList.add('hidden');
-        }
-    });
     
     initGame(2);
 });
