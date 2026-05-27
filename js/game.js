@@ -1,4 +1,4 @@
-// ---------- ИГРОВАЯ ЛОГИКА (v11 — финальная) ----------
+// ---------- ИГРОВАЯ ЛОГИКА (v12 — бонусы на карточках, полоски видны) ----------
 
 "use strict";
 
@@ -255,7 +255,6 @@ function initGame(mode) {
     if (aiTimeout) clearTimeout(aiTimeout);
     gameMode = mode;
     
-    // Сохраняем старые данные игроков
     const oldData = [];
     for (let i = 0; i < 2; i++) {
         if (players[i]) {
@@ -449,6 +448,11 @@ function updateUI() {
             container.appendChild(emptyDiv);
         }
 
+        // Бонусы игрока
+        const titleBonus = getTitleBonus(pl);
+        const relicBonus = getRelicBonus(pl);
+        const totalBonus = titleBonus + relicBonus;
+
         pl.hand.forEach(h => {
             let card = document.createElement('div');
             const isHidden = (battlePhase === 'select' && (idx !== currentPlayerIndex || pl.isAI));
@@ -471,16 +475,25 @@ function updateUI() {
                 gold: getRanksForStat(h, 'gold')
             };
 
-            function statBarHTML(icon, label, value, maxVal, ranks, barClass) {
-                const pct = (value / maxVal) * 100;
+            function statBarHTML(icon, label, baseValue, maxVal, ranks, barClass) {
+                const totalValue = baseValue + totalBonus;
+                const pct = Math.min((totalValue / maxVal) * 100, 100);
                 const glowing = pct >= 70 ? ' glowing' : '';
                 const record = isRecord(ranks) ? ' record' : '';
+                
+                let valueHTML = '';
+                if (totalBonus > 0) {
+                    valueHTML = `${baseValue} <span class="stat-bonus">+${totalBonus}</span>`;
+                } else {
+                    valueHTML = `${baseValue}`;
+                }
+                
                 return `
                     <div class="stat-row">
                         <div class="label-group">
                             <span class="stat-label">${icon} ${label}</span>
                             <div class="stat-right">
-                                <span class="stat-value">${value}</span>
+                                <span class="stat-value">${valueHTML}</span>
                                 <span class="stat-ranks">${ranksHTML(ranks)}</span>
                             </div>
                         </div>
@@ -519,7 +532,7 @@ function updateUI() {
                         <div class="hero-icon ${profHL ? 'icon-highlight' : ''}" data-trait="prof"><span>${h.iconProf}</span><span>Проф</span></div>
                         <div class="hero-icon ${sagaHL ? 'icon-highlight' : ''}" data-trait="saga"><span>${h.iconSaga}</span><span>Сага</span></div>
                     </div>
-                    <div class="hero-power-badge"><span class="power-value">⚡ ${power}</span></div>
+                    <div class="hero-power-badge"><span class="power-value">⚡ ${power}${totalBonus > 0 ? ` <span class="stat-bonus">+${totalBonus}</span>` : ''}</span></div>
                     <div class="stats-container">
                         ${statBarHTML('❤️', 'Здоровье', h.hp, GLOBAL_MAX.hp, ranksForStats.hp, 'hp-bar')}
                         ${statBarHTML('🛡️', 'Броня', h.arm, GLOBAL_MAX.arm, ranksForStats.arm, 'armor-bar')}
