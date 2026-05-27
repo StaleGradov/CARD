@@ -1,4 +1,4 @@
-// ---------- ИГРОВАЯ ЛОГИКА (v6 — инвентарь, слоты, итоги раунда, фикс модалок) ----------
+// ---------- ИГРОВАЯ ЛОГИКА (v7 — всё исправлено) ----------
 
 "use strict";
 
@@ -302,6 +302,10 @@ function initGame(mode = gameMode) {
     
     currentEvent = { location: null, kingdom: null, profession: null, saga: null };
     
+    // Скрываем модальные окна при новой игре
+    document.getElementById('inventoryModal').style.display = 'none';
+    document.getElementById('relicChoiceModal').style.display = 'none';
+    
     renderArena();
     updateUI(); 
     addLog(`✨ Новая кампания! Режим: ${numPlayers} игрока. Раунд 1. Сравнение по МОЩИ (⚡).`);
@@ -532,15 +536,15 @@ function updateUI() {
 // ========== МОДАЛЬНОЕ ОКНО ИНВЕНТАРЯ ==========
 function showInventoryModal(playerId) {
     const modal = document.getElementById('inventoryModal');
+    if (!modal) return;
+    
     const equipSlotsContainer = document.getElementById('equipSlots');
     const relicsListContainer = document.getElementById('relicsList');
     const equipBonusInfo = document.getElementById('equipBonusInfo');
     const relicTotalCount = document.getElementById('relicTotalCount');
     const invPlayerIdSpan = document.getElementById('invPlayerId');
     
-    if (!modal || !equipSlotsContainer || !relicsListContainer) {
-        return;
-    }
+    if (!equipSlotsContainer || !relicsListContainer) return;
     
     const player = players[playerId];
     if (!player) return;
@@ -557,7 +561,7 @@ function showInventoryModal(playerId) {
         slotDiv.className = 'equip-slot';
         if (equipped && rarityColor) {
             slotDiv.style.border = `2px solid ${rarityColor.border}`;
-            slotDiv.style.boxShadow = `0 0 10px ${rarityColor.glow}`;
+            slotDiv.style.boxShadow = `0 0 12px ${rarityColor.glow}`;
             slotDiv.style.background = rarityColor.bg;
         }
         
@@ -575,9 +579,9 @@ function showInventoryModal(playerId) {
         `;
         
         if (equipped) {
-            const unequipBtn = slotDiv.querySelector('.equip-slot-unequip');
-            if (unequipBtn) {
-                unequipBtn.addEventListener('click', (e) => {
+            const btn = slotDiv.querySelector('.equip-slot-unequip');
+            if (btn) {
+                btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     e.preventDefault();
                     player.unequipRelic(slot.id);
@@ -590,17 +594,16 @@ function showInventoryModal(playerId) {
         equipSlotsContainer.appendChild(slotDiv);
     });
     
-    // Информация о бонусе
+    // Бонусы
     const equippedArray = player.getEquippedRelicsArray();
     const totalBonus = getActiveSetBonus(equippedArray);
-    
     const setGroups = {};
     equippedArray.forEach(r => {
         if (!setGroups[r.setName]) setGroups[r.setName] = [];
         setGroups[r.setName].push(r);
     });
     
-    let bonusHTML = `<div class="bonus-total">Суммарный бонус экипировки: <span style="color:gold;font-size:1.2rem;">+${totalBonus}</span> ко всем статам</div>`;
+    let bonusHTML = `<div class="bonus-total">Суммарный бонус экипировки: <span style="color:gold;font-size:1.3rem;">+${totalBonus}</span> ко всем статам</div>`;
     for (const [setName, items] of Object.entries(setGroups)) {
         const setSize = items[0].setSize;
         const collected = items.length;
@@ -608,16 +611,12 @@ function showInventoryModal(playerId) {
         const rarity = RARITY_COLORS[items[0].rarity];
         const setBonus = collected * items[0].bonus * (complete ? 2 : 1);
         if (rarity) {
-            bonusHTML += `
-                <div class="bonus-set-row" style="color:${rarity.text}">
-                    ${rarity.name}: ${setName} — ${collected}/${setSize} ${complete ? '✅ ПОЛНЫЙ (x2)' : ''} = +${setBonus}
-                </div>
-            `;
+            bonusHTML += `<div class="bonus-set-row" style="color:${rarity.text}">${rarity.name}: ${setName} — ${collected}/${setSize} ${complete ? '✅ x2' : ''} = +${setBonus}</div>`;
         }
     }
     equipBonusInfo.innerHTML = bonusHTML;
     
-    // Список всех реликвий в инвентаре
+    // Список реликвий
     relicTotalCount.innerText = player.relics.length;
     relicsListContainer.innerHTML = '';
     
@@ -625,9 +624,7 @@ function showInventoryModal(playerId) {
         relicsListContainer.innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">Инвентарь пуст</div>';
     } else {
         const rarityOrder = ['mythic', 'legendary', 'epic', 'rare', 'uncommon', 'common'];
-        const sortedRelics = [...player.relics].sort((a, b) => {
-            return rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
-        });
+        const sortedRelics = [...player.relics].sort((a, b) => rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity));
         
         sortedRelics.forEach(relic => {
             const rarityColor = RARITY_COLORS[relic.rarity];
@@ -641,14 +638,14 @@ function showInventoryModal(playerId) {
                 <img src="${IMAGE_BASE_URL}${relic.imageNum}.jpg" alt="${relic.name}" class="relic-item-img" onerror="this.style.display='none'">
                 <div class="relic-item-info">
                     <div class="relic-item-name" style="color:${rarityColor.text}">${relic.name}</div>
-                    <div class="relic-item-desc">${relic.desc} · Слот: ${(EQUIP_SLOTS.find(s => s.id === relic.slot) || {}).name || relic.slot}</div>
+                    <div class="relic-item-desc">${relic.desc} · ${(EQUIP_SLOTS.find(s => s.id === relic.slot) || {}).name || relic.slot}</div>
                 </div>
                 <button class="relic-equip-btn" data-relic-id="${relic.id}">Экипировать</button>
             `;
             
-            const equipBtn = relicDiv.querySelector('.relic-equip-btn');
-            if (equipBtn) {
-                equipBtn.addEventListener('click', (e) => {
+            const btn = relicDiv.querySelector('.relic-equip-btn');
+            if (btn) {
+                btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     player.equipRelic(relic);
@@ -661,18 +658,15 @@ function showInventoryModal(playerId) {
         });
     }
     
-    // Кнопка "Снять всё"
-    const unequipAllBtn = document.getElementById('unequipAllBtn');
-    if (unequipAllBtn) {
-        unequipAllBtn.onclick = function(e) {
-            e.preventDefault();
-            player.unequipAll();
-            updateUI();
-            showInventoryModal(playerId);
-        };
-    }
+    document.getElementById('unequipAllBtn').onclick = (e) => {
+        e.preventDefault();
+        player.unequipAll();
+        updateUI();
+        showInventoryModal(playerId);
+    };
     
-    modal.classList.remove('hidden');
+    // ПОКАЗЫВАЕМ
+    modal.style.display = 'flex';
 }
 
 // ========== ВЫБОР ГЕРОЕВ ==========
@@ -859,12 +853,13 @@ function startBattle() {
             
             addLog(`👑 ФРОНТ ${gameWinner + 1} ПОБЕДИЛ В ИГРЕ!`);
             
-            // Показываем модальное окно выбора реликвии
+            updateUI();
+            
+            // Показываем модалку выбора реликвии с задержкой
             setTimeout(() => {
                 showRelicChoiceModal(winner, loser);
-            }, 500);
+            }, 600);
             
-            updateUI();
             return;
         }
     }
@@ -921,10 +916,12 @@ function showRelicChoiceModal(winner, loser) {
     `;
     
     content.innerHTML = html;
-    modal.classList.remove('hidden');
+    
+    // ПОКАЗЫВАЕМ
+    modal.style.display = 'flex';
     
     const closeModal = () => {
-        modal.classList.add('hidden');
+        modal.style.display = 'none';
     };
     
     const takeNewBtn = content.querySelector('#takeNewRelic');
@@ -980,7 +977,7 @@ function showStealRelicModal(winner, loser, allLoserRelics) {
         <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
     `;
     
-    allLoserRelics.forEach((relic, idx) => {
+    allLoserRelics.forEach((relic) => {
         const rarityColor = RARITY_COLORS[relic.rarity];
         if (!rarityColor) return;
         html += `
@@ -996,7 +993,9 @@ function showStealRelicModal(winner, loser, allLoserRelics) {
     
     html += `</div>`;
     content.innerHTML = html;
-    modal.classList.remove('hidden');
+    
+    // ПОКАЗЫВАЕМ
+    modal.style.display = 'flex';
     
     content.querySelectorAll('.steal-option').forEach(opt => {
         opt.addEventListener('click', () => {
@@ -1010,7 +1009,7 @@ function showStealRelicModal(winner, loser, allLoserRelics) {
                 winner.relics.push(stolen);
                 addLog(`💀 Фронт ${winner.id + 1} забирает "${stolen.name}"!`);
             }
-            modal.classList.add('hidden');
+            modal.style.display = 'none';
         });
     });
 }
@@ -1115,38 +1114,25 @@ function bindMusicEvents() {
 document.addEventListener('click', function once() { if (playlist.length && bgMusic && !bgMusic.src) loadTrack(currentTrackIndex); document.removeEventListener('click', once); }, { once: true });
 document.addEventListener('click', (e) => { if (playlistPanel && !playlistPanel.classList.contains('hidden') && !playlistPanel.contains(e.target) && !(togglePlaylistBtn && togglePlaylistBtn.contains(e.target))) playlistPanel.classList.add('hidden'); });
 
-// ========== ЗАКРЫТИЕ МОДАЛЬНЫХ ОКОН ==========
+// ========== СТАРТ ==========
 document.addEventListener('DOMContentLoaded', () => {
     initMusic();
     bindMusicEvents();
     
-    // Кнопка закрытия инвентаря
-    const closeInventoryBtn = document.getElementById('closeInventoryBtn');
-    if (closeInventoryBtn) {
-        closeInventoryBtn.addEventListener('click', () => {
-            document.getElementById('inventoryModal').classList.add('hidden');
-        });
-    }
+    // Закрытие инвентаря по кнопке
+    document.getElementById('closeInventoryBtn').addEventListener('click', () => {
+        document.getElementById('inventoryModal').style.display = 'none';
+    });
     
     // Закрытие инвентаря по клику на фон
-    const inventoryModal = document.getElementById('inventoryModal');
-    if (inventoryModal) {
-        inventoryModal.addEventListener('click', function(e) {
-            if (e.target === inventoryModal) {
-                inventoryModal.classList.add('hidden');
-            }
-        });
-    }
+    document.getElementById('inventoryModal').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
     
-    // Закрытие модалки выбора реликвии по клику на фон
-    const relicChoiceModal = document.getElementById('relicChoiceModal');
-    if (relicChoiceModal) {
-        relicChoiceModal.addEventListener('click', function(e) {
-            if (e.target === relicChoiceModal) {
-                relicChoiceModal.classList.add('hidden');
-            }
-        });
-    }
+    // Закрытие модалки реликвии по клику на фон
+    document.getElementById('relicChoiceModal').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
     
     document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', (e) => {
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
@@ -1154,11 +1140,12 @@ document.addEventListener('DOMContentLoaded', () => {
         initGame(btn.dataset.mode === 'pc' ? 'pc' : parseInt(btn.dataset.mode));
     }));
     
-    const actionBtn = document.getElementById('actionBtn');
-    if (actionBtn) actionBtn.onclick = processAction;
+    document.getElementById('actionBtn').onclick = processAction;
+    document.getElementById('resetGame').onclick = () => initGame(gameMode);
     
-    const resetGameBtn = document.getElementById('resetGame');
-    if (resetGameBtn) resetGameBtn.onclick = () => initGame(gameMode);
+    // Скрываем модалки при старте
+    document.getElementById('inventoryModal').style.display = 'none';
+    document.getElementById('relicChoiceModal').style.display = 'none';
     
     initGame(2);
 });
