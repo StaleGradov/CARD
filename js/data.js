@@ -212,54 +212,83 @@ const SAGAS = [
     { name: 'Небесные явления', desc: 'НЕБЕСА: +20 ко всем статам', imageNum: 508, saga: 'Небесные явления', mod: (h) => { if (h.saga === 'Небесные явления') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } }
 ];
 
-// ========== РЕЛИКВИИ (27 штук) ==========
-// Сеты: 
-// Сет "Доспехи Войны" (7 предметов): Шлем, Нагрудник, Наплечники, Поножи, Перчатки, Сапоги, Щит
-// Сет "Оружие Героя" (6 предметов): Меч, Топор, Молот, Копьё, Лук, Кинжал
-// Сет "Кольца Силы" (5 предметов): Кольцо Огня, Кольцо Воды, Кольцо Земли, Кольцо Воздуха, Кольцо Духа
-// Сет "Амулеты Мудрости" (4 предмета): Амулет Жизни, Амулет Смерти, Амулет Времени, Амулет Судьбы
-// Сет "Плащ и Пояс" (3 предмета): Плащ Теней, Пояс Силы, Брошь Отваги
-// Сет "Свитки и Зелья" (2 предмета): Свиток Знаний, Зелье Мощи
+// ========== РЕЛИКВИИ (27 штук) — ОБНОВЛЁННЫЕ ==========
+// Сеты и их редкость:
+// Сет из 7 предметов — МИФИЧЕСКИЙ (оранжевый)
+// Сет из 6 предметов — ЛЕГЕНДАРНЫЙ (фиолетовый)
+// Сет из 5 предметов — ЭПИЧЕСКИЙ (синий)
+// Сет из 4 предметов — РЕДКИЙ (зелёный)
+// Сет из 3 предметов — НЕОБЫЧНЫЙ (белый)
+// Сет из 2 предметов — ОБЫЧНЫЙ (серый)
+// Слоты: helm, armor, shoulders, gloves, boots, weapon, shield, ring, amulet, cloak, belt, brooch, scroll, potion
 
 const RELICS = [
-    // Сет "Доспехи Войны" (7 предметов) - imageNum 601-607
-    { id: 'relic_01', name: 'Шлем Доблести', setName: 'Доспехи Войны', setSize: 7, bonus: 7, desc: '+7 ко всем статам (Доспехи Войны)', imageNum: 601 },
-    { id: 'relic_02', name: 'Нагрудник Стойкости', setName: 'Доспехи Войны', setSize: 7, bonus: 7, desc: '+7 ко всем статам (Доспехи Войны)', imageNum: 602 },
-    { id: 'relic_03', name: 'Наплечники Мощи', setName: 'Доспехи Войны', setSize: 7, bonus: 7, desc: '+7 ко всем статам (Доспехи Войны)', imageNum: 603 },
-    { id: 'relic_04', name: 'Поножи Быстроты', setName: 'Доспехи Войны', setSize: 7, bonus: 7, desc: '+7 ко всем статам (Доспехи Войны)', imageNum: 604 },
-    { id: 'relic_05', name: 'Перчатки Ярости', setName: 'Доспехи Войны', setSize: 7, bonus: 7, desc: '+7 ко всем статам (Доспехи Войны)', imageNum: 605 },
-    { id: 'relic_06', name: 'Сапоги Странника', setName: 'Доспехи Войны', setSize: 7, bonus: 7, desc: '+7 ко всем статам (Доспехи Войны)', imageNum: 606 },
-    { id: 'relic_07', name: 'Щит Бастиона', setName: 'Доспехи Войны', setSize: 7, bonus: 7, desc: '+7 ко всем статам (Доспехи Войны)', imageNum: 607 },
+    // ===== МИФИЧЕСКИЙ СЕТ "Доспехи Войны" (7 предметов) — слоты брони =====
+    { id: 'relic_01', name: 'Шлем Доблести',      slot: 'helm',      setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 601 },
+    { id: 'relic_02', name: 'Нагрудник Стойкости', slot: 'armor',     setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 602 },
+    { id: 'relic_03', name: 'Наплечники Мощи',     slot: 'shoulders', setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 603 },
+    { id: 'relic_04', name: 'Поножи Быстроты',     slot: 'boots',     setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 604 },
+    { id: 'relic_05', name: 'Перчатки Ярости',     slot: 'gloves',    setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 605 },
+    { id: 'relic_06', name: 'Сапоги Странника',    slot: 'boots',     setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 606 },
+    { id: 'relic_07', name: 'Щит Бастиона',        slot: 'shield',    setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 607 },
     
-    // Сет "Оружие Героя" (6 предметов) - imageNum 608-613
-    { id: 'relic_08', name: 'Меч Справедливости', setName: 'Оружие Героя', setSize: 6, bonus: 6, desc: '+6 ко всем статам (Оружие Героя)', imageNum: 608 },
-    { id: 'relic_09', name: 'Топор Громовержца', setName: 'Оружие Героя', setSize: 6, bonus: 6, desc: '+6 ко всем статам (Оружие Героя)', imageNum: 609 },
-    { id: 'relic_10', name: 'Молот Титана', setName: 'Оружие Героя', setSize: 6, bonus: 6, desc: '+6 ко всем статам (Оружие Героя)', imageNum: 610 },
-    { id: 'relic_11', name: 'Копьё Бури', setName: 'Оружие Героя', setSize: 6, bonus: 6, desc: '+6 ко всем статам (Оружие Героя)', imageNum: 611 },
-    { id: 'relic_12', name: 'Лук Охотника', setName: 'Оружие Героя', setSize: 6, bonus: 6, desc: '+6 ко всем статам (Оружие Героя)', imageNum: 612 },
-    { id: 'relic_13', name: 'Кинжал Теней', setName: 'Оружие Героя', setSize: 6, bonus: 6, desc: '+6 ко всем статам (Оружие Героя)', imageNum: 613 },
+    // ===== ЛЕГЕНДАРНЫЙ СЕТ "Оружие Героя" (6 предметов) =====
+    { id: 'relic_08', name: 'Меч Справедливости',  slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 608 },
+    { id: 'relic_09', name: 'Топор Громовержца',   slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 609 },
+    { id: 'relic_10', name: 'Молот Титана',        slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 610 },
+    { id: 'relic_11', name: 'Копьё Бури',          slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 611 },
+    { id: 'relic_12', name: 'Лук Охотника',        slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 612 },
+    { id: 'relic_13', name: 'Кинжал Теней',        slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 613 },
     
-    // Сет "Кольца Силы" (5 предметов) - imageNum 614-618
-    { id: 'relic_14', name: 'Кольцо Огня', setName: 'Кольца Силы', setSize: 5, bonus: 5, desc: '+5 ко всем статам (Кольца Силы)', imageNum: 614 },
-    { id: 'relic_15', name: 'Кольцо Воды', setName: 'Кольца Силы', setSize: 5, bonus: 5, desc: '+5 ко всем статам (Кольца Силы)', imageNum: 615 },
-    { id: 'relic_16', name: 'Кольцо Земли', setName: 'Кольца Силы', setSize: 5, bonus: 5, desc: '+5 ко всем статам (Кольца Силы)', imageNum: 616 },
-    { id: 'relic_17', name: 'Кольцо Воздуха', setName: 'Кольца Силы', setSize: 5, bonus: 5, desc: '+5 ко всем статам (Кольца Силы)', imageNum: 617 },
-    { id: 'relic_18', name: 'Кольцо Духа', setName: 'Кольца Силы', setSize: 5, bonus: 5, desc: '+5 ко всем статам (Кольца Силы)', imageNum: 618 },
+    // ===== ЭПИЧЕСКИЙ СЕТ "Кольца Силы" (5 предметов) =====
+    { id: 'relic_14', name: 'Кольцо Огня',         slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 614 },
+    { id: 'relic_15', name: 'Кольцо Воды',         slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 615 },
+    { id: 'relic_16', name: 'Кольцо Земли',        slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 616 },
+    { id: 'relic_17', name: 'Кольцо Воздуха',      slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 617 },
+    { id: 'relic_18', name: 'Кольцо Духа',         slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 618 },
     
-    // Сет "Амулеты Мудрости" (4 предмета) - imageNum 619-622
-    { id: 'relic_19', name: 'Амулет Жизни', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, desc: '+4 ко всем статам (Амулеты Мудрости)', imageNum: 619 },
-    { id: 'relic_20', name: 'Амулет Смерти', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, desc: '+4 ко всем статам (Амулеты Мудрости)', imageNum: 620 },
-    { id: 'relic_21', name: 'Амулет Времени', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, desc: '+4 ко всем статам (Амулеты Мудрости)', imageNum: 621 },
-    { id: 'relic_22', name: 'Амулет Судьбы', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, desc: '+4 ко всем статам (Амулеты Мудрости)', imageNum: 622 },
+    // ===== РЕДКИЙ СЕТ "Амулеты Мудрости" (4 предмета) =====
+    { id: 'relic_19', name: 'Амулет Жизни',        slot: 'amulet', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, rarity: 'rare', desc: '+4/стат · Амулеты Мудрости', imageNum: 619 },
+    { id: 'relic_20', name: 'Амулет Смерти',       slot: 'amulet', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, rarity: 'rare', desc: '+4/стат · Амулеты Мудрости', imageNum: 620 },
+    { id: 'relic_21', name: 'Амулет Времени',      slot: 'amulet', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, rarity: 'rare', desc: '+4/стат · Амулеты Мудрости', imageNum: 621 },
+    { id: 'relic_22', name: 'Амулет Судьбы',       slot: 'amulet', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, rarity: 'rare', desc: '+4/стат · Амулеты Мудрости', imageNum: 622 },
     
-    // Сет "Плащ и Пояс" (3 предмета) - imageNum 623-625
-    { id: 'relic_23', name: 'Плащ Теней', setName: 'Плащ и Пояс', setSize: 3, bonus: 3, desc: '+3 ко всем статам (Плащ и Пояс)', imageNum: 623 },
-    { id: 'relic_24', name: 'Пояс Силы', setName: 'Плащ и Пояс', setSize: 3, bonus: 3, desc: '+3 ко всем статам (Плащ и Пояс)', imageNum: 624 },
-    { id: 'relic_25', name: 'Брошь Отваги', setName: 'Плащ и Пояс', setSize: 3, bonus: 3, desc: '+3 ко всем статам (Плащ и Пояс)', imageNum: 625 },
+    // ===== НЕОБЫЧНЫЙ СЕТ "Плащ и Пояс" (3 предмета) =====
+    { id: 'relic_23', name: 'Плащ Теней',          slot: 'cloak',  setName: 'Плащ и Пояс', setSize: 3, bonus: 3, rarity: 'uncommon', desc: '+3/стат · Плащ и Пояс', imageNum: 623 },
+    { id: 'relic_24', name: 'Пояс Силы',           slot: 'belt',   setName: 'Плащ и Пояс', setSize: 3, bonus: 3, rarity: 'uncommon', desc: '+3/стат · Плащ и Пояс', imageNum: 624 },
+    { id: 'relic_25', name: 'Брошь Отваги',        slot: 'brooch', setName: 'Плащ и Пояс', setSize: 3, bonus: 3, rarity: 'uncommon', desc: '+3/стат · Плащ и Пояс', imageNum: 625 },
     
-    // Сет "Свитки и Зелья" (2 предмета) - imageNum 626-627
-    { id: 'relic_26', name: 'Свиток Знаний', setName: 'Свитки и Зелья', setSize: 2, bonus: 2, desc: '+2 ко всем статам (Свитки и Зелья)', imageNum: 626 },
-    { id: 'relic_27', name: 'Зелье Мощи', setName: 'Свитки и Зелья', setSize: 2, bonus: 2, desc: '+2 ко всем статам (Свитки и Зелья)', imageNum: 627 }
+    // ===== ОБЫЧНЫЙ СЕТ "Свитки и Зелья" (2 предмета) =====
+    { id: 'relic_26', name: 'Свиток Знаний',       slot: 'scroll', setName: 'Свитки и Зелья', setSize: 2, bonus: 2, rarity: 'common', desc: '+2/стат · Свитки и Зелья', imageNum: 626 },
+    { id: 'relic_27', name: 'Зелье Мощи',          slot: 'potion', setName: 'Свитки и Зелья', setSize: 2, bonus: 2, rarity: 'common', desc: '+2/стат · Свитки и Зелья', imageNum: 627 }
+];
+
+// Цвета редкости реликвий
+const RARITY_COLORS = {
+    'mythic':   { border: '#ff8c00', glow: '#ffaa00', bg: 'linear-gradient(145deg, #3a2000, #1a0e00)', text: '#ffcc66', name: 'Мифический' },
+    'legendary': { border: '#9b30ff', glow: '#bb66ff', bg: 'linear-gradient(145deg, #2a0a3a, #150520)', text: '#d4a0ff', name: 'Легендарный' },
+    'epic':     { border: '#2196f3', glow: '#64b5f6', bg: 'linear-gradient(145deg, #0a1a3a, #050d20)', text: '#90caf9', name: 'Эпический' },
+    'rare':     { border: '#4caf50', glow: '#81c784', bg: 'linear-gradient(145deg, #0a2a0a, #051505)', text: '#a5d6a7', name: 'Редкий' },
+    'uncommon': { border: '#bdbdbd', glow: '#e0e0e0', bg: 'linear-gradient(145deg, #1a1a1a, #0d0d0d)', text: '#e0e0e0', name: 'Необычный' },
+    'common':   { border: '#757575', glow: '#9e9e9e', bg: 'linear-gradient(145deg, #151515, #0a0a0a)', text: '#bdbdbd', name: 'Обычный' }
+};
+
+// Слоты экипировки
+const EQUIP_SLOTS = [
+    { id: 'helm',      name: 'Шлем',       icon: '🪖' },
+    { id: 'armor',     name: 'Нагрудник',  icon: '🛡️' },
+    { id: 'shoulders', name: 'Наплечники', icon: '💪' },
+    { id: 'gloves',    name: 'Перчатки',   icon: '🧤' },
+    { id: 'boots',     name: 'Сапоги',     icon: '👢' },
+    { id: 'weapon',    name: 'Оружие',     icon: '⚔️' },
+    { id: 'shield',    name: 'Щит',        icon: '🛡️' },
+    { id: 'ring',      name: 'Кольцо',     icon: '💍' },
+    { id: 'amulet',    name: 'Амулет',     icon: '📿' },
+    { id: 'cloak',     name: 'Плащ',       icon: '🧥' },
+    { id: 'belt',      name: 'Пояс',       icon: ' Belt' },
+    { id: 'brooch',    name: 'Брошь',      icon: '📎' },
+    { id: 'scroll',    name: 'Свиток',     icon: '📜' },
+    { id: 'potion',    name: 'Зелье',      icon: '🧪' }
 ];
 
 // ========== ЗВАНИЯ (10 уровней) ==========
@@ -276,13 +305,13 @@ const TITLES = [
     { level: 10, name: 'Божество',      bonus: 10, imageNum: 710 }
 ];
 
-// Функция получения бонуса от активного сета реликвий
-function getActiveSetBonus(relics) {
-    if (!relics || relics.length === 0) return 0;
+// Функция получения бонуса от экипированных реликвий (лучший сет)
+function getActiveSetBonus(equippedRelics) {
+    if (!equippedRelics || equippedRelics.length === 0) return 0;
     
     // Группируем реликвии по сетам
     const setGroups = {};
-    relics.forEach(r => {
+    equippedRelics.forEach(r => {
         if (!setGroups[r.setName]) setGroups[r.setName] = [];
         setGroups[r.setName].push(r);
     });
