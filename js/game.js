@@ -1,4 +1,4 @@
-// ---------- ИГРОВАЯ ЛОГИКА (v9 — полный фикс) ----------
+// ---------- ИГРОВАЯ ЛОГИКА (v11 — финальная) ----------
 
 "use strict";
 
@@ -88,7 +88,8 @@ let ALL_HEROES = [];
 
 // ========== КЛАСС ИГРОКА ==========
 class Player {
-    constructor(id, isAI = false) {
+    constructor(id, isAI) {
+        if (isAI === undefined) isAI = false;
         this.id = id;
         this.isAI = isAI;
         this.deck = [];
@@ -253,12 +254,28 @@ function initGame(mode) {
     if (mode === undefined) mode = gameMode;
     if (aiTimeout) clearTimeout(aiTimeout);
     gameMode = mode;
+    
+    // Сохраняем старые данные игроков
+    const oldData = [];
+    for (let i = 0; i < 2; i++) {
+        if (players[i]) {
+            oldData[i] = {
+                relics: [...players[i].relics],
+                equippedRelics: JSON.parse(JSON.stringify(players[i].equippedRelics)),
+                titleLevel: players[i].titleLevel,
+                winStreak: players[i].winStreak
+            };
+        } else {
+            oldData[i] = { relics: [], equippedRelics: {}, titleLevel: 0, winStreak: 0 };
+        }
+    }
+    
     players = [];
     const numPlayers = (mode === 'pc') ? 2 : mode;
     for (let i = 0; i < numPlayers; i++) {
         players.push(new Player(i, (mode === 'pc' && i === 1)));
     }
-
+    
     const allHeroesCopy = shuffle([...ALL_HEROES]);
     const cardsPerPlayer = Math.floor(ALL_HEROES.length / numPlayers);
     players.forEach((p, idx) => {
@@ -266,26 +283,29 @@ function initGame(mode) {
         p.hand = p.deck.splice(0, 3);
         p.selectedHeroes = [];
         p.hasConfirmed = false;
-        p.relics = [];
-        p.equippedRelics = {};
-        p.winStreak = 0;
-        p.titleLevel = 0;
+        p.relics = oldData[idx] ? oldData[idx].relics : [];
+        p.equippedRelics = oldData[idx] ? oldData[idx].equippedRelics : {};
+        p.winStreak = oldData[idx] ? oldData[idx].winStreak : 0;
+        p.titleLevel = oldData[idx] ? oldData[idx].titleLevel : 0;
     });
-
+    
     currentPlayerIndex = 0;
     round = 1;
     gameWinner = null;
     battlePhase = 'select';
     lastRoundWinner = null;
-
+    
     eventDecks.locations = shuffle([...LOCATIONS]);
     eventDecks.kingdoms = shuffle([...KINGDOMS]);
     eventDecks.professions = shuffle([...PROFESSIONS]);
     eventDecks.sagas = shuffle([...SAGAS]);
     eventDecks.relics = shuffle([...RELICS]);
-
+    
     currentEvent = { location: null, kingdom: null, profession: null, saga: null };
-
+    
+    document.getElementById('inventoryModal').style.display = 'none';
+    document.getElementById('relicChoiceModal').style.display = 'none';
+    
     renderArena();
     updateUI();
     addLog(`✨ Новая кампания! Режим: ${numPlayers} игрока. Раунд 1. Сравнение по МОЩИ (⚡).`);
@@ -302,13 +322,26 @@ function updateUI() {
 
     if (gameWinner !== null) {
         if (turnIndicator) turnIndicator.innerText = '🏁 ИГРА ОКОНЧЕНА';
-        if (actionBtn) { actionBtn.textContent = '🏆 ИГРА ЗАВЕРШЕНА'; actionBtn.disabled = true; }
+        if (actionBtn) {
+            actionBtn.textContent = '🔄 НОВАЯ ИГРА';
+            actionBtn.disabled = false;
+            actionBtn.onclick = function() {
+                initGame(gameMode);
+            };
+        }
     } else if (battlePhase === 'select') {
         if (turnIndicator) turnIndicator.innerText = `🎲 Ход Фронта ${currentPlayerIndex + 1}`;
-        if (actionBtn) { actionBtn.textContent = '✅ ЗАКОНЧИТЬ ВЫБОР'; actionBtn.disabled = false; }
+        if (actionBtn) {
+            actionBtn.textContent = '✅ ЗАКОНЧИТЬ ВЫБОР';
+            actionBtn.disabled = false;
+            actionBtn.onclick = processAction;
+        }
     } else {
         if (turnIndicator) turnIndicator.innerText = '⚔️ БОЙ ИДЁТ...';
-        if (actionBtn) { actionBtn.textContent = '⚔️ БОЙ ИДЁТ...'; actionBtn.disabled = true; }
+        if (actionBtn) {
+            actionBtn.textContent = '⚔️ БОЙ ИДЁТ...';
+            actionBtn.disabled = true;
+        }
     }
 
     // События
@@ -841,7 +874,6 @@ function startBattle() {
             addLog(`👑 ФРОНТ ${gameWinner + 1} ПОБЕДИЛ В ИГРЕ!`);
             updateUI();
 
-            // Показываем модалку через setTimeout
             setTimeout(function() {
                 showRelicChoiceModal(winner, loser);
             }, 600);
@@ -850,7 +882,6 @@ function startBattle() {
         }
     }
 
-    // Скрываем итог раунда
     setTimeout(function() {
         lastRoundWinner = undefined;
         updateUI();
@@ -863,9 +894,7 @@ function startBattle() {
 function showRelicChoiceModal(winner, loser) {
     const modal = document.getElementById('relicChoiceModal');
     const content = document.getElementById('relicChoiceContent');
-    if (!modal || !content) {
-        return;
-    }
+    if (!modal || !content) return;
 
     let html = `
         <div class="result-title" style="color:gold;">🏆 ПОБЕДА ФРОНТА ${winner.id + 1}!</div>
