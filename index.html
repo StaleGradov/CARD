@@ -33,6 +33,39 @@
     <div class="log" id="log">[⚔️] Тигримион ждёт. Выберите героя для Раунда 1.</div>
 </div>
 
+<!-- ========== МОДАЛЬНОЕ ОКНО ИНВЕНТАРЯ ========== -->
+<div id="inventoryModal" class="inventory-modal">
+    <div class="inventory-content">
+        <div class="inventory-header">
+            <span>🎒 ИНВЕНТАРЬ — ФРОНТ <span id="invPlayerId">1</span></span>
+            <button class="inventory-close-btn" id="closeInventoryBtn">✕</button>
+        </div>
+        
+        <div class="inventory-body">
+            <!-- Левая панель: слоты экипировки -->
+            <div class="inventory-left">
+                <h3 class="inventory-section-title">🎽 ЭКИПИРОВКА</h3>
+                <div class="equip-slots" id="equipSlots"></div>
+                <div class="equip-bonus-info" id="equipBonusInfo"></div>
+            </div>
+            
+            <!-- Правая панель: список реликвий -->
+            <div class="inventory-right">
+                <h3 class="inventory-section-title">🔮 ВСЕ РЕЛИКВИИ (<span id="relicTotalCount">0</span>)</h3>
+                <div class="relics-list" id="relicsList"></div>
+                <div class="inventory-footer">
+                    <button class="inventory-btn-action" id="unequipAllBtn">🗑️ СНЯТЬ ВСЁ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== МОДАЛЬНОЕ ОКНО ВЫБОРА РЕЛИКВИИ ПОСЛЕ ПОБЕДЫ ========== -->
+<div id="relicChoiceModal" class="result-modal">
+    <div class="result-content" id="relicChoiceContent"></div>
+</div>
+
 <!-- ========== МУЗЫКАЛЬНЫЙ ПЛЕЕР ========== -->
 <audio id="bgMusic" preload="auto"></audio>
 
