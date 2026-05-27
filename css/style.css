@@ -124,8 +124,8 @@ body {
 
 .event-card { 
     flex: 0 0 auto;
-    width: 340px;
-    height: 481px;
+    width: 360px;
+    height: 510px;
     background: #1a1a1a; 
     border-radius: 24px; 
     overflow: hidden; 
@@ -167,7 +167,7 @@ body {
 
 .event-info { 
     height: 45%;
-    padding: 12px 14px;
+    padding: 14px 16px;
     background: var(--parchment-bg) center/cover no-repeat;
     background-color: rgba(30, 25, 18, 0.85);
     background-blend-mode: multiply;
@@ -182,7 +182,7 @@ body {
 .event-info::-webkit-scrollbar-thumb { background: #c9a45b; border-radius: 3px; }
 
 .event-name { 
-    font-size: 1.2rem; 
+    font-size: 1.3rem; 
     font-weight: bold; 
     text-align: center; 
     color: #ffdfa5; 
@@ -192,7 +192,7 @@ body {
 }
 
 .event-desc { 
-    font-size: 0.85rem; 
+    font-size: 0.9rem; 
     opacity: 0.9; 
     text-align: center; 
     color: #ecd690; 
@@ -200,7 +200,7 @@ body {
 }
 
 .event-icon { 
-    font-size: 2rem; 
+    font-size: 2.2rem; 
     text-align: center; 
     margin: 5px 0;
 }
@@ -215,10 +215,10 @@ body {
 
 .player-card { 
     flex: 1 1 400px; 
-    min-width: 360px; 
+    min-width: 380px; 
     background: #1e261ae0; 
     border-radius: 32px; 
-    padding: 12px 15px; 
+    padding: 14px 18px; 
     backdrop-filter: blur(4px); 
     border: 2px solid #c9a45b; 
     box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3); 
@@ -245,7 +245,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Строка с инфой игрока */
 .player-info-row {
     display: flex;
     justify-content: center;
@@ -259,9 +258,9 @@ body {
     background: linear-gradient(145deg, #4a3000, #2a1a00);
     border: 1px solid #ffd700;
     color: #ffd700;
-    padding: 2px 12px;
+    padding: 3px 14px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: bold;
 }
 
@@ -269,9 +268,9 @@ body {
     background: rgba(100, 60, 200, 0.4);
     border: 1px solid #9b30ff;
     color: #d4b8ff;
-    padding: 2px 12px;
+    padding: 3px 14px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: bold;
 }
 
@@ -279,9 +278,9 @@ body {
     background: rgba(200, 100, 0, 0.4);
     border: 1px solid #ff6600;
     color: #ff9933;
-    padding: 2px 12px;
+    padding: 3px 14px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: bold;
 }
 
@@ -289,7 +288,7 @@ body {
 .hero-cards { 
     display: flex; 
     flex-wrap: nowrap;
-    gap: 14px; 
+    gap: 16px; 
     justify-content: center;
     align-items: stretch;
     margin-top: 8px;
@@ -302,8 +301,8 @@ body {
 
 .hero-card { 
     flex: 0 0 auto;
-    width: 280px;
-    height: 396px;
+    width: 300px;
+    height: 420px;
     min-width: auto;
     max-width: none;
     background: #1a1a1a; 
@@ -316,6 +315,7 @@ body {
     transition: all 0.2s ease; 
     display: flex; 
     flex-direction: column;
+    position: relative;
 }
 
 .hero-card:hover { 
@@ -335,6 +335,7 @@ body {
     position: relative;
     flex-shrink: 0;
     background: #0d0d0d;
+    overflow: hidden;
 }
 
 .hero-portrait img { 
@@ -350,14 +351,14 @@ body {
     bottom: 0; 
     left: 0; 
     right: 0; 
-    height: 40px; 
+    height: 35px; 
     background: linear-gradient(to top, #1a1a1a, transparent); 
     pointer-events: none;
 }
 
 .hero-info { 
     height: 52%;
-    padding: 4px 7px 5px;
+    padding: 5px 8px 6px;
     background: var(--parchment-bg) center/cover no-repeat;
     background-color: rgba(30, 25, 18, 0.85);
     background-blend-mode: multiply;
@@ -372,32 +373,33 @@ body {
 }
 
 .hero-name { 
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: bold; 
     text-align: center; 
-    margin-bottom: 0; 
+    margin-bottom: 1px; 
     color: #ffefc0; 
     text-transform: uppercase; 
     letter-spacing: 0.5px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    line-height: 1.15;
+    line-height: 1.2;
 }
 
 .hero-subtitle { 
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 500;
     opacity: 0.9; 
     text-align: center; 
-    margin-bottom: 0;
+    margin-bottom: 2px;
     color: #f5e2b0;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+    line-height: 1.2;
 }
 
 .hero-icons-row { 
     display: flex; 
     justify-content: center; 
-    gap: 5px;
-    margin: 0 0 1px 0;
+    gap: 6px;
+    margin: 2px 0;
     flex-wrap: wrap;
 }
 
@@ -405,19 +407,18 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: bold;
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(2px);
-    padding: 2px 5px;
+    padding: 3px 7px;
     border-radius: 20px; 
     border: 1px solid rgba(201, 164, 91, 0.5);
     gap: 1px;
-    min-width: 45px;
+    min-width: 50px;
     transition: all 0.3s ease;
 }
 
-/* Подсветка иконок когда можно объединять */
 .hero-icon.icon-highlight {
     border-color: #ffd700 !important;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
@@ -432,12 +433,12 @@ body {
 }
 
 .hero-icon span:first-child {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: normal;
 }
 
 .hero-icon span:last-child { 
-    font-size: 0.5rem;
+    font-size: 0.55rem;
     opacity: 0.9;
     font-weight: normal;
     letter-spacing: 0px;
@@ -445,16 +446,16 @@ body {
 
 .hero-power-badge { 
     text-align: center; 
-    margin: 0 0 2px 0;
+    margin: 2px 0;
 }
 
 .power-value { 
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(2px);
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 30px; 
     font-weight: bold; 
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     border: 1px solid #ffd58c; 
     color: #ffd58c;
     display: inline-block;
@@ -465,38 +466,75 @@ body {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    margin: 0;
+    gap: 5px;
+    margin: 2px 0 0;
 }
 
 .stat-row { 
-    margin-top: -1px;
+    margin-bottom: 0;
 }
-
-.stat-row:first-child { margin-top: 0; }
 
 .label-group { 
     display: flex; 
     justify-content: space-between; 
-    font-size: 0.6rem;
+    align-items: flex-end;
+    font-size: 0.65rem;
     font-weight: bold;
-    margin-bottom: 1px; 
+    margin-bottom: 2px; 
     opacity: 0.95;
     letter-spacing: 0px;
     text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
 
+.stat-label {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.stat-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
 .stat-value {
     font-weight: bold;
     color: #ffefb0;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
+    line-height: 1;
 }
 
+.stat-ranks {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-height: 0.55rem;
+    margin-top: 1px;
+}
+
+.rank-badge {
+    font-size: 0.45rem;
+    white-space: nowrap;
+    opacity: 0.9;
+    line-height: 1;
+    padding: 0 1px;
+}
+
+.rank-badge.rank-race { color: #c0ffc0; }
+.rank-badge.rank-prof { color: #ffd58c; }
+.rank-badge.rank-saga { color: #ff9999; }
+.rank-badge.rank-global { color: gold; font-weight: bold; }
+.rank-badge.top1 { text-shadow: 0 0 4px currentColor; font-weight: bold; }
+
 .bar-bg { 
-    height: 5px;
-    background: rgba(0, 0, 0, 0.5); 
+    height: 6px;
+    background: rgba(0, 0, 0, 0.6); 
     border-radius: 3px; 
-    overflow: hidden; 
+    overflow: hidden;
+    position: relative;
 }
 
 .bar-fill { 
@@ -504,12 +542,95 @@ body {
     width: 0; 
     transition: width 0.3s ease-out; 
     border-radius: 2px;
+    position: relative;
 }
 
-.hp-bar { background: linear-gradient(90deg, #ff2d55, #ff5e7e); box-shadow: 0 0 4px #ff2d55; }
-.armor-bar { background: linear-gradient(90deg, #2196f3, #64b5f6); box-shadow: 0 0 4px #2196f3; }
-.dmg-bar { background: linear-gradient(90deg, #ffc107, #ffd54f); box-shadow: 0 0 4px #ffc107; }
-.gold-bar { background: linear-gradient(90deg, #ffd700, #ffed4a); box-shadow: 0 0 5px #ffd700; }
+.hp-bar { background: linear-gradient(90deg, #881122 0%, #cc3355 70%, #ff2d55 100%); }
+.armor-bar { background: linear-gradient(90deg, #0e3d6e 0%, #1a6dd4 70%, #2196f3 100%); }
+.dmg-bar { background: linear-gradient(90deg, #662200 0%, #994400 70%, #cc5500 100%); }
+.gold-bar { background: linear-gradient(90deg, #664400 0%, #997700 70%, #b8860b 100%); }
+
+/* Свечение полосок ≥70% */
+.bar-fill.glowing::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 10px;
+    border-radius: 50%;
+    filter: blur(3px);
+    opacity: 0.8;
+}
+
+.bar-fill.hp-bar.glowing { background: linear-gradient(90deg, #cc2244 0%, #ff2d55 50%, #ff6b8a 100%); }
+.bar-fill.hp-bar.glowing::after { background: #ff6b8a; box-shadow: 0 0 8px #ff2d55, 0 0 15px #ff6b8a; }
+
+.bar-fill.armor-bar.glowing { background: linear-gradient(90deg, #1a6dd4 0%, #2196f3 50%, #64b5f6 100%); }
+.bar-fill.armor-bar.glowing::after { background: #64b5f6; box-shadow: 0 0 8px #2196f3, 0 0 15px #64b5f6; }
+
+.bar-fill.dmg-bar.glowing { background: linear-gradient(90deg, #993300 0%, #cc5500 40%, #ff7722 80%, #ff9944 100%); }
+.bar-fill.dmg-bar.glowing::after { background: #ff9944; box-shadow: 0 0 10px #cc5500, 0 0 20px #ff7722, 0 0 30px #ff9944; }
+
+.bar-fill.gold-bar.glowing { background: linear-gradient(90deg, #997700 0%, #d4a017 50%, #ffd700 80%, #ffed4a 100%); }
+.bar-fill.gold-bar.glowing::after { background: #fff8b0; box-shadow: 0 0 10px #ffd700, 0 0 20px #ffed4a, 0 0 30px #fff8b0; }
+
+.bar-fill.record { animation: recordGlow 1.2s ease-in-out infinite; }
+
+.bar-fill.hp-bar.record.glowing::after { box-shadow: 0 0 12px #ff2d55, 0 0 25px #ff6b8a; }
+.bar-fill.armor-bar.record.glowing::after { box-shadow: 0 0 12px #2196f3, 0 0 25px #64b5f6; }
+.bar-fill.dmg-bar.record.glowing::after { box-shadow: 0 0 15px #cc5500, 0 0 30px #ff7722, 0 0 45px #ff9944; }
+.bar-fill.gold-bar.record.glowing::after { box-shadow: 0 0 15px #ffd700, 0 0 30px #ffed4a, 0 0 45px #fff8b0; }
+
+@keyframes recordGlow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+}
+
+/* ========= ЗВЁЗДЫ МОЩИ И БОГАТСТВА ========= */
+.stars-row {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 5;
+    background: rgba(0,0,0,0.65);
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(201,164,91,0.3);
+}
+
+.stars-combat, .stars-wealth { display: flex; gap: 2px; }
+
+.star {
+    font-size: 0.8rem;
+    color: #333;
+    text-shadow: none;
+    transition: all 0.3s;
+}
+
+.star.active {
+    color: gold;
+    text-shadow: 0 0 5px gold;
+}
+
+.star.wealth {
+    font-size: 0.7rem;
+}
+
+.star.wealth.active {
+    color: #ffd700;
+    text-shadow: 0 0 5px #ffd700;
+}
+
+.stars-divider {
+    color: #555;
+    font-size: 0.65rem;
+    margin: 0 2px;
+}
 
 /* ========= КНОПКИ ДЕЙСТВИЙ ========= */
 .actions-row {
@@ -522,7 +643,7 @@ body {
     background: linear-gradient(145deg, #b3470c, #8a3509); 
     border: none; 
     flex: 2;
-    padding: 10px; 
+    padding: 12px; 
     font-size: 1.1rem; 
     font-weight: bold; 
     color: #ffefb9; 
@@ -556,7 +677,7 @@ body {
 .log { 
     background: #090c07e0; 
     border-radius: 20px; 
-    padding: 8px 15px; 
+    padding: 10px 18px; 
     margin-top: 12px; 
     height: 100px; 
     overflow-y: auto; 
@@ -569,7 +690,7 @@ body {
 .deck-counter { 
     text-align: center;
     color: #ffd58c;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     margin-top: 8px;
 }
 
@@ -935,7 +1056,7 @@ body {
 /* ========= СКРОЛЛБАРЫ ========= */
 .hero-cards::-webkit-scrollbar,
 .event-cards-row::-webkit-scrollbar {
-    height: 5px;
+    height: 6px;
     background: #1a1a1a;
     border-radius: 3px;
 }
@@ -945,155 +1066,66 @@ body {
     background: #c9a45b;
     border-radius: 3px;
 }
-/* ========== ЗВЁЗДЫ МОЩИ И БОГАТСТВА ========== */
-.stars-row {
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 6px;
-    z-index: 5;
-    background: rgba(0,0,0,0.6);
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 1px solid rgba(201,164,91,0.3);
-}
 
-.stars-combat, .stars-wealth { display: flex; gap: 2px; }
-
-.star {
-    font-size: 0.75rem;
-    color: #333;
-    text-shadow: none;
-    transition: all 0.3s;
-}
-
-.star.active {
-    color: gold;
-    text-shadow: 0 0 5px gold;
-}
-
-.star.wealth {
-    font-size: 0.65rem;
-}
-
-.star.wealth.active {
-    color: #ffd700;
-    text-shadow: 0 0 5px #ffd700;
-}
-
-.stars-divider {
-    color: #555;
-    font-size: 0.6rem;
-    margin: 0 2px;
-}
-
-/* ========== РАНГИ НА СТАТАХ ========== */
-.stat-label {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-}
-
-.stat-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.stat-ranks {
-    display: flex;
-    gap: 2px;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    min-height: 0.5rem;
-}
-
-.rank-badge {
-    font-size: 0.42rem;
-    white-space: nowrap;
-    opacity: 0.9;
-    line-height: 1;
-    padding: 0 1px;
-}
-
-.rank-badge.rank-race { color: #c0ffc0; }
-.rank-badge.rank-prof { color: #ffd58c; }
-.rank-badge.rank-saga { color: #ff9999; }
-.rank-badge.rank-global { color: gold; font-weight: bold; }
-.rank-badge.top1 { text-shadow: 0 0 4px currentColor; font-weight: bold; }
-
-/* Свечение для полосок >70% */
-.bar-fill.glowing::after {
-    content: '';
-    position: absolute;
-    right: -2px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 10px;
-    border-radius: 50%;
-    filter: blur(3px);
-    opacity: 0.8;
-}
-
-.bar-fill.record { animation: recordGlow 1.2s ease-in-out infinite; }
-
-@keyframes recordGlow {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.3); }
-}
-
-/* Полоски со свечением */
-.bar-fill.hp-bar.glowing { background: linear-gradient(90deg, #cc2244 0%, #ff2d55 50%, #ff6b8a 100%); }
-.bar-fill.hp-bar.glowing::after { background: #ff6b8a; box-shadow: 0 0 8px #ff2d55, 0 0 15px #ff6b8a; }
-
-.bar-fill.armor-bar.glowing { background: linear-gradient(90deg, #1a6dd4 0%, #2196f3 50%, #64b5f6 100%); }
-.bar-fill.armor-bar.glowing::after { background: #64b5f6; box-shadow: 0 0 8px #2196f3, 0 0 15px #64b5f6; }
-
-.bar-fill.dmg-bar.glowing { background: linear-gradient(90deg, #993300 0%, #cc5500 40%, #ff7722 80%, #ff9944 100%); }
-.bar-fill.dmg-bar.glowing::after { background: #ff9944; box-shadow: 0 0 10px #cc5500, 0 0 20px #ff7722, 0 0 30px #ff9944; }
-
-.bar-fill.gold-bar.glowing { background: linear-gradient(90deg, #997700 0%, #d4a017 50%, #ffd700 80%, #ffed4a 100%); }
-.bar-fill.gold-bar.glowing::after { background: #fff8b0; box-shadow: 0 0 10px #ffd700, 0 0 20px #ffed4a, 0 0 30px #fff8b0; }
-
-/* Рекордные полоски */
-.bar-fill.hp-bar.record.glowing::after { box-shadow: 0 0 12px #ff2d55, 0 0 25px #ff6b8a; }
-.bar-fill.armor-bar.record.glowing::after { box-shadow: 0 0 12px #2196f3, 0 0 25px #64b5f6; }
-.bar-fill.dmg-bar.record.glowing::after { box-shadow: 0 0 15px #cc5500, 0 0 30px #ff7722, 0 0 45px #ff9944; }
-.bar-fill.gold-bar.record.glowing::after { box-shadow: 0 0 15px #ffd700, 0 0 30px #ffed4a, 0 0 45px #fff8b0; }
 /* ========= АДАПТИВНОСТЬ ========= */
+@media (max-width: 1100px) {
+    .hero-card { width: 270px; height: 378px; }
+    .event-card { width: 320px; height: 453px; }
+    .hero-name { font-size: 0.9rem; }
+    .hero-subtitle { font-size: 0.63rem; }
+    .hero-icon { min-width: 44px; padding: 2px 5px; }
+    .hero-icon span:first-child { font-size: 0.7rem; }
+    .hero-icon span:last-child { font-size: 0.48rem; }
+    .power-value { font-size: 0.75rem; padding: 2px 8px; }
+    .label-group { font-size: 0.6rem; }
+    .stat-value { font-size: 0.63rem; }
+    .bar-bg { height: 5px; }
+    .star { font-size: 0.7rem; }
+    .star.wealth { font-size: 0.62rem; }
+}
+
 @media (max-width: 900px) {
-    .hero-card { width: 240px; height: 339px; }
-    .event-card { width: 280px; height: 396px; }
-    .hero-icon { min-width: 40px; padding: 1px 4px; }
+    .hero-card { width: 250px; height: 350px; }
+    .event-card { width: 290px; height: 410px; }
+    .hero-icon { min-width: 40px; padding: 2px 4px; }
     .hero-icon span:first-child { font-size: 0.65rem; }
     .hero-icon span:last-child { font-size: 0.45rem; }
-    .hero-name { font-size: 0.8rem; }
-    .hero-subtitle { font-size: 0.55rem; }
-    .power-value { font-size: 0.65rem; padding: 1px 6px; }
+    .hero-name { font-size: 0.82rem; }
+    .hero-subtitle { font-size: 0.58rem; }
+    .power-value { font-size: 0.7rem; padding: 2px 7px; }
     .label-group, .stat-value { font-size: 0.55rem; }
     .bar-bg { height: 4px; }
-    .event-name { font-size: 1rem; }
-    .event-desc { font-size: 0.7rem; }
-    .event-icon { font-size: 1.6rem; }
+    .event-name { font-size: 1.1rem; }
+    .event-desc { font-size: 0.8rem; }
+    .event-icon { font-size: 1.8rem; }
+    .star { font-size: 0.65rem; }
+    .star.wealth { font-size: 0.58rem; }
+    .rank-badge { font-size: 0.4rem; }
 }
 
 @media (max-width: 700px) {
     .hero-cards { flex-wrap: wrap; justify-content: center; }
-    .hero-card { width: 260px; height: 368px; }
-    .event-card { width: 300px; height: 424px; }
+    .hero-card { width: 280px; height: 392px; }
+    .event-card { width: 320px; height: 453px; }
     .player-card { min-width: auto; }
 }
 
 @media (max-width: 550px) {
-    .hero-card { width: 220px; height: 311px; }
-    .event-card { width: 260px; height: 368px; }
+    .hero-card { width: 240px; height: 336px; }
+    .event-card { width: 280px; height: 396px; }
+    .hero-name { font-size: 0.78rem; }
+    .hero-subtitle { font-size: 0.55rem; }
+    .star { font-size: 0.6rem; }
+    .star.wealth { font-size: 0.55rem; }
 }
 
 @media (max-width: 500px) {
     .playlist-panel { width: 280px; }
     .music-toggle-btn { width: 45px; height: 45px; font-size: 20px; }
+}
+
+@media print {
+    body { background: white; padding: 0; margin: 0; }
+    .game-container { padding: 0; background: none; box-shadow: none; }
+    .hero-card, .event-card { width: 105mm; height: 148mm; page-break-inside: avoid; break-inside: avoid; }
 }
