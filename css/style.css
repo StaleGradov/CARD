@@ -1095,3 +1095,467 @@ body {
     .event-card { width: 290px; height: 410px; }
     .playlist-panel { width: 290px; }
 }
+/* ========= АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ (800px - 1300px) ========= */
+@media (min-width: 801px) and (max-width: 1300px) {
+    .game-container {
+        padding: 12px 16px 16px;
+        border-radius: 36px;
+    }
+    
+    .title {
+        font-size: 1.6rem;
+        letter-spacing: 3px;
+        margin-bottom: 6px;
+    }
+    
+    .top-bar {
+        padding: 6px 14px;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .round-info {
+        font-size: 1.1rem;
+        padding: 5px 16px;
+    }
+    
+    .mode-btn {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+    }
+    
+    /* События — 2 в ряд */
+    .event-cards-row {
+        gap: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .event-card {
+        width: 300px;
+        height: 425px;
+        border-radius: 20px;
+    }
+    
+    .event-info {
+        padding: 12px 14px;
+        gap: 6px;
+    }
+    
+    .event-name {
+        font-size: 1.2rem;
+    }
+    
+    .event-desc {
+        font-size: 0.85rem;
+        line-height: 1.2;
+    }
+    
+    .event-icon {
+        font-size: 2rem;
+        margin: 3px 0;
+    }
+    
+    /* Игроки — вертикально */
+    .arena {
+        flex-direction: column;
+        gap: 14px;
+    }
+    
+    .player-card {
+        flex: 1 1 auto;
+        min-width: auto;
+        padding: 12px 14px;
+        border-radius: 28px;
+    }
+    
+    .player-name {
+        font-size: 1.3rem;
+        padding: 8px 12px;
+        margin-bottom: 6px;
+    }
+    
+    .player-info-row {
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+    
+    .title-badge,
+    .relic-count,
+    .streak-badge {
+        padding: 4px 12px;
+        font-size: 0.75rem;
+    }
+    
+    .inventory-btn {
+        padding: 5px 10px;
+        font-size: 1rem;
+    }
+    
+    /* Карточки героев */
+    .hero-card {
+        width: 280px;
+        height: 430px;
+        border-radius: 18px;
+    }
+    
+    .hero-portrait {
+        height: 44%;
+    }
+    
+    .hero-info {
+        height: 56%;
+        padding: 4px 7px 5px;
+        gap: 1px;
+    }
+    
+    .hero-name {
+        font-size: 0.95rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.68rem;
+    }
+    
+    .hero-icons-row {
+        gap: 5px;
+        margin: 1px 0;
+    }
+    
+    .hero-icon {
+        font-size: 0.78rem;
+        padding: 2px 6px;
+        min-width: 44px;
+    }
+    
+    .hero-icon span:first-child {
+        font-size: 0.72rem;
+    }
+    
+    .hero-icon span:last-child {
+        font-size: 0.5rem;
+    }
+    
+    .power-value {
+        padding: 2px 8px;
+        font-size: 0.78rem;
+    }
+    
+    .stats-container {
+        gap: 4px;
+        margin: 1px 0 0;
+    }
+    
+    .label-group {
+        font-size: 0.62rem;
+        margin-bottom: 1px;
+    }
+    
+    .stat-value {
+        font-size: 0.65rem;
+    }
+    
+    .stat-bonus {
+        font-size: 0.55rem;
+    }
+    
+    .bar-bg {
+        height: 6px;
+    }
+    
+    .star {
+        font-size: 0.78rem;
+    }
+    
+    .star.wealth {
+        font-size: 0.68rem;
+    }
+    
+    /* Кнопки */
+    .actions-row {
+        gap: 12px;
+        margin: 12px 0 6px;
+    }
+    
+    .fight-btn {
+        padding: 11px;
+        font-size: 1.05rem;
+    }
+    
+    /* Лог */
+    .log {
+        height: 90px;
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        margin-top: 10px;
+    }
+    
+    .deck-counter {
+        font-size: 0.85rem;
+        margin-top: 6px;
+    }
+    
+    .turn-indicator {
+        font-size: 1.2rem;
+        margin: 6px 0;
+    }
+}
+
+/* ========= АДАПТАЦИЯ ДЛЯ УЗКИХ ПЛАНШЕТОВ / ТЕЛЕФОНОВ (до 800px) ========= */
+@media (max-width: 800px) {
+    .game-container {
+        padding: 10px 12px 14px;
+        border-radius: 30px;
+    }
+    
+    .title {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+        margin-bottom: 4px;
+    }
+    
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    
+    .round-info {
+        text-align: center;
+        font-size: 1rem;
+    }
+    
+    .mode-selector {
+        justify-content: center;
+    }
+    
+    .mode-btn {
+        padding: 5px 12px;
+        font-size: 0.75rem;
+    }
+    
+    /* События — горизонтальный скролл */
+    .event-cards-row {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 10px;
+        justify-content: flex-start;
+        padding: 3px 0;
+    }
+    
+    .event-card {
+        width: 260px;
+        height: 370px;
+        flex-shrink: 0;
+        border-radius: 18px;
+    }
+    
+    .event-info {
+        padding: 10px 12px;
+        gap: 5px;
+    }
+    
+    .event-name {
+        font-size: 1.1rem;
+    }
+    
+    .event-desc {
+        font-size: 0.78rem;
+    }
+    
+    .event-icon {
+        font-size: 1.8rem;
+        margin: 2px 0;
+    }
+    
+    /* Игроки */
+    .arena {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .player-card {
+        flex: 1 1 auto;
+        min-width: auto;
+        padding: 10px 12px;
+        border-radius: 24px;
+    }
+    
+    .player-name {
+        font-size: 1.2rem;
+        padding: 6px 10px;
+        margin-bottom: 6px;
+    }
+    
+    .player-info-row {
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+    
+    .title-badge,
+    .relic-count,
+    .streak-badge {
+        padding: 3px 10px;
+        font-size: 0.7rem;
+    }
+    
+    .inventory-btn {
+        padding: 4px 8px;
+        font-size: 0.9rem;
+    }
+    
+    /* Карточки героев */
+    .hero-card {
+        width: 250px;
+        height: 385px;
+        border-radius: 16px;
+    }
+    
+    .hero-name {
+        font-size: 0.88rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.62rem;
+    }
+    
+    .hero-icon {
+        font-size: 0.72rem;
+        padding: 2px 5px;
+        min-width: 40px;
+    }
+    
+    .hero-icon span:first-child {
+        font-size: 0.66rem;
+    }
+    
+    .hero-icon span:last-child {
+        font-size: 0.46rem;
+    }
+    
+    .power-value {
+        padding: 2px 7px;
+        font-size: 0.72rem;
+    }
+    
+    .stats-container {
+        gap: 3px;
+    }
+    
+    .label-group {
+        font-size: 0.58rem;
+    }
+    
+    .stat-value {
+        font-size: 0.6rem;
+    }
+    
+    .stat-bonus {
+        font-size: 0.5rem;
+    }
+    
+    .bar-bg {
+        height: 5px;
+    }
+    
+    .star {
+        font-size: 0.72rem;
+    }
+    
+    .star.wealth {
+        font-size: 0.62rem;
+    }
+    
+    /* Кнопки */
+    .actions-row {
+        flex-direction: column;
+        gap: 8px;
+        margin: 10px 0 4px;
+    }
+    
+    .fight-btn {
+        padding: 10px;
+        font-size: 1rem;
+    }
+    
+    /* Лог */
+    .log {
+        height: 80px;
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        margin-top: 8px;
+    }
+    
+    .deck-counter {
+        font-size: 0.8rem;
+    }
+    
+    .turn-indicator {
+        font-size: 1.1rem;
+    }
+}
+
+/* ========= ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНОВ (до 480px) ========= */
+@media (max-width: 480px) {
+    .hero-card {
+        width: 220px;
+        height: 340px;
+    }
+    
+    .event-card {
+        width: 230px;
+        height: 325px;
+    }
+    
+    .hero-name {
+        font-size: 0.8rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.58rem;
+    }
+    
+    .hero-icon {
+        font-size: 0.66rem;
+        padding: 1px 4px;
+        min-width: 36px;
+    }
+    
+    .hero-icon span:first-child {
+        font-size: 0.6rem;
+    }
+    
+    .hero-icon span:last-child {
+        font-size: 0.42rem;
+    }
+    
+    .power-value {
+        font-size: 0.68rem;
+        padding: 1px 6px;
+    }
+    
+    .label-group {
+        font-size: 0.55rem;
+    }
+    
+    .stat-value {
+        font-size: 0.55rem;
+    }
+    
+    .bar-bg {
+        height: 4px;
+    }
+    
+    .star {
+        font-size: 0.66rem;
+    }
+    
+    .star.wealth {
+        font-size: 0.58rem;
+    }
+    
+    .rank-badge {
+        font-size: 0.38rem;
+    }
+}
