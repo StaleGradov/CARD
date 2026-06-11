@@ -21,7 +21,9 @@ const SAGA_ICONS = {
     'Вслед за солнцем':'☀️', 'Амулет':'📿', 'Питомцы':'🐾', 
     'Колодец с золотом':'💰', 'Небесные явления':'🌙' 
 };
-
+const EVENT_ICONS = { 
+    location: '🏞️', kingdom: '👑', profession: '⚜️', saga: '📜', relic: '🔮', title: '👑' 
+};
 // ========== НОРМАЛИЗАЦИЯ ПРОФЕССИЙ ==========
 function normalizeProf(prof) { 
     const map = { 
