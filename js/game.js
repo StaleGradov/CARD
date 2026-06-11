@@ -1,4 +1,4 @@
-// ---------- ИГРОВАЯ ЛОГИКА ТИГРИМИОН v2.0 (исправленная) ----------
+// ---------- ИГРОВАЯ ЛОГИКА ТИГРИМИОН v2.1 (полностью исправленная) ----------
 
 "use strict";
 
@@ -78,7 +78,7 @@ let ALL_HEROES = [];
             maxDmg: h[6],
             maxArm: h[7],
             maxGold: h[8],
-            cost: h[4] + h[8],
+            cost: Math.floor((h[4] + h[8]) / 5),
             imageFile: `${IMAGE_BASE_URL}${h[9]}.jpg`,
             iconRace: RACE_ICONS[h[1]] || '❓',
             iconProf: PROF_ICONS[h[2]] || '📜',
@@ -101,12 +101,14 @@ class Player {
         this.relics = [];
         this.equippedRelics = {};
         this.unlockedSlots = 3;
-        this.tokens = 20;
+        this.tokens = 100;
         this.winStreak = 0;
         this.titleLevel = 0;
         this.capturedKingdom = null;
         this.capturedProfession = null;
         this.capturedSaga = null;
+        this.hasDoneAction = false;
+        this.chosenLand = null;
     }
 
     getEquippedRelicsArray() {
@@ -242,13 +244,14 @@ function getHeroBonus(hero, player) {
     return bonus;
 }
 
+function getHeroCost(hero) {
+    return hero.cost || Math.floor((hero.power + hero.gold) / 5);
+}
+
 // ========== РЕНДЕРИНГ АРЕНЫ ==========
 function renderArena() {
     const container = document.getElementById('arenaContainer');
-    if (!container) {
-        console.error('arenaContainer не найден!');
-        return;
-    }
+    if (!container) return;
     container.innerHTML = '';
 
     players.forEach((p, idx) => {
@@ -272,7 +275,7 @@ function renderArena() {
             `;
         } else if (gamePhase === 'action') {
             card.innerHTML = `
-                <div class="player-name"><span style="font-size:1.5rem;">🏰 ИГРОК ${idx+1}</span></div>
+                <div class="player-name"><span style="font-size:1.5rem;">🏰 ИГРОК ${idx+1} ${p.hasDoneAction ? '✅' : '⏳'}</span></div>
                 <div class="player-info-row">
                     <span class="title-badge" id="titleP${idx}"></span>
                     <span class="relic-count" id="relicsP${idx}"></span>
@@ -343,6 +346,8 @@ function initGame(mode) {
         p.capturedKingdom = oldData[idx].capturedKingdom;
         p.capturedProfession = oldData[idx].capturedProfession;
         p.capturedSaga = oldData[idx].capturedSaga;
+        p.hasDoneAction = false;
+        p.chosenLand = null;
     });
 
     currentPlayerIndex = 0;
@@ -393,8 +398,14 @@ function updateUI() {
             if (actionBtn) { actionBtn.textContent = '⚔️ БОЙ ИДЁТ...'; actionBtn.disabled = true; }
         }
     } else if (gamePhase === 'action') {
-        if (turnIndicator) turnIndicator.innerText = `🏰 Фаза действий — Игрок ${activePlayerIndex + 1}`;
-        if (actionBtn) { actionBtn.textContent = '🎯 ВЫБРАТЬ ДЕЙСТВИЕ'; actionBtn.disabled = false; actionBtn.onclick = showActionMenu; }
+        const currentPlayer = players[activePlayerIndex];
+        if (currentPlayer.hasDoneAction) {
+            if (turnIndicator) turnIndicator.innerText = `🏰 Игрок ${activePlayerIndex + 1} завершил ход`;
+            if (actionBtn) { actionBtn.textContent = '⏳ ОЖИДАНИЕ...'; actionBtn.disabled = true; }
+        } else {
+            if (turnIndicator) turnIndicator.innerText = `🏰 Фаза действий — Игрок ${activePlayerIndex + 1} (🪙${currentPlayer.tokens})`;
+            if (actionBtn) { actionBtn.textContent = '🎯 ВЫБРАТЬ ДЕЙСТВИЕ'; actionBtn.disabled = false; actionBtn.onclick = showActionMenu; }
+        }
     }
 
     const eventsContainer = document.getElementById('eventCardsContainer');
@@ -424,12 +435,20 @@ function updateUI() {
         } else if (gamePhase === 'action') {
             const statusCard = document.createElement('div');
             statusCard.className = 'event-card';
+            const p = players[activePlayerIndex];
             statusCard.innerHTML = `
-                <div class="event-portrait" style="background:#2a1a3a; display:flex; align-items:center; justify-content:center; font-size:4rem;">🎯</div>
+                <div class="event-portrait" style="background:#2a1a3a; display:flex; align-items:center; justify-content:center; font-size:3rem;">
+                    ${p.chosenLand ? '🏞️' : '🎯'}
+                </div>
                 <div class="event-info">
                     <div class="event-icon">🏰</div>
                     <div class="event-name">ФАЗА ДЕЙСТВИЙ</div>
-                    <div class="event-desc">Игрок ${activePlayerIndex + 1} выбирает действие</div>
+                    <div class="event-desc">
+                        Игрок ${activePlayerIndex + 1}<br>
+                        🪙 ${p.tokens} жетонов<br>
+                        👥 Героев: ${p.collection.length}<br>
+                        ${p.chosenLand ? '🏞️ Земля: ' + p.chosenLand.name : '🎯 Выберите действие'}
+                    </div>
                 </div>
             `;
             eventsContainer.appendChild(statusCard);
@@ -455,11 +474,11 @@ function updateUI() {
         if (relicsBadge) {
             const equippedCount = pl.getEquippedRelicsArray().length;
             const relicBonus = getRelicBonus(pl);
-            relicsBadge.innerHTML = `🔮 ${equippedCount}/${pl.unlockedSlots} слотов ${relicBonus > 0 ? `(+${relicBonus})` : ''}`;
+            relicsBadge.innerHTML = `🔮 ${equippedCount}/${pl.unlockedSlots} ${relicBonus > 0 ? `(+${relicBonus})` : ''}`;
         }
 
         if (streakBadge) {
-            streakBadge.innerHTML = `🔥 Серия: ${pl.winStreak}`;
+            streakBadge.innerHTML = `🔥 ${pl.winStreak}`;
             streakBadge.style.display = pl.winStreak > 0 ? 'inline' : 'none';
         }
 
@@ -523,9 +542,10 @@ function updateUI() {
             if (collectionInfo) {
                 collectionInfo.innerHTML = `
                     <div style="text-align:center; color:#ffd58c; margin-bottom:8px;">
-                        🏰 Королевство: ${pl.capturedKingdom ? pl.capturedKingdom.name : 'Нет'} |
-                        ⚜️ Профессия: ${pl.capturedProfession ? pl.capturedProfession.name : 'Нет'} |
-                        📜 Сага: ${pl.capturedSaga ? pl.capturedSaga.name : 'Нет'}
+                        🏰 ${pl.capturedKingdom ? pl.capturedKingdom.name : 'Нет королевства'} |
+                        ⚜️ ${pl.capturedProfession ? pl.capturedProfession.name : 'Нет профессии'} |
+                        📜 ${pl.capturedSaga ? pl.capturedSaga.name : 'Нет саги'}
+                        ${pl.chosenLand ? ' | 🏞️ ' + pl.chosenLand.name : ''}
                     </div>
                 `;
             }
@@ -534,7 +554,7 @@ function updateUI() {
             if (pl.collection.length === 0) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.style.cssText = 'width:100%;text-align:center;color:#aaa;padding:20px';
-                emptyDiv.innerText = 'Коллекция пуста. Купите героя в магазине.';
+                emptyDiv.innerText = '😴 Коллекция пуста. Купите героя в магазине.';
                 container.appendChild(emptyDiv);
             }
 
@@ -560,6 +580,7 @@ function renderHeroCard(container, pl, h, idx, bonus) {
     const stars = getStars(power);
     const wStars = getWealthStars(h.gold);
     const totalBonus = bonus;
+    const cost = getHeroCost(h);
 
     const ranksForStats = {
         hp: getRanksForStat(h, 'hp'),
@@ -625,7 +646,10 @@ function renderHeroCard(container, pl, h, idx, bonus) {
                 <div class="hero-icon ${profHL ? 'icon-highlight' : ''}" data-trait="prof"><span>${h.iconProf}</span><span>Проф</span></div>
                 <div class="hero-icon ${sagaHL ? 'icon-highlight' : ''}" data-trait="saga"><span>${h.iconSaga}</span><span>Сага</span></div>
             </div>
-            <div class="hero-power-badge"><span class="power-value">⚡ ${power}${totalBonus > 0 ? ` <span class="stat-bonus">+${totalBonus}</span>` : ''}</span></div>
+            <div class="hero-power-badge">
+                <span class="power-value">⚡ ${power}${totalBonus > 0 ? ` <span class="stat-bonus">+${totalBonus}</span>` : ''}</span>
+                ${gamePhase === 'action' ? `<div style="font-size:0.6rem; color:#ffd58c; margin-top:2px;">Цена: ${cost} 🪙</div>` : ''}
+            </div>
             <div class="stats-container">
                 ${statBarHTML('❤️', 'Здоровье', h.hp, GLOBAL_MAX.hp, ranksForStats.hp, 'hp-bar')}
                 ${statBarHTML('🛡️', 'Броня', h.arm, GLOBAL_MAX.arm, ranksForStats.arm, 'armor-bar')}
@@ -647,57 +671,95 @@ function renderHeroCard(container, pl, h, idx, bonus) {
     container.appendChild(card);
 }
 
-// ========== ДЕЙСТВИЯ ==========
+// ========== ФАЗА ДЕЙСТВИЙ ==========
 function showActionMenu() {
+    const player = players[activePlayerIndex];
+    if (player.hasDoneAction) {
+        addLog('⚠️ Вы уже совершили действие в этой фазе!');
+        return;
+    }
+
     const modal = document.getElementById('relicChoiceModal');
     const content = document.getElementById('relicChoiceContent');
     if (!modal || !content) return;
 
-    const player = players[activePlayerIndex];
     const opponent = players[1 - activePlayerIndex];
 
     let html = `
         <div class="result-title" style="color:gold;">🎯 ИГРОК ${activePlayerIndex + 1} — ВЫБЕРИТЕ ДЕЙСТВИЕ</div>
-        <div style="text-align:center;color:#ffd58c;margin-bottom:10px;">🪙 Жетонов: ${player.tokens}</div>
+        <div style="text-align:center;color:#ffd58c;margin-bottom:10px;">🪙 Жетонов: ${player.tokens} | 👥 Героев: ${player.collection.length}</div>
         <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
-            <div class="relic-option" id="actionShop" style="border-color:#4caf50; box-shadow:0 0 15px #4caf50;">
-                <div class="relic-option-icon">🛒</div>
-                <div class="relic-option-title">МАГАЗИН</div>
-                <div class="relic-option-desc">Купить героя в коллекцию</div>
-            </div>
-            <div class="relic-option" id="actionDuel" style="border-color:#ff6600; box-shadow:0 0 15px #ff6600;">
-                <div class="relic-option-icon">⚔️</div>
-                <div class="relic-option-title">ПВП ДУЭЛЬ</div>
-                <div class="relic-option-desc">Атаковать Игрока ${opponent.id + 1}</div>
-            </div>
+    `;
+
+    // Магазин — доступен всегда
+    html += `
+        <div class="relic-option" id="actionShop" style="border-color:#4caf50; box-shadow:0 0 15px #4caf50;">
+            <div class="relic-option-icon">🛒</div>
+            <div class="relic-option-title">МАГАЗИН</div>
+            <div class="relic-option-desc">Купить героя в коллекцию (🪙${player.tokens})</div>
+        </div>
+    `;
+
+    // Выбор земли — доступен всегда
+    html += `
+        <div class="relic-option" id="actionChooseLand" style="border-color:#ffd700; box-shadow:0 0 15px #ffd700;">
+            <div class="relic-option-icon">🏞️</div>
+            <div class="relic-option-title">ВЫБРАТЬ ЗЕМЛЮ</div>
+            <div class="relic-option-desc">${player.chosenLand ? 'Текущая: ' + player.chosenLand.name : 'Выбрать параметр отражения'}</div>
+        </div>
+    `;
+
+    // Монстр — доступен если есть герои
+    if (player.collection.length > 0) {
+        html += `
             <div class="relic-option" id="actionMonster" style="border-color:#2196f3; box-shadow:0 0 15px #2196f3;">
                 <div class="relic-option-icon">👹</div>
                 <div class="relic-option-title">ОХОТА НА МОНСТРА</div>
-                <div class="relic-option-desc">Фарм жетонов</div>
-            </div>
-            <div class="relic-option" id="actionKingdom" style="border-color:#ffd700; box-shadow:0 0 15px #ffd700;">
-                <div class="relic-option-icon">👑</div>
-                <div class="relic-option-title">ЗАХВАТ КОРОЛЕВСТВА</div>
-                <div class="relic-option-desc">${player.capturedKingdom ? 'Уже захвачено: ' + player.capturedKingdom.name : 'Доступно'}</div>
-            </div>
-    `;
-
-    if (player.capturedKingdom) {
-        html += `
-            <div class="relic-option" id="actionProfession" style="border-color:#9b30ff; box-shadow:0 0 15px #9b30ff;">
-                <div class="relic-option-icon">⚜️</div>
-                <div class="relic-option-title">ЗАХВАТ ПРОФЕССИИ</div>
-                <div class="relic-option-desc">${player.capturedProfession ? 'Уже захвачено: ' + player.capturedProfession.name : 'Доступно'}</div>
+                <div class="relic-option-desc">Фарм жетонов (нужны герои)</div>
             </div>
         `;
     }
 
-    if (player.capturedKingdom && player.capturedProfession) {
+    // Дуэль — доступна если у обоих есть герои
+    if (player.collection.length > 0 && opponent.collection.length > 0) {
+        html += `
+            <div class="relic-option" id="actionDuel" style="border-color:#ff6600; box-shadow:0 0 15px #ff6600;">
+                <div class="relic-option-icon">⚔️</div>
+                <div class="relic-option-title">ПВП ДУЭЛЬ</div>
+                <div class="relic-option-desc">Атаковать Игрока ${opponent.id + 1} (нужны герои у обоих)</div>
+            </div>
+        `;
+    }
+
+    // Захват королевства
+    if (player.collection.length > 0 && !player.capturedKingdom) {
+        html += `
+            <div class="relic-option" id="actionKingdom" style="border-color:#ff8c00; box-shadow:0 0 15px #ff8c00;">
+                <div class="relic-option-icon">👑</div>
+                <div class="relic-option-title">ЗАХВАТ КОРОЛЕВСТВА</div>
+                <div class="relic-option-desc">Бой с королём и стражами</div>
+            </div>
+        `;
+    }
+
+    // Захват профессии
+    if (player.collection.length > 0 && player.capturedKingdom && !player.capturedProfession) {
+        html += `
+            <div class="relic-option" id="actionProfession" style="border-color:#9b30ff; box-shadow:0 0 15px #9b30ff;">
+                <div class="relic-option-icon">⚜️</div>
+                <div class="relic-option-title">ЗАХВАТ ПРОФЕССИИ</div>
+                <div class="relic-option-desc">Бой с хранителями</div>
+            </div>
+        `;
+    }
+
+    // Захват саги
+    if (player.collection.length > 0 && player.capturedKingdom && player.capturedProfession && !player.capturedSaga) {
         html += `
             <div class="relic-option" id="actionSaga" style="border-color:#ff4444; box-shadow:0 0 15px #ff4444;">
                 <div class="relic-option-icon">📜</div>
                 <div class="relic-option-title">ЗАХВАТ САГИ</div>
-                <div class="relic-option-desc">${player.capturedSaga ? 'Уже захвачено: ' + player.capturedSaga.name : 'Доступно'}</div>
+                <div class="relic-option-desc">Бой с хранителями саги</div>
             </div>
         `;
     }
@@ -707,24 +769,93 @@ function showActionMenu() {
     content.innerHTML = html;
     modal.style.display = 'flex';
 
-    const closeModal = () => { modal.style.display = 'none'; };
+    content.querySelector('#actionShop')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+        showShopModal();
+    });
 
-    content.querySelector('#actionShop')?.addEventListener('click', () => { closeModal(); showShopModal(); });
-    content.querySelector('#actionDuel')?.addEventListener('click', () => { closeModal(); startDuel(); });
-    content.querySelector('#actionMonster')?.addEventListener('click', () => { closeModal(); fightMonster(); });
-    content.querySelector('#actionKingdom')?.addEventListener('click', () => { closeModal(); fightKingdom(); });
-    content.querySelector('#actionProfession')?.addEventListener('click', () => { closeModal(); fightProfession(); });
-    content.querySelector('#actionSaga')?.addEventListener('click', () => { closeModal(); fightSaga(); });
+    content.querySelector('#actionChooseLand')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+        showLandSelection();
+    });
+
+    content.querySelector('#actionMonster')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+        fightMonster();
+    });
+
+    content.querySelector('#actionDuel')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+        startDuel();
+    });
+
+    content.querySelector('#actionKingdom')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+        fightKingdom();
+    });
+
+    content.querySelector('#actionProfession')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+        fightProfession();
+    });
+
+    content.querySelector('#actionSaga')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+        fightSaga();
+    });
 }
 
-// ========== МАГАЗИН ==========
-function showShopModal() {
+// ========== ВЫБОР ЗЕМЛИ ==========
+function showLandSelection() {
     const modal = document.getElementById('relicChoiceModal');
     const content = document.getElementById('relicChoiceContent');
     if (!modal || !content) return;
 
     const player = players[activePlayerIndex];
 
+    let html = `
+        <div class="result-title" style="color:gold;">🏞️ ВЫБЕРИТЕ ЗЕМЛЮ ОТРАЖЕНИЯ</div>
+        <div style="text-align:center;color:#ffd58c;margin-bottom:15px;">Земля определяет по какому параметру вы будете защищаться в дуэлях</div>
+        <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
+    `;
+
+    LOCATIONS.forEach(loc => {
+        html += `
+            <div class="relic-option land-option" data-land-name="${loc.name}" style="border-color:#ffd700; box-shadow:0 0 15px rgba(255,215,0,0.3);">
+                <div class="relic-option-icon">🏞️</div>
+                <div class="relic-option-title">${loc.name}</div>
+                <div class="relic-option-desc">${loc.desc}</div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+
+    content.innerHTML = html;
+    modal.style.display = 'flex';
+
+    content.querySelectorAll('.land-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const landName = opt.dataset.landName;
+            const land = LOCATIONS.find(l => l.name === landName);
+            if (land) {
+                player.chosenLand = land;
+                addLog(`🏞️ Игрок ${activePlayerIndex + 1} выбрал землю: ${land.name} — ${land.desc}`);
+            }
+            modal.style.display = 'none';
+            updateUI();
+        });
+    });
+}
+
+// ========== МАГАЗИН (полностью переписан) ==========
+function showShopModal() {
+    const player = players[activePlayerIndex];
+    const modal = document.getElementById('relicChoiceModal');
+    const content = document.getElementById('relicChoiceContent');
+    if (!modal || !content) return;
+
+    // Если магазин пуст — наполняем
     if (shopCards.length === 0) {
         for (let i = 0; i < 5; i++) {
             if (eventDecks.heroPool.length > 0) {
@@ -734,8 +865,11 @@ function showShopModal() {
     }
 
     let html = `
-        <div class="result-title" style="color:gold;">🛒 МАГАЗИН ГЕРОЕВ</div>
-        <div style="text-align:center;color:#ffd58c;margin-bottom:10px;">🪙 Ваши жетоны: ${player.tokens} | Героев в коллекции: ${player.collection.length}/10</div>
+        <div class="result-title" style="color:gold;">🛒 МАГАЗИН ГЕРОЕВ — ИГРОК ${activePlayerIndex + 1}</div>
+        <div style="text-align:center;color:#ffd58c;margin-bottom:10px;">
+            🪙 Ваши жетоны: <span style="color:gold;font-size:1.3rem;">${player.tokens}</span> | 
+            👥 Героев в коллекции: ${player.collection.length}/10
+        </div>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
     `;
 
@@ -743,19 +877,22 @@ function showShopModal() {
         const cost = getHeroCost(hero);
         const canBuy = player.tokens >= cost && player.collection.length < 10;
         html += `
-            <div class="shop-card" style="width:200px; background:#1a1a1a; border:2px solid ${canBuy ? '#4caf50' : '#555'}; border-radius:16px; padding:12px; text-align:center; cursor:${canBuy ? 'pointer' : 'default'}; opacity:${canBuy ? '1' : '0.5'};">
+            <div class="shop-card" data-hero-idx="${idx}" style="width:200px; background:#1a1a1a; border:2px solid ${canBuy ? '#4caf50' : '#555'}; border-radius:16px; padding:12px; text-align:center; cursor:${canBuy ? 'pointer' : 'default'}; opacity:${canBuy ? '1' : '0.5'}; transition:all 0.2s;">
                 <img src="${hero.imageFile}" style="width:100%; height:120px; object-fit:cover; border-radius:8px;" onerror="this.src='${IMAGE_BASE_URL}placeholder.jpg'">
                 <div style="color:#ffefc0; font-weight:bold; margin:6px 0;">${hero.name}</div>
-                <div style="color:#aaa; font-size:0.7rem;">${hero.race} · ${hero.prof}</div>
-                <div style="color:#ffd58c; margin:4px 0;">⚡ ${hero.power} 💰 ${hero.gold}</div>
-                <div style="color:gold; font-weight:bold;">Цена: ${cost} 🪙</div>
-                ${canBuy ? `<button class="shop-buy-btn" data-idx="${idx}" style="background:#2a471f; border:1px solid #4caf50; color:#a0ffa0; padding:5px 12px; border-radius:12px; cursor:pointer; margin-top:6px;">КУПИТЬ</button>` : '<div style="color:#ff4444; font-size:0.7rem;">Недостаточно средств</div>'}
+                <div style="color:#aaa; font-size:0.7rem;">${hero.race} · ${hero.prof} · ${hero.saga}</div>
+                <div style="color:#ffd58c; margin:4px 0;">⚡ ${hero.power} | ❤️${hero.hp} 🛡️${hero.arm} ⚔️${hero.dmg} 💰${hero.gold}</div>
+                <div style="color:gold; font-weight:bold; font-size:1.1rem;">Цена: ${cost} 🪙</div>
+                ${canBuy ? 
+                    `<button class="shop-buy-btn" data-idx="${idx}" style="background:#2a471f; border:1px solid #4caf50; color:#a0ffa0; padding:6px 14px; border-radius:12px; cursor:pointer; margin-top:6px; font-weight:bold;">КУПИТЬ</button>` 
+                    : `<div style="color:#ff4444; font-size:0.7rem;">${player.collection.length >= 10 ? 'Коллекция заполнена' : 'Недостаточно средств'}</div>`
+                }
             </div>
         `;
     });
 
     html += `</div>
-        <div style="text-align:center; margin-top:15px;">
+        <div style="text-align:center; margin-top:15px; display:flex; gap:10px; justify-content:center;">
             <button id="closeShopBtn" style="background:#5a2020; border:1px solid #ff4444; color:#ffaaaa; padding:8px 20px; border-radius:20px; cursor:pointer; font-size:0.8rem;">ЗАКРЫТЬ МАГАЗИН</button>
         </div>
     `;
@@ -763,23 +900,28 @@ function showShopModal() {
     content.innerHTML = html;
     modal.style.display = 'flex';
 
+    // Закрытие магазина
     content.querySelector('#closeShopBtn').addEventListener('click', () => {
         modal.style.display = 'none';
-        endActionPhase();
+        updateUI();
     });
 
+    // Покупка героя
     content.querySelectorAll('.shop-buy-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const idx = parseInt(e.target.dataset.idx);
+            e.stopPropagation();
+            const idx = parseInt(btn.dataset.idx);
             const hero = shopCards[idx];
             const cost = getHeroCost(hero);
+            
             if (player.tokens >= cost && player.collection.length < 10) {
                 player.tokens -= cost;
                 player.collection.push(hero);
                 shopCards.splice(idx, 1);
-                addLog(`🛒 Игрок ${activePlayerIndex + 1} купил ${hero.name} за ${cost} 🪙`);
+                addLog(`🛒 Игрок ${activePlayerIndex + 1} купил героя: ${hero.name} (${hero.race} · ${hero.prof}) за ${cost} 🪙`);
+                addLog(`   Осталось жетонов: ${player.tokens} 🪙`);
                 updateUI();
-                showShopModal();
+                showShopModal(); // Перерисовать магазин
             }
         });
     });
@@ -792,39 +934,45 @@ function startDuel() {
 
     if (attacker.collection.length === 0) {
         addLog('⚠️ У вас нет героев для дуэли!');
-        endActionPhase();
+        return;
+    }
+    if (defender.collection.length === 0) {
+        addLog('⚠️ У противника нет героев для дуэли!');
         return;
     }
 
     const attackPower = attacker.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, attacker), 0);
-    const defendPower = defender.collection.length > 0
-        ? defender.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, defender), 0)
-        : 0;
+    const defendPower = defender.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, defender), 0);
+
+    addLog(`⚔️ Дуэль! Игрок ${attacker.id + 1} (${attackPower}) vs Игрок ${defender.id + 1} (${defendPower})`);
 
     if (attackPower > defendPower) {
-        const stolen = Math.min(10, defender.tokens);
+        const stolen = Math.min(15, defender.tokens);
         defender.tokens -= stolen;
         attacker.tokens += stolen;
-        addLog(`⚔️ Игрок ${activePlayerIndex + 1} победил в дуэли! +${stolen} 🪙`);
+        addLog(`⚔️ Игрок ${attacker.id + 1} победил в дуэли! +${stolen} 🪙`);
     } else if (attackPower < defendPower) {
-        const lost = Math.min(10, attacker.tokens);
+        const lost = Math.min(15, attacker.tokens);
         attacker.tokens -= lost;
         defender.tokens += lost;
-        addLog(`🛡️ Игрок ${1 - activePlayerIndex + 1} отбил атаку! +${lost} 🪙`);
+        addLog(`🛡️ Игрок ${defender.id + 1} отбил атаку! +${lost} 🪙`);
     } else {
         addLog(`🤝 Ничья в дуэли!`);
     }
 
+    attacker.hasDoneAction = true;
     updateUI();
-    endActionPhase();
+    
+    // Проверяем, все ли сделали действия
+    checkAllActionsDone();
 }
 
+// ========== МОНСТР ==========
 function fightMonster() {
     const player = players[activePlayerIndex];
     
     if (player.collection.length === 0) {
         addLog('⚠️ У вас нет героев для боя с монстром! Сначала купите героя в магазине.');
-        endActionPhase();
         return;
     }
     
@@ -849,8 +997,9 @@ function fightMonster() {
         player.tokens += 5;
     }
 
+    player.hasDoneAction = true;
     updateUI();
-    endActionPhase();
+    checkAllActionsDone();
 }
 
 // ========== ЗАХВАТ КОРОЛЕВСТВА ==========
@@ -858,7 +1007,10 @@ function fightKingdom() {
     const player = players[activePlayerIndex];
     if (player.capturedKingdom) {
         addLog('⚠️ Вы уже захватили королевство!');
-        endActionPhase();
+        return;
+    }
+    if (player.collection.length === 0) {
+        addLog('⚠️ У вас нет героев для захвата!');
         return;
     }
 
@@ -866,19 +1018,22 @@ function fightKingdom() {
     const bossPower = kingdom.boss.hp + kingdom.boss.dmg + kingdom.boss.arm + kingdom.boss.gold;
     const guardsPower = kingdom.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
     const totalBossPower = bossPower + guardsPower;
-
     const playerPower = player.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, player), 0);
+
+    addLog(`👑 Игрок ${activePlayerIndex + 1} атакует ${kingdom.name}!`);
+    addLog(`   Сила игрока: ${playerPower} vs Сила королевства: ${totalBossPower}`);
 
     if (playerPower > totalBossPower) {
         player.capturedKingdom = kingdom;
         eventDecks.kingdoms.shift();
-        addLog(`👑 Игрок ${activePlayerIndex + 1} захватил ${kingdom.name}! ${kingdom.buffDesc}`);
+        addLog(`👑 Победа! ${kingdom.name} захвачено! ${kingdom.buffDesc}`);
     } else {
         addLog(`💀 Захват не удался! ${kingdom.boss.name} слишком силён.`);
     }
 
+    player.hasDoneAction = true;
     updateUI();
-    endActionPhase();
+    checkAllActionsDone();
 }
 
 // ========== ЗАХВАТ ПРОФЕССИИ ==========
@@ -886,12 +1041,14 @@ function fightProfession() {
     const player = players[activePlayerIndex];
     if (!player.capturedKingdom) {
         addLog('⚠️ Сначала захватите королевство!');
-        endActionPhase();
         return;
     }
     if (player.capturedProfession) {
         addLog('⚠️ Вы уже захватили профессию!');
-        endActionPhase();
+        return;
+    }
+    if (player.collection.length === 0) {
+        addLog('⚠️ У вас нет героев для захвата!');
         return;
     }
 
@@ -899,19 +1056,22 @@ function fightProfession() {
     const bossPower = profession.boss.hp + profession.boss.dmg + profession.boss.arm + profession.boss.gold;
     const guardsPower = profession.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
     const totalBossPower = bossPower + guardsPower;
-
     const playerPower = player.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, player), 0);
+
+    addLog(`⚜️ Игрок ${activePlayerIndex + 1} атакует ${profession.name}!`);
+    addLog(`   Сила игрока: ${playerPower} vs Сила профессии: ${totalBossPower}`);
 
     if (playerPower > totalBossPower) {
         player.capturedProfession = profession;
         eventDecks.professions.shift();
-        addLog(`⚜️ Игрок ${activePlayerIndex + 1} захватил ${profession.name}! ${profession.buffDesc}`);
+        addLog(`⚜️ Победа! ${profession.name} захвачено! ${profession.buffDesc}`);
     } else {
         addLog(`💀 Захват не удался! ${profession.boss.name} слишком силён.`);
     }
 
+    player.hasDoneAction = true;
     updateUI();
-    endActionPhase();
+    checkAllActionsDone();
 }
 
 // ========== ЗАХВАТ САГИ ==========
@@ -919,12 +1079,14 @@ function fightSaga() {
     const player = players[activePlayerIndex];
     if (!player.capturedKingdom || !player.capturedProfession) {
         addLog('⚠️ Сначала захватите королевство и профессию!');
-        endActionPhase();
         return;
     }
     if (player.capturedSaga) {
         addLog('⚠️ Вы уже захватили сагу!');
-        endActionPhase();
+        return;
+    }
+    if (player.collection.length === 0) {
+        addLog('⚠️ У вас нет героев для захвата!');
         return;
     }
 
@@ -932,62 +1094,112 @@ function fightSaga() {
     const bossPower = saga.boss.hp + saga.boss.dmg + saga.boss.arm + saga.boss.gold;
     const guardsPower = saga.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
     const totalBossPower = bossPower + guardsPower;
-
     const playerPower = player.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, player), 0);
+
+    addLog(`📜 Игрок ${activePlayerIndex + 1} атакует ${saga.name}!`);
+    addLog(`   Сила игрока: ${playerPower} vs Сила саги: ${totalBossPower}`);
 
     if (playerPower > totalBossPower) {
         player.capturedSaga = saga;
         eventDecks.sagas.shift();
-        addLog(`📜 Игрок ${activePlayerIndex + 1} захватил ${saga.name}! ${saga.buffDesc}`);
+        addLog(`📜 Победа! ${saga.name} захвачено! ${saga.buffDesc}`);
     } else {
         addLog(`💀 Захват не удался! ${saga.boss.name} слишком силён.`);
     }
 
+    player.hasDoneAction = true;
     updateUI();
-    endActionPhase();
+    checkAllActionsDone();
 }
 
-// ========== ЗАВЕРШЕНИЕ ФАЗЫ ДЕЙСТВИЙ ==========
-function endActionPhase() {
-    activePlayerIndex = 1 - activePlayerIndex;
-
-    if (activePlayerIndex === 0) {
-        gamePhase = 'farm';
-        battlePhase = 'select';
-        currentPlayerIndex = 0;
-        players.forEach(p => { p.selectedHeroes = []; p.hasConfirmed = false; });
-        lastRoundWinner = null;
-        round++;
-        if (round === 2) currentEvent.location = eventDecks.locations.shift();
-        if (round === 3) currentEvent.kingdom = eventDecks.kingdoms.shift();
-        if (round === 4) currentEvent.profession = eventDecks.professions.shift();
-        if (round === 5) currentEvent.saga = eventDecks.sagas.shift();
-        shopCards = [];
-        renderArena();
-        updateUI();
-        addLog(`🌀 Раунд ${round} фарм-фазы начался!`);
+// ========== ПРОВЕРКА ЗАВЕРШЕНИЯ ФАЗЫ ДЕЙСТВИЙ ==========
+function checkAllActionsDone() {
+    const allDone = players.every(p => p.hasDoneAction);
+    
+    if (allDone) {
+        addLog(`✅ Все игроки завершили действия. Возвращаемся в фарм-фазу!`);
+        setTimeout(() => {
+            startNewFarmRound();
+        }, 1500);
     } else {
+        // Передаём ход следующему игроку
+        activePlayerIndex = 1 - activePlayerIndex;
         updateUI();
         addLog(`🏰 Ход переходит к Игроку ${activePlayerIndex + 1}`);
+        
+        // Если следующий игрок уже сделал действие — пропускаем
+        if (players[activePlayerIndex].hasDoneAction) {
+            addLog(`⏳ Игрок ${activePlayerIndex + 1} уже сделал действие.`);
+            checkAllActionsDone();
+            return;
+        }
+        
         if (players[activePlayerIndex].isAI) {
             setTimeout(() => aiActionPhase(), 800);
         }
     }
 }
 
+function startNewFarmRound() {
+    gamePhase = 'farm';
+    battlePhase = 'select';
+    currentPlayerIndex = 0;
+    round++;
+    
+    players.forEach(p => {
+        p.selectedHeroes = [];
+        p.hasConfirmed = false;
+        p.hasDoneAction = false;
+    });
+    
+    lastRoundWinner = null;
+    shopCards = [];
+    
+    if (round === 2) currentEvent.location = eventDecks.locations.shift();
+    if (round === 3) currentEvent.kingdom = eventDecks.kingdoms.shift();
+    if (round === 4) currentEvent.profession = eventDecks.professions.shift();
+    if (round === 5) currentEvent.saga = eventDecks.sagas.shift();
+    
+    renderArena();
+    updateUI();
+    
+    if (round === 2) addLog(`🌀 Раунд ${round}! Локация: ${currentEvent.location.name}`);
+    else if (round === 3) addLog(`🌀 Раунд ${round}! Королевство: ${currentEvent.kingdom.name}`);
+    else if (round === 4) addLog(`🌀 Раунд ${round}! Профессия: ${currentEvent.profession.name}`);
+    else if (round === 5) addLog(`🌀 Раунд ${round}! Сага: ${currentEvent.saga.name}`);
+    else addLog(`🌀 Раунд ${round} начался!`);
+    
+    checkAITurn();
+}
+
 function aiActionPhase() {
     const player = players[activePlayerIndex];
-    if (player.collection.length === 0 || player.tokens >= 20) {
+    
+    if (player.collection.length === 0) {
+        // Нет героев — идём в магазин
         showShopModal();
         setTimeout(() => {
-            document.getElementById('closeShopBtn')?.click();
-        }, 500);
+            const closeBtn = document.getElementById('closeShopBtn');
+            if (closeBtn) closeBtn.click();
+            player.hasDoneAction = true;
+            updateUI();
+            checkAllActionsDone();
+        }, 1000);
+    } else if (!player.chosenLand) {
+        // Выбираем землю
+        const randomLand = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
+        player.chosenLand = randomLand;
+        addLog(`🤖 ИИ выбрал землю: ${randomLand.name}`);
+        player.hasDoneAction = true;
+        updateUI();
+        checkAllActionsDone();
     } else {
+        // Идём на монстра
         fightMonster();
     }
 }
 
-// ========== ФАРМ-ФАЗА (выбор героев и битва) ==========
+// ========== ФАРМ-ФАЗА ==========
 function toggleHeroSelection(player, hero) {
     if (gamePhase !== 'farm' || battlePhase !== 'select' || player.isAI || player.hasConfirmed) return;
     const index = player.selectedHeroes.indexOf(hero);
@@ -1158,9 +1370,11 @@ function startFarmBattle() {
                 addLog(`🏅 Звание: ${TITLES[winner.titleLevel - 1].name}! (+${TITLES[winner.titleLevel - 1].bonus})`);
             }
             addLog(`👑 ФРОНТ ${i + 1} ВЫИГРАЛ ФАРМ-ФАЗУ! +30🪙 бонус`);
+            addLog(`🏰 Переход в фазу действий!`);
 
             gamePhase = 'action';
             activePlayerIndex = 0;
+            players.forEach(p => p.hasDoneAction = false);
             shopCards = [];
             for (let j = 0; j < 5; j++) {
                 if (eventDecks.heroPool.length > 0) {
@@ -1169,7 +1383,7 @@ function startFarmBattle() {
             }
             renderArena();
             updateUI();
-            addLog(`🏰 Фаза действий началась! Игроки могут покупать героев и совершать действия.`);
+            
             if (players[activePlayerIndex].isAI) {
                 setTimeout(() => aiActionPhase(), 1000);
             }
