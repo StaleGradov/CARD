@@ -1,4 +1,4 @@
-// ---------- ИГРОВАЯ ЛОГИКА ТИГРИМИОН v2.0 ----------
+// ---------- ИГРОВАЯ ЛОГИКА ТИГРИМИОН v2.0 (исправленная) ----------
 
 "use strict";
 
@@ -234,14 +234,6 @@ function getRelicBonus(player) {
     return getActiveSetBonus(player.getEquippedRelicsArray());
 }
 
-function getTotalBonus(player) {
-    let bonus = getTitleBonus(player) + getRelicBonus(player);
-    if (player.capturedKingdom) bonus += 10;
-    if (player.capturedProfession) bonus += 15;
-    if (player.capturedSaga) bonus += 20;
-    return bonus;
-}
-
 function getHeroBonus(hero, player) {
     let bonus = getTitleBonus(player) + getRelicBonus(player);
     if (player.capturedKingdom && player.capturedKingdom.race === hero.race) bonus += 10;
@@ -250,17 +242,21 @@ function getHeroBonus(hero, player) {
     return bonus;
 }
 
-// ========== РЕНДЕРИНГ ==========
+// ========== РЕНДЕРИНГ АРЕНЫ ==========
 function renderArena() {
     const container = document.getElementById('arenaContainer');
-    if (!container) return;
+    if (!container) {
+        console.error('arenaContainer не найден!');
+        return;
+    }
     container.innerHTML = '';
 
-    if (gamePhase === 'farm') {
-        players.forEach((p, idx) => {
-            const card = document.createElement('div');
-            card.className = 'player-card';
-            card.id = `player${idx}Card`;
+    players.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = 'player-card';
+        card.id = `player${idx}Card`;
+        
+        if (gamePhase === 'farm') {
             card.innerHTML = `
                 <div class="player-name"><span style="font-size:1.5rem;">⚔️ ФРОНТ ${idx+1}</span></div>
                 <div class="player-info-row">
@@ -274,13 +270,7 @@ function renderArena() {
                 <div class="hero-cards" id="handP${idx}"></div>
                 <div class="deck-counter" id="deckInfo${idx}">📚 В колоде: 0</div>
             `;
-            container.appendChild(card);
-        });
-    } else if (gamePhase === 'action') {
-        players.forEach((p, idx) => {
-            const card = document.createElement('div');
-            card.className = 'player-card';
-            card.id = `player${idx}Card`;
+        } else if (gamePhase === 'action') {
             card.innerHTML = `
                 <div class="player-name"><span style="font-size:1.5rem;">🏰 ИГРОК ${idx+1}</span></div>
                 <div class="player-info-row">
@@ -293,9 +283,9 @@ function renderArena() {
                 <div class="collection-info" id="collectionP${idx}"></div>
                 <div class="hero-cards" id="handP${idx}"></div>
             `;
-            container.appendChild(card);
-        });
-    }
+        }
+        container.appendChild(card);
+    });
 }
 
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
@@ -385,6 +375,11 @@ function initGame(mode) {
 function updateUI() {
     const roundDisplay = document.getElementById('roundDisplay');
     if (roundDisplay) roundDisplay.innerText = gamePhase === 'farm' ? `${round}` : '—';
+
+    const phaseIndicator = document.getElementById('phaseIndicator');
+    if (phaseIndicator) {
+        phaseIndicator.innerText = gamePhase === 'farm' ? '🌾 ФАРМ-ФАЗА' : '🏰 ФАЗА ДЕЙСТВИЙ';
+    }
 
     const turnIndicator = document.getElementById('turnIndicator');
     const actionBtn = document.getElementById('actionBtn');
@@ -740,7 +735,7 @@ function showShopModal() {
 
     let html = `
         <div class="result-title" style="color:gold;">🛒 МАГАЗИН ГЕРОЕВ</div>
-        <div style="text-align:center;color:#ffd58c;margin-bottom:10px;">🪙 Ваши жетоны: ${player.tokens} | Слотов в коллекции: ${player.collection.length}/10</div>
+        <div style="text-align:center;color:#ffd58c;margin-bottom:10px;">🪙 Ваши жетоны: ${player.tokens} | Героев в коллекции: ${player.collection.length}/10</div>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
     `;
 
@@ -955,12 +950,28 @@ function endActionPhase() {
         if (round === 3) currentEvent.kingdom = eventDecks.kingdoms.shift();
         if (round === 4) currentEvent.profession = eventDecks.professions.shift();
         if (round === 5) currentEvent.saga = eventDecks.sagas.shift();
+        shopCards = [];
         renderArena();
         updateUI();
         addLog(`🌀 Раунд ${round} фарм-фазы начался!`);
     } else {
         updateUI();
         addLog(`🏰 Ход переходит к Игроку ${activePlayerIndex + 1}`);
+        if (players[activePlayerIndex].isAI) {
+            setTimeout(() => aiActionPhase(), 800);
+        }
+    }
+}
+
+function aiActionPhase() {
+    const player = players[activePlayerIndex];
+    if (player.collection.length === 0 || player.tokens >= 20) {
+        showShopModal();
+        setTimeout(() => {
+            document.getElementById('closeShopBtn')?.click();
+        }, 500);
+    } else {
+        fightMonster();
     }
 }
 
@@ -1136,7 +1147,6 @@ function startFarmBattle() {
             }
             addLog(`👑 ФРОНТ ${i + 1} ВЫИГРАЛ ФАРМ-ФАЗУ! +3🪙 бонус`);
 
-            // Переход к фазе действий
             gamePhase = 'action';
             activePlayerIndex = 0;
             shopCards = [];
@@ -1148,6 +1158,9 @@ function startFarmBattle() {
             renderArena();
             updateUI();
             addLog(`🏰 Фаза действий началась! Игроки могут покупать героев и совершать действия.`);
+            if (players[activePlayerIndex].isAI) {
+                setTimeout(() => aiActionPhase(), 1000);
+            }
             return;
         }
     }
