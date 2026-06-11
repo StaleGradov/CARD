@@ -47,10 +47,9 @@ function renderArena() {
                     <span class="relic-count" id="relicsP${idx}"></span>
                     <span class="streak-badge" id="streakP${idx}"></span>
                     <span class="token-badge" id="tokensP${idx}"></span>
-                    <button class="inventory-btn" id="invBtn${idx}" title="Инвентарь">🎒</button>
                 </div>
+                <div class="action-cards-row" id="actionCardsP${idx}"></div>
                 <div class="equipment-row" id="equipmentP${idx}"></div>
-                <div class="collection-info" id="collectionP${idx}"></div>
                 <div class="hero-cards" id="handP${idx}"></div>
             `;
         }
@@ -58,82 +57,97 @@ function renderArena() {
     });
 }
 
+// ========== КАРТОЧКИ ДЕЙСТВИЙ В ЛАГЕРЕ ==========
+function renderActionCards(player, idx) {
+    const container = document.getElementById(`actionCardsP${idx}`);
+    if (!container) return;
+    
+    const opponent = players[1 - idx];
+    
+    // Определяем что доступно
+    const canDuel = player.collection.length > 0 && opponent.collection.length > 0 && !player.hasDoneAction;
+    const canMonster = player.collection.length > 0 && !player.hasDoneAction;
+    const canKingdom = player.collection.length > 0 && !player.capturedKingdom && !player.hasDoneAction;
+    const canProfession = player.collection.length > 0 && player.capturedKingdom && !player.capturedProfession && !player.hasDoneAction;
+    const canSaga = player.collection.length > 0 && player.capturedKingdom && player.capturedProfession && !player.capturedSaga && !player.hasDoneAction;
+    const canShop = !player.hasDoneAction;
+    const canRelicShop = !player.hasDoneAction;
+    const canInventory = true;
+    const canLand = !player.hasDoneAction;
+    
+    let html = '';
+    
+    // Группа 1: Таверна, Магазин, Инвентарь
+    html += `
+        <div class="action-card ${canShop ? '' : 'action-done'}" ${canShop ? `onclick="showShopModal()"` : ''}>
+            <div class="action-card-icon">🛒</div>
+            <div class="action-card-name">ТАВЕРНА</div>
+            <div class="action-card-desc">Нанять героя</div>
+        </div>
+        <div class="action-card ${canRelicShop ? '' : 'action-done'}" ${canRelicShop ? `onclick="showRelicShopModal()"` : ''}>
+            <div class="action-card-icon">🔮</div>
+            <div class="action-card-name">МАГАЗИН</div>
+            <div class="action-card-desc">Купить реликвию</div>
+        </div>
+        <div class="action-card" onclick="showInventoryModal(${idx})">
+            <div class="action-card-icon">🎒</div>
+            <div class="action-card-name">ИНВЕНТАРЬ</div>
+            <div class="action-card-desc">Экипировка</div>
+        </div>
+    `;
+    
+    // Разделитель
+    html += `<div class="action-separator"></div>`;
+    
+    // Группа 2: Земля, Королевство, Профессия, Сага
+    html += `
+        <div class="action-card ${canLand ? '' : 'action-done'}" ${canLand ? `onclick="showLandSelection()"` : ''}>
+            <div class="action-card-icon">🏞️</div>
+            <div class="action-card-name">${player.chosenLand ? player.chosenLand.name : 'ВЫБРАТЬ ЗЕМЛЮ'}</div>
+            <div class="action-card-desc">${player.chosenLand ? player.chosenLand.desc : 'Параметр защиты'}</div>
+        </div>
+        <div class="action-card ${canKingdom ? '' : 'action-done'} ${player.capturedKingdom ? 'captured' : ''}" ${canKingdom ? `onclick="showKingdomSelection()"` : ''}>
+            <div class="action-card-icon">👑</div>
+            <div class="action-card-name">${player.capturedKingdom ? player.capturedKingdom.name : 'КОРОЛЕВСТВО'}</div>
+            <div class="action-card-desc">${player.capturedKingdom ? '+10 к ' + player.capturedKingdom.race : 'Захватить'}</div>
+        </div>
+        <div class="action-card ${canProfession ? '' : 'action-done'} ${player.capturedProfession ? 'captured' : ''}" ${canProfession ? `onclick="showProfessionSelection()"` : ''}>
+            <div class="action-card-icon">⚜️</div>
+            <div class="action-card-name">${player.capturedProfession ? player.capturedProfession.name : 'ПРОФЕССИЯ'}</div>
+            <div class="action-card-desc">${player.capturedProfession ? '+15 к ' + player.capturedProfession.prof : 'Захватить'}</div>
+        </div>
+        <div class="action-card ${canSaga ? '' : 'action-done'} ${player.capturedSaga ? 'captured' : ''}" ${canSaga ? `onclick="showSagaSelection()"` : ''}>
+            <div class="action-card-icon">📜</div>
+            <div class="action-card-name">${player.capturedSaga ? player.capturedSaga.name : 'САГА'}</div>
+            <div class="action-card-desc">${player.capturedSaga ? '+20 к ' + player.capturedSaga.saga : 'Захватить'}</div>
+        </div>
+    `;
+    
+    // Разделитель
+    html += `<div class="action-separator"></div>`;
+    
+    // Группа 3: Монстр, Дуэль
+    html += `
+        <div class="action-card ${canMonster ? '' : 'action-done'}" ${canMonster ? `onclick="showMonsterSelection()"` : ''}>
+            <div class="action-card-icon">👹</div>
+            <div class="action-card-name">МОНСТР</div>
+            <div class="action-card-desc">Охота за жетонами</div>
+        </div>
+        <div class="action-card ${canDuel ? '' : 'action-done'}" ${canDuel ? `onclick="showDuelPreview()"` : ''}>
+            <div class="action-card-icon">⚔️</div>
+            <div class="action-card-name">ДУЭЛЬ</div>
+            <div class="action-card-desc">${canDuel ? 'Атаковать Игрока ' + (opponent.id + 1) : 'Нет противника'}</div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
 // ========== ОТОБРАЖЕНИЕ ЭКИПИРОВКИ ==========
 function renderEquipmentRow(player, idx) {
     const container = document.getElementById(`equipmentP${idx}`);
     if (!container) return;
     container.innerHTML = '';
-    
-    // Карта земли
-    if (player.chosenLand) {
-        const landCard = document.createElement('div');
-        landCard.className = 'equip-card';
-        landCard.innerHTML = `
-            <div class="equip-card-icon">🏞️</div>
-            <div class="equip-card-name">${player.chosenLand.name}</div>
-            <div class="equip-card-desc">${player.chosenLand.desc}</div>
-        `;
-        container.appendChild(landCard);
-    } else {
-        const landCard = document.createElement('div');
-        landCard.className = 'equip-card empty';
-        landCard.innerHTML = `<div class="equip-card-icon">🏞️</div><div class="equip-card-name">Земля не выбрана</div>`;
-        container.appendChild(landCard);
-    }
-    
-    // Карта королевства
-    if (player.capturedKingdom) {
-        const kCard = document.createElement('div');
-        kCard.className = 'equip-card captured';
-        kCard.style.border = '2px solid #ffd700';
-        kCard.innerHTML = `
-            <div class="equip-card-icon">👑</div>
-            <div class="equip-card-name">${player.capturedKingdom.name}</div>
-            <div class="equip-card-desc">+10 к расе ${player.capturedKingdom.race}</div>
-        `;
-        container.appendChild(kCard);
-    } else {
-        const kCard = document.createElement('div');
-        kCard.className = 'equip-card empty';
-        kCard.innerHTML = `<div class="equip-card-icon">👑</div><div class="equip-card-name">Нет королевства</div>`;
-        container.appendChild(kCard);
-    }
-    
-    // Карта профессии
-    if (player.capturedProfession) {
-        const pCard = document.createElement('div');
-        pCard.className = 'equip-card captured';
-        pCard.style.border = '2px solid #9b30ff';
-        pCard.innerHTML = `
-            <div class="equip-card-icon">⚜️</div>
-            <div class="equip-card-name">${player.capturedProfession.name}</div>
-            <div class="equip-card-desc">+15 к профессии ${player.capturedProfession.prof}</div>
-        `;
-        container.appendChild(pCard);
-    } else {
-        const pCard = document.createElement('div');
-        pCard.className = 'equip-card empty';
-        pCard.innerHTML = `<div class="equip-card-icon">⚜️</div><div class="equip-card-name">Нет профессии</div>`;
-        container.appendChild(pCard);
-    }
-    
-    // Карта саги
-    if (player.capturedSaga) {
-        const sCard = document.createElement('div');
-        sCard.className = 'equip-card captured';
-        sCard.style.border = '2px solid #ff4444';
-        sCard.innerHTML = `
-            <div class="equip-card-icon">📜</div>
-            <div class="equip-card-name">${player.capturedSaga.name}</div>
-            <div class="equip-card-desc">+20 к саге ${player.capturedSaga.saga}</div>
-        `;
-        container.appendChild(sCard);
-    } else {
-        const sCard = document.createElement('div');
-        sCard.className = 'equip-card empty';
-        sCard.innerHTML = `<div class="equip-card-icon">📜</div><div class="equip-card-name">Нет саги</div>`;
-        container.appendChild(sCard);
-    }
     
     // Экипированные реликвии
     const equipped = player.getEquippedRelicsArray();
@@ -147,14 +161,16 @@ function renderEquipmentRow(player, idx) {
             rCard.innerHTML = `
                 <div class="equip-card-icon">🔮</div>
                 <div class="equip-card-name" style="color:${rarityColor.text}">${relic.name}</div>
-                <div class="equip-card-desc">+${relic.bonus} ко всем | ${relic.setName}</div>
+                <div class="equip-card-desc">+${relic.bonus} | ${relic.setName}</div>
             `;
             container.appendChild(rCard);
         });
-    } else if (player.relics.length > 0) {
+    }
+    
+    if (equipped.length === 0) {
         const rCard = document.createElement('div');
         rCard.className = 'equip-card empty';
-        rCard.innerHTML = `<div class="equip-card-icon">🔮</div><div class="equip-card-name">Реликвии не экипированы</div><div class="equip-card-desc">Откройте инвентарь</div>`;
+        rCard.innerHTML = `<div class="equip-card-icon">🔮</div><div class="equip-card-name">Нет реликвий</div>`;
         container.appendChild(rCard);
     }
 }
@@ -451,7 +467,7 @@ function updateUI() {
             if (actionBtn) { actionBtn.textContent = '⏳ ОЖИДАНИЕ...'; actionBtn.disabled = true; }
         } else {
             if (turnIndicator) turnIndicator.innerText = `🏰 Фаза действий — Игрок ${activePlayerIndex + 1}`;
-            if (actionBtn) { actionBtn.textContent = '🎯 ВЫБРАТЬ ДЕЙСТВИЕ'; actionBtn.disabled = false; actionBtn.onclick = showActionMenu; }
+            if (actionBtn) { actionBtn.textContent = '✅ ЗАКОНЧИТЬ ХОД'; actionBtn.disabled = false; actionBtn.onclick = () => { players[activePlayerIndex].hasDoneAction = true; updateUI(); checkAllActionsDone(); }; }
         }
     }
 
@@ -541,8 +557,9 @@ function updateUI() {
             };
         }
 
-        // Рендерим строку экипировки в фазе действий
+        // Рендерим карточки действий и экипировку в фазе действий
         if (gamePhase === 'action') {
+            renderActionCards(pl, idx);
             renderEquipmentRow(pl, idx);
         }
 
