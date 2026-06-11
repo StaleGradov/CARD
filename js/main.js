@@ -3,6 +3,39 @@
 
 "use strict";
 
+function goToCamp() {
+    if (gamePhase !== 'farm') return;
+    
+    players.forEach(p => {
+        p.selectedHeroes = [];
+        p.hasConfirmed = false;
+        p.hasDoneAction = false;
+    });
+    
+    gamePhase = 'action';
+    activePlayerIndex = 0;
+    battleType = null;
+    
+    if (shopCards.length === 0) {
+        for (let j = 0; j < 5; j++) { 
+            if (eventDecks.heroPool.length > 0) shopCards.push(eventDecks.heroPool.pop()); 
+        }
+    }
+    if (relicShopCards.length === 0) {
+        for (let j = 0; j < 5; j++) { 
+            if (eventDecks.relicPool.length > 0) relicShopCards.push(eventDecks.relicPool.pop()); 
+        }
+    }
+    
+    renderArena();
+    updateUI();
+    addLog(`🏰 Переход в лагерь. Игроки могут покупать героев и совершать действия.`);
+    
+    if (players[activePlayerIndex].isAI) {
+        setTimeout(() => aiActionPhase(), 1000);
+    }
+}
+
 function initGame(mode) {
     if (mode === undefined) mode = gameMode;
     if (aiTimeout) clearTimeout(aiTimeout);
