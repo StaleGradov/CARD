@@ -1191,3 +1191,64 @@ body {
     color: #aaa;
     font-size: 0.6rem;
 }
+/* ========= КАРТОЧКИ ДЕЙСТВИЙ В ЛАГЕРЕ ========= */
+.action-cards-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.action-card {
+    flex: 0 0 auto;
+    width: 130px;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid #666;
+    border-radius: 14px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+    border-color: #c9a45b;
+    box-shadow: 0 0 15px rgba(201, 164, 91, 0.4);
+}
+
+.action-card.captured {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.action-card.action-done {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+}
+
+.action-card-icon {
+    font-size: 2rem;
+    margin-bottom: 4px;
+}
+
+.action-card-name {
+    color: #ffdfa5;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.action-card-desc {
+    color: #aaa;
+    font-size: 0.6rem;
+}
+
+.action-separator {
+    width: 2px;
+    background: #555;
+    margin: 0 4px;
+    align-self: stretch;
+}
