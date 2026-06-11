@@ -49,12 +49,114 @@ function renderArena() {
                     <span class="token-badge" id="tokensP${idx}"></span>
                     <button class="inventory-btn" id="invBtn${idx}" title="Инвентарь">🎒</button>
                 </div>
+                <div class="equipment-row" id="equipmentP${idx}"></div>
                 <div class="collection-info" id="collectionP${idx}"></div>
                 <div class="hero-cards" id="handP${idx}"></div>
             `;
         }
         container.appendChild(card);
     });
+}
+
+// ========== ОТОБРАЖЕНИЕ ЭКИПИРОВКИ ==========
+function renderEquipmentRow(player, idx) {
+    const container = document.getElementById(`equipmentP${idx}`);
+    if (!container) return;
+    container.innerHTML = '';
+    
+    // Карта земли
+    if (player.chosenLand) {
+        const landCard = document.createElement('div');
+        landCard.className = 'equip-card';
+        landCard.innerHTML = `
+            <div class="equip-card-icon">🏞️</div>
+            <div class="equip-card-name">${player.chosenLand.name}</div>
+            <div class="equip-card-desc">${player.chosenLand.desc}</div>
+        `;
+        container.appendChild(landCard);
+    } else {
+        const landCard = document.createElement('div');
+        landCard.className = 'equip-card empty';
+        landCard.innerHTML = `<div class="equip-card-icon">🏞️</div><div class="equip-card-name">Земля не выбрана</div>`;
+        container.appendChild(landCard);
+    }
+    
+    // Карта королевства
+    if (player.capturedKingdom) {
+        const kCard = document.createElement('div');
+        kCard.className = 'equip-card captured';
+        kCard.style.border = '2px solid #ffd700';
+        kCard.innerHTML = `
+            <div class="equip-card-icon">👑</div>
+            <div class="equip-card-name">${player.capturedKingdom.name}</div>
+            <div class="equip-card-desc">+10 к расе ${player.capturedKingdom.race}</div>
+        `;
+        container.appendChild(kCard);
+    } else {
+        const kCard = document.createElement('div');
+        kCard.className = 'equip-card empty';
+        kCard.innerHTML = `<div class="equip-card-icon">👑</div><div class="equip-card-name">Нет королевства</div>`;
+        container.appendChild(kCard);
+    }
+    
+    // Карта профессии
+    if (player.capturedProfession) {
+        const pCard = document.createElement('div');
+        pCard.className = 'equip-card captured';
+        pCard.style.border = '2px solid #9b30ff';
+        pCard.innerHTML = `
+            <div class="equip-card-icon">⚜️</div>
+            <div class="equip-card-name">${player.capturedProfession.name}</div>
+            <div class="equip-card-desc">+15 к профессии ${player.capturedProfession.prof}</div>
+        `;
+        container.appendChild(pCard);
+    } else {
+        const pCard = document.createElement('div');
+        pCard.className = 'equip-card empty';
+        pCard.innerHTML = `<div class="equip-card-icon">⚜️</div><div class="equip-card-name">Нет профессии</div>`;
+        container.appendChild(pCard);
+    }
+    
+    // Карта саги
+    if (player.capturedSaga) {
+        const sCard = document.createElement('div');
+        sCard.className = 'equip-card captured';
+        sCard.style.border = '2px solid #ff4444';
+        sCard.innerHTML = `
+            <div class="equip-card-icon">📜</div>
+            <div class="equip-card-name">${player.capturedSaga.name}</div>
+            <div class="equip-card-desc">+20 к саге ${player.capturedSaga.saga}</div>
+        `;
+        container.appendChild(sCard);
+    } else {
+        const sCard = document.createElement('div');
+        sCard.className = 'equip-card empty';
+        sCard.innerHTML = `<div class="equip-card-icon">📜</div><div class="equip-card-name">Нет саги</div>`;
+        container.appendChild(sCard);
+    }
+    
+    // Экипированные реликвии
+    const equipped = player.getEquippedRelicsArray();
+    if (equipped.length > 0) {
+        equipped.forEach(relic => {
+            const rarityColor = RARITY_COLORS[relic.rarity];
+            const rCard = document.createElement('div');
+            rCard.className = 'equip-card';
+            rCard.style.border = `2px solid ${rarityColor.border}`;
+            rCard.style.background = rarityColor.bg;
+            rCard.innerHTML = `
+                <div class="equip-card-icon">🔮</div>
+                <div class="equip-card-name" style="color:${rarityColor.text}">${relic.name}</div>
+                <div class="equip-card-desc">+${relic.bonus} ко всем | ${relic.setName}</div>
+            `;
+            container.appendChild(rCard);
+        });
+    } else if (player.relics.length > 0) {
+        const rCard = document.createElement('div');
+        rCard.className = 'equip-card empty';
+        rCard.innerHTML = `<div class="equip-card-icon">🔮</div><div class="equip-card-name">Реликвии не экипированы</div><div class="equip-card-desc">Откройте инвентарь</div>`;
+        container.appendChild(rCard);
+    }
 }
 
 // ========== КАРТОЧКА ГЕРОЯ ==========
@@ -439,6 +541,11 @@ function updateUI() {
             };
         }
 
+        // Рендерим строку экипировки в фазе действий
+        if (gamePhase === 'action') {
+            renderEquipmentRow(pl, idx);
+        }
+
         let container = document.getElementById(`handP${idx}`);
         if (!container) return;
 
@@ -454,16 +561,6 @@ function updateUI() {
             const deckInfo = document.getElementById(`deckInfo${idx}`);
             if (deckInfo) deckInfo.innerText = `📚 В колоде: ${pl.deck.length}`;
         } else if (gamePhase === 'action') {
-            const collectionInfo = document.getElementById(`collectionP${idx}`);
-            if (collectionInfo) {
-                collectionInfo.innerHTML = `
-                    <div style="text-align:center; color:#ffd58c; margin-bottom:8px;">
-                        ${pl.capturedKingdom ? '👑' : ''} ${pl.capturedProfession ? '⚜️' : ''} ${pl.capturedSaga ? '📜' : ''}
-                        ${pl.chosenLand ? '🏞️ ' + pl.chosenLand.name : ''}
-                    </div>
-                `;
-            }
-
             container.innerHTML = '';
             if (pl.collection.length === 0) {
                 const emptyDiv = document.createElement('div');
