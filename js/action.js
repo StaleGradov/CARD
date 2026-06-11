@@ -155,12 +155,12 @@ function showKingdomSelection() {
     const modal = document.getElementById('relicChoiceModal');
     const content = document.getElementById('relicChoiceContent');
     if (!modal || !content) return;
-    const availableKingdoms = eventDecks.kingdoms.length > 0 ? eventDecks.kingdoms.slice(0, 3) : KINGDOMS.slice(0, 3);
-    let html = `<div class="result-title" style="color:gold;">👑 ВЫБЕРИТЕ КОРОЛЕВСТВО</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">`;
+    const availableKingdoms = eventDecks.kingdoms.length > 0 ? eventDecks.kingdoms : [...KINGDOMS];
+    let html = `<div class="result-title" style="color:gold;">👑 ВЫБЕРИТЕ КОРОЛЕВСТВО (${availableKingdoms.length} доступно)</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">`;
     availableKingdoms.forEach((kingdom, idx) => {
         const bossPower = kingdom.boss.hp + kingdom.boss.dmg + kingdom.boss.arm + kingdom.boss.gold;
         const totalPower = bossPower + kingdom.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
-        html += `<div class="kingdom-card" data-kingdom-idx="${idx}" style="width:300px; background:#1a1a00; border:2px solid #ffd700; border-radius:16px; padding:12px; text-align:center; cursor:pointer;"><div style="font-size:2rem;">👑</div><div style="color:#ffd700; font-weight:bold; font-size:1.1rem;">${kingdom.name}</div><div style="color:#ffd58c; font-size:0.8rem;">${kingdom.buffDesc}</div><div style="margin:8px 0; color:#ff6666;">👑 ${kingdom.boss.name}: ❤️${kingdom.boss.hp} 🛡️${kingdom.boss.arm} ⚔️${kingdom.boss.dmg} 💰${kingdom.boss.gold}</div><div style="color:#ffaaaa; font-size:0.7rem;">Стража: ${kingdom.guards.map(g => g.name).join(', ')}</div><div style="color:gold; margin-top:6px;">Сила: ${totalPower}</div></div>`;
+        html += `<div class="kingdom-card" data-kingdom-idx="${idx}" style="width:300px; background:#1a1a00; border:2px solid #ffd700; border-radius:16px; padding:12px; text-align:center; cursor:pointer;"><div style="font-size:2rem;">👑</div><div style="color:#ffd700; font-weight:bold; font-size:1.1rem;">${kingdom.name}</div><div style="color:#ffd58c; font-size:0.8rem;">${kingdom.buffDesc} | ${kingdom.debuffDesc}</div><div style="margin:8px 0; color:#ff6666;">👑 ${kingdom.boss.name}: ❤️${kingdom.boss.hp} 🛡️${kingdom.boss.arm} ⚔️${kingdom.boss.dmg} 💰${kingdom.boss.gold}</div><div style="color:#ffaaaa; font-size:0.7rem;">Стража: ${kingdom.guards.map(g => g.name).join(', ')}</div><div style="color:gold; margin-top:6px;">Сила: ${totalPower}</div></div>`;
     });
     html += `</div>`; content.innerHTML = html; modal.style.display = 'flex';
     content.querySelectorAll('.kingdom-card').forEach(card => { card.addEventListener('click', () => { const kingdom = availableKingdoms[parseInt(card.dataset.kingdomIdx)]; modal.style.display = 'none'; startKingdomBattle(kingdom); }); });
@@ -171,8 +171,8 @@ function startKingdomBattle(kingdom) {
     const bossPower = kingdom.boss.hp + kingdom.boss.dmg + kingdom.boss.arm + kingdom.boss.gold;
     const totalPower = bossPower + kingdom.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
     const playerPower = player.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, player), 0);
-    if (playerPower > totalPower) { player.capturedKingdom = kingdom; eventDecks.kingdoms = eventDecks.kingdoms.filter(k => k.name !== kingdom.name); addLog(`👑 Захвачено: ${kingdom.name}!`); }
-    else { addLog(`💀 Поражение!`); }
+    if (playerPower > totalPower) { player.capturedKingdom = kingdom; eventDecks.kingdoms = eventDecks.kingdoms.filter(k => k.name !== kingdom.name); addLog(`👑 Захвачено: ${kingdom.name}! ${kingdom.buffDesc}`); }
+    else { addLog(`💀 Поражение! ${kingdom.boss.name} слишком силён.`); }
     player.hasDoneAction = true; updateUI(); checkAllActionsDone();
 }
 
@@ -181,11 +181,11 @@ function showProfessionSelection() {
     const modal = document.getElementById('relicChoiceModal');
     const content = document.getElementById('relicChoiceContent');
     if (!modal || !content) return;
-    const availableProfs = eventDecks.professions.length > 0 ? eventDecks.professions.slice(0, 3) : PROFESSIONS.slice(0, 3);
-    let html = `<div class="result-title" style="color:gold;">⚜️ ВЫБЕРИТЕ ПРОФЕССИЮ</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">`;
+    const availableProfs = eventDecks.professions.length > 0 ? eventDecks.professions : [...PROFESSIONS];
+    let html = `<div class="result-title" style="color:gold;">⚜️ ВЫБЕРИТЕ ПРОФЕССИЮ (${availableProfs.length} доступно)</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">`;
     availableProfs.forEach((prof, idx) => {
         const totalPower = prof.boss.hp + prof.boss.dmg + prof.boss.arm + prof.boss.gold + prof.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
-        html += `<div class="kingdom-card" data-prof-idx="${idx}" style="width:300px; background:#1a0020; border:2px solid #9b30ff; border-radius:16px; padding:12px; text-align:center; cursor:pointer;"><div style="font-size:2rem;">⚜️</div><div style="color:#d4a0ff; font-weight:bold;">${prof.name}</div><div style="color:#c0a0ff; font-size:0.8rem;">${prof.buffDesc}</div><div style="margin:8px 0; color:#ff6666;">${prof.boss.name}: ❤️${prof.boss.hp} 🛡️${prof.boss.arm} ⚔️${prof.boss.dmg} 💰${prof.boss.gold}</div><div style="color:gold;">Сила: ${totalPower}</div></div>`;
+        html += `<div class="kingdom-card" data-prof-idx="${idx}" style="width:300px; background:#1a0020; border:2px solid #9b30ff; border-radius:16px; padding:12px; text-align:center; cursor:pointer;"><div style="font-size:2rem;">⚜️</div><div style="color:#d4a0ff; font-weight:bold;">${prof.name}</div><div style="color:#c0a0ff; font-size:0.8rem;">${prof.buffDesc} | ${prof.debuffDesc || ''}</div><div style="margin:8px 0; color:#ff6666;">${prof.boss.name}: ❤️${prof.boss.hp} 🛡️${prof.boss.arm} ⚔️${prof.boss.dmg} 💰${prof.boss.gold}</div><div style="color:gold;">Сила: ${totalPower}</div></div>`;
     });
     html += `</div>`; content.innerHTML = html; modal.style.display = 'flex';
     content.querySelectorAll('.kingdom-card').forEach(card => { card.addEventListener('click', () => { const prof = availableProfs[parseInt(card.dataset.profIdx)]; modal.style.display = 'none'; startProfessionBattle(prof); }); });
@@ -195,8 +195,8 @@ function startProfessionBattle(profession) {
     const player = players[activePlayerIndex];
     const totalPower = profession.boss.hp + profession.boss.dmg + profession.boss.arm + profession.boss.gold + profession.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
     const playerPower = player.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, player), 0);
-    if (playerPower > totalPower) { player.capturedProfession = profession; eventDecks.professions = eventDecks.professions.filter(p => p.name !== profession.name); addLog(`⚜️ Захвачено: ${profession.name}!`); }
-    else { addLog(`💀 Поражение!`); }
+    if (playerPower > totalPower) { player.capturedProfession = profession; eventDecks.professions = eventDecks.professions.filter(p => p.name !== profession.name); addLog(`⚜️ Захвачено: ${profession.name}! ${profession.buffDesc}`); }
+    else { addLog(`💀 Поражение! ${profession.boss.name} слишком силён.`); }
     player.hasDoneAction = true; updateUI(); checkAllActionsDone();
 }
 
@@ -205,11 +205,11 @@ function showSagaSelection() {
     const modal = document.getElementById('relicChoiceModal');
     const content = document.getElementById('relicChoiceContent');
     if (!modal || !content) return;
-    const availableSagas = eventDecks.sagas.length > 0 ? eventDecks.sagas.slice(0, 3) : SAGAS.slice(0, 3);
-    let html = `<div class="result-title" style="color:gold;">📜 ВЫБЕРИТЕ САГУ</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">`;
+    const availableSagas = eventDecks.sagas.length > 0 ? eventDecks.sagas : [...SAGAS];
+    let html = `<div class="result-title" style="color:gold;">📜 ВЫБЕРИТЕ САГУ (${availableSagas.length} доступно)</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">`;
     availableSagas.forEach((saga, idx) => {
         const totalPower = saga.boss.hp + saga.boss.dmg + saga.boss.arm + saga.boss.gold + saga.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
-        html += `<div class="kingdom-card" data-saga-idx="${idx}" style="width:300px; background:#200000; border:2px solid #ff4444; border-radius:16px; padding:12px; text-align:center; cursor:pointer;"><div style="font-size:2rem;">📜</div><div style="color:#ff6666; font-weight:bold;">${saga.name}</div><div style="color:#ffaaaa; font-size:0.8rem;">${saga.buffDesc}</div><div style="margin:8px 0; color:#ff6666;">${saga.boss.name}: ❤️${saga.boss.hp} 🛡️${saga.boss.arm} ⚔️${saga.boss.dmg} 💰${saga.boss.gold}</div><div style="color:gold;">Сила: ${totalPower}</div></div>`;
+        html += `<div class="kingdom-card" data-saga-idx="${idx}" style="width:300px; background:#200000; border:2px solid #ff4444; border-radius:16px; padding:12px; text-align:center; cursor:pointer;"><div style="font-size:2rem;">📜</div><div style="color:#ff6666; font-weight:bold;">${saga.name}</div><div style="color:#ffaaaa; font-size:0.8rem;">${saga.buffDesc} | ${saga.debuffDesc || ''}</div><div style="margin:8px 0; color:#ff6666;">${saga.boss.name}: ❤️${saga.boss.hp} 🛡️${saga.boss.arm} ⚔️${saga.boss.dmg} 💰${saga.boss.gold}</div><div style="color:gold;">Сила: ${totalPower}</div></div>`;
     });
     html += `</div>`; content.innerHTML = html; modal.style.display = 'flex';
     content.querySelectorAll('.kingdom-card').forEach(card => { card.addEventListener('click', () => { const saga = availableSagas[parseInt(card.dataset.sagaIdx)]; modal.style.display = 'none'; startSagaBattle(saga); }); });
@@ -219,8 +219,8 @@ function startSagaBattle(saga) {
     const player = players[activePlayerIndex];
     const totalPower = saga.boss.hp + saga.boss.dmg + saga.boss.arm + saga.boss.gold + saga.guards.reduce((s, g) => s + g.hp + g.dmg + g.arm + g.gold, 0);
     const playerPower = player.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, player), 0);
-    if (playerPower > totalPower) { player.capturedSaga = saga; eventDecks.sagas = eventDecks.sagas.filter(s => s.name !== saga.name); addLog(`📜 Захвачено: ${saga.name}!`); }
-    else { addLog(`💀 Поражение!`); }
+    if (playerPower > totalPower) { player.capturedSaga = saga; eventDecks.sagas = eventDecks.sagas.filter(s => s.name !== saga.name); addLog(`📜 Захвачено: ${saga.name}! ${saga.buffDesc}`); }
+    else { addLog(`💀 Поражение! ${saga.boss.name} слишком силён.`); }
     player.hasDoneAction = true; updateUI(); checkAllActionsDone();
 }
 
