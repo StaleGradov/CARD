@@ -1,9 +1,9 @@
-// ---------- БАЗА ДАННЫХ ГЕРОЕВ И КАРТ ----------
+// ---------- БАЗА ДАННЫХ ТИГРИМИОН (v2.0) ----------
 
 // Путь к изображениям
 const IMAGE_BASE_URL = 'https://raw.githubusercontent.com/StaleGradov/CARD/main/images/';
 
-// Иконки
+// ========== ИКОНКИ ==========
 const RACE_ICONS = { 
     'Эльф': '🌲', 'Гном': '🪨', 'Человек': '⚙️', 'Орк': '🩸', 
     'Фея': '✨', 'Дракон': '🐉', 'Лайтар': '🐱', 'Полурослик': '🍂' 
@@ -22,11 +22,7 @@ const SAGA_ICONS = {
     'Колодец с золотом':'💰', 'Небесные явления':'🌙' 
 };
 
-const EVENT_ICONS = { 
-    location: '🏞️', kingdom: '👑', profession: '⚜️', saga: '📜', relic: '🔮', title: '👑' 
-};
-
-// Нормализация профессий
+// ========== НОРМАЛИЗАЦИЯ ПРОФЕССИЙ ==========
 function normalizeProf(prof) { 
     const map = { 
         'Охотница': 'Охотник', 'Воровка': 'Вор', 'Колдунья': 'Колдун', 
@@ -37,8 +33,7 @@ function normalizeProf(prof) {
     return map[prof] || prof; 
 }
 
-// ---------- 104 ГЕРОЯ (ПО 13 КАЖДОЙ РАСЫ) ----------
-// Формат: [Имя, Раса, Профессия, Сага, МОЩЬ, HP, DMG, ARM, GOLD, IMAGE_NUM]
+// ========== 104 ГЕРОЯ (БЕЗ ИЗМЕНЕНИЙ) ==========
 const RAW_HEROES = [
     // ========== ЭЛЬФЫ (13) ==========
     ['Талмир', 'Эльф', 'Знахарь', 'Вулканор', 78, 30, 36, 12, 20, 2],
@@ -159,10 +154,9 @@ const RAW_HEROES = [
     ['Робин Тин', 'Полурослик', 'Гладиатор', 'Колодец с золотом', 83, 34, 36, 13, 42, 99],
     ['Брандихок', 'Полурослик', 'Колдун', 'Небесные явления', 27, 9, 14, 4, 75, 100],
     ['Персиваль Хопкинс', 'Полурослик', 'Охотник за головами', 'Вулканор', 86, 27, 47, 12, 28, 101]
-
 ].map(h => [h[0], h[1], normalizeProf(h[2]), h[3], h[4], h[5], h[6], h[7], h[8], h[9]]);
 
-// Локации
+// ========== ЗЕМЛИ (ЛОКАЦИИ) ==========
 const LOCATIONS = [
     { name: 'Земля Доблести', desc: 'ПОБЕДА ПО УРОНУ (⚔️)', imageNum: 201, rule: (h0, h1) => (h0.dmg > h1.dmg) ? 0 : (h0.dmg < h1.dmg ? 1 : null) },
     { name: 'Земля Стойкости', desc: 'ПОБЕДА ПО ЗДОРОВЬЮ (❤️)', imageNum: 202, rule: (h0, h1) => (h0.hp > h1.hp) ? 0 : (h0.hp < h1.hp ? 1 : null) },
@@ -171,59 +165,326 @@ const LOCATIONS = [
     { name: 'Земля Равновесия', desc: 'ПОБЕДА ПО СУММЕ БОЕВЫХ СТАТОВ (❤️+🛡️+⚔️)', imageNum: 205, rule: (h0, h1) => { let s0 = h0.hp + h0.dmg + h0.arm, s1 = h1.hp + h1.dmg + h1.arm; return (s0 > s1) ? 0 : (s0 < s1 ? 1 : null); } }
 ];
 
-// Королевства
+// ========== КОРОЛЕВСТВА (с королями и телохранителями) ==========
 const KINGDOMS = [
-    { name: 'Арканиум - Царство Людей', desc: 'ЛЮДИ: +10 ко всем статам', imageNum: 301, race: 'Человек', mod: (h) => { if (h.race === 'Человек') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } } },
-    { name: 'Дунгарн - Подземный купол Гномов', desc: 'ГНОМЫ: +10 ко всем статам', imageNum: 302, race: 'Гном', mod: (h) => { if (h.race === 'Гном') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } } },
-    { name: 'Варгош - Кровавые Топи Орков', desc: 'ОРКИ: +10 ко всем статам', imageNum: 303, race: 'Орк', mod: (h) => { if (h.race === 'Орк') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } } },
-    { name: 'Астрарион - Небесная Империя Драконов', desc: 'ДРАКОНЫ: +10 ко всем статам', imageNum: 304, race: 'Дракон', mod: (h) => { if (h.race === 'Дракон') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } } },
-    { name: 'Илверин - Королевство Эльфов', desc: 'ЭЛЬФЫ: +10 ко всем статам', imageNum: 305, race: 'Эльф', mod: (h) => { if (h.race === 'Эльф') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } } },
-    { name: 'Люминель - Анклав Фей', desc: 'ФЕИ: +10 ко всем статам', imageNum: 306, race: 'Фея', mod: (h) => { if (h.race === 'Фея') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } } },
-    { name: 'Фелисар - Обитель Лайтаров', desc: 'ЛАЙТАРЫ: +10 ко всем статам', imageNum: 307, race: 'Лайтар', mod: (h) => { if (h.race === 'Лайтар') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } } },
-    { name: 'Хобблтон - Долина полуросликов', desc: 'ПОЛУРОСЛИКИ: +10 ко всем статам', imageNum: 308, race: 'Полурослик', mod: (h) => { if (h.race === 'Полурослик') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } } }
+    { 
+        name: 'Арканиум - Царство Людей', desc: 'ЛЮДИ: +10 ко всем статам', imageNum: 301, race: 'Человек',
+        boss: { name: 'Король Арканум', hp: 120, dmg: 55, arm: 30, gold: 50, imageNum: 801, desc: 'Правитель людей. Мощен в атаке.' },
+        guards: [
+            { name: 'Рыцарь Света', hp: 80, dmg: 35, arm: 40, gold: 20, imageNum: 802, desc: 'Телохранитель короля. Тяжёлая броня.' },
+            { name: 'Маг Двора', hp: 60, dmg: 50, arm: 15, gold: 30, imageNum: 803, desc: 'Придворный чародей. Высокий урон.' }
+        ],
+        mod: (h) => { if (h.race === 'Человек') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } },
+        buffDesc: '+10 Человек', debuffDesc: '-5 Орк (вражда)'
+    },
+    { 
+        name: 'Дунгарн - Подземный купол Гномов', desc: 'ГНОМЫ: +10 ко всем статам', imageNum: 302, race: 'Гном',
+        boss: { name: 'Король Торин IV', hp: 100, dmg: 40, arm: 50, gold: 60, imageNum: 804, desc: 'Владыка гномов. Непробиваемая броня.' },
+        guards: [
+            { name: 'Страж Глубин', hp: 90, dmg: 30, arm: 45, gold: 25, imageNum: 805, desc: 'Подземный страж. Максимальная защита.' },
+            { name: 'Молотобоец', hp: 70, dmg: 45, arm: 35, gold: 15, imageNum: 806, desc: 'Мастер молота. Сокрушительный удар.' }
+        ],
+        mod: (h) => { if (h.race === 'Гном') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } },
+        buffDesc: '+10 Гном', debuffDesc: '-5 Эльф (соперничество)'
+    },
+    { 
+        name: 'Варгош - Кровавые Топи Орков', desc: 'ОРКИ: +10 ко всем статам', imageNum: 303, race: 'Орк',
+        boss: { name: 'Вождь Грумаш', hp: 140, dmg: 60, arm: 20, gold: 10, imageNum: 807, desc: 'Вождь орков. Яростный берсерк.' },
+        guards: [
+            { name: 'Шаман Крови', hp: 70, dmg: 40, arm: 15, gold: 20, imageNum: 808, desc: 'Орочий шаман. Магия крови.' },
+            { name: 'Берсерк', hp: 100, dmg: 50, arm: 10, gold: 5, imageNum: 809, desc: 'Безумный воин. Без страха и брони.' }
+        ],
+        mod: (h) => { if (h.race === 'Орк') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } },
+        buffDesc: '+10 Орк', debuffDesc: '-5 Человек (война)'
+    },
+    { 
+        name: 'Астрарион - Небесная Империя Драконов', desc: 'ДРАКОНЫ: +10 ко всем статам', imageNum: 304, race: 'Дракон',
+        boss: { name: 'Император Малихор', hp: 150, dmg: 65, arm: 35, gold: 40, imageNum: 810, desc: 'Древний дракон. Все статы высоки.' },
+        guards: [
+            { name: 'Драконий Жрец', hp: 80, dmg: 45, arm: 25, gold: 35, imageNum: 811, desc: 'Жрец культа драконов.' },
+            { name: 'Всадник на Виверне', hp: 90, dmg: 50, arm: 20, gold: 20, imageNum: 812, desc: 'Элитный воздушный воин.' }
+        ],
+        mod: (h) => { if (h.race === 'Дракон') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } },
+        buffDesc: '+10 Дракон', debuffDesc: '-5 Лайтар (охота)'
+    },
+    { 
+        name: 'Илверин - Королевство Эльфов', desc: 'ЭЛЬФЫ: +10 ко всем статам', imageNum: 305, race: 'Эльф',
+        boss: { name: 'Королева Элуна', hp: 90, dmg: 55, arm: 25, gold: 55, imageNum: 813, desc: 'Эльфийская королева. Магия и золото.' },
+        guards: [
+            { name: 'Лунный Страж', hp: 75, dmg: 40, arm: 30, gold: 25, imageNum: 814, desc: 'Элитный эльфийский мечник.' },
+            { name: 'Лучница Звёзд', hp: 60, dmg: 55, arm: 15, gold: 30, imageNum: 815, desc: 'Мастер лука. Смертельный выстрел.' }
+        ],
+        mod: (h) => { if (h.race === 'Эльф') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } },
+        buffDesc: '+10 Эльф', debuffDesc: '-5 Гном (соперничество)'
+    },
+    { 
+        name: 'Люминель - Анклав Фей', desc: 'ФЕИ: +10 ко всем статам', imageNum: 306, race: 'Фея',
+        boss: { name: 'Королева Титания', hp: 70, dmg: 60, arm: 15, gold: 45, imageNum: 816, desc: 'Правительница фей. Магия и иллюзии.' },
+        guards: [
+            { name: 'Фея-Защитница', hp: 55, dmg: 35, arm: 25, gold: 35, imageNum: 817, desc: 'Крылатая защитница.' },
+            { name: 'Дух Рощи', hp: 80, dmg: 30, arm: 30, gold: 20, imageNum: 818, desc: 'Древний дух леса. Регенерация.' }
+        ],
+        mod: (h) => { if (h.race === 'Фея') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } },
+        buffDesc: '+10 Фея', debuffDesc: '-5 Полурослик (проказы)'
+    },
+    { 
+        name: 'Фелисар - Обитель Лайтаров', desc: 'ЛАЙТАРЫ: +10 ко всем статам', imageNum: 307, race: 'Лайтар',
+        boss: { name: 'Прайд-лорд Аслан', hp: 110, dmg: 60, arm: 25, gold: 30, imageNum: 819, desc: 'Вождь лайтаров. Скорость и когти.' },
+        guards: [
+            { name: 'Охотник Прайда', hp: 75, dmg: 50, arm: 15, gold: 20, imageNum: 820, desc: 'Быстрый охотник.' },
+            { name: 'Шаман Прайда', hp: 60, dmg: 35, arm: 20, gold: 35, imageNum: 821, desc: 'Духовный лидер лайтаров.' }
+        ],
+        mod: (h) => { if (h.race === 'Лайтар') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } },
+        buffDesc: '+10 Лайтар', debuffDesc: '-5 Дракон (охота)'
+    },
+    { 
+        name: 'Хобблтон - Долина полуросликов', desc: 'ПОЛУРОСЛИКИ: +10 ко всем статам', imageNum: 308, race: 'Полурослик',
+        boss: { name: 'Мэр Толстопуз', hp: 60, dmg: 20, arm: 20, gold: 100, imageNum: 822, desc: 'Мэр полуросликов. Невероятно богат.' },
+        guards: [
+            { name: 'Шериф', hp: 65, dmg: 30, arm: 25, gold: 40, imageNum: 823, desc: 'Блюститель порядка. Мал да удал.' },
+            { name: 'Трактирщик', hp: 70, dmg: 25, arm: 30, gold: 50, imageNum: 824, desc: 'Владелец таверны. Крепкий хозяйственник.' }
+        ],
+        mod: (h) => { if (h.race === 'Полурослик') { h.hp += 10; h.dmg += 10; h.arm += 10; h.gold += 10; } },
+        buffDesc: '+10 Полурослик', debuffDesc: '-5 Фея (проказы)'
+    }
 ];
 
-// Профессии
+// ========== ПРОФЕССИИ (с хранителями) ==========
 const PROFESSIONS = [
-    { name: 'Логово Воров', desc: 'ВОРЫ: +15 ко всем статам', imageNum: 401, prof: 'Вор', mod: (h) => { if (h.prof === 'Вор') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Арена Гладиаторов', desc: 'ГЛАДИАТОРЫ: +15 ко всем статам', imageNum: 402, prof: 'Гладиатор', mod: (h) => { if (h.prof === 'Гладиатор') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Кузница Титанов', desc: 'КУЗНЕЦЫ: +15 ко всем статам', imageNum: 403, prof: 'Кузнец', mod: (h) => { if (h.prof === 'Кузнец') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Башня Чародеев', desc: 'КОЛДУНЫ: +15 ко всем статам', imageNum: 404, prof: 'Колдун', mod: (h) => { if (h.prof === 'Колдун') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Роща Знахаря', desc: 'ЗНАХАРИ: +15 ко всем статам', imageNum: 405, prof: 'Знахарь', mod: (h) => { if (h.prof === 'Знахарь') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Стрельбище', desc: 'ЛУЧНИКИ: +15 ко всем статам', imageNum: 406, prof: 'Лучник', mod: (h) => { if (h.prof === 'Лучник') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Лагерь Охотников', desc: 'ОХОТНИКИ: +15 ко всем статам', imageNum: 407, prof: 'Охотник', mod: (h) => { if (h.prof === 'Охотник') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Рынок Торговцев', desc: 'ТОРГОВЦЫ: +15 ко всем статам', imageNum: 408, prof: 'Торговец', mod: (h) => { if (h.prof === 'Торговец') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Казармы Воинов', desc: 'ВОИНЫ: +15 ко всем статам', imageNum: 410, prof: 'Воин', mod: (h) => { if (h.prof === 'Воин') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Ристалище Кулачных Бойцов', desc: 'КУЛАЧНЫЕ БОЙЦЫ: +15 ко всем статам', imageNum: 411, prof: 'Кулачный боец', mod: (h) => { if (h.prof === 'Кулачный боец') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Некрополь', desc: 'ВОЛХВЫ СМЕРТИ: +15 ко всем статам', imageNum: 412, prof: 'Волхв смерти', mod: (h) => { if (h.prof === 'Волхв смерти') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Зал Древностей', desc: 'ИСКАТЕЛИ: +15 ко всем статам', imageNum: 413, prof: 'Искатель древностей', mod: (h) => { if (h.prof === 'Искатель древностей') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } },
-    { name: 'Гильдия Охотников за головами', desc: 'ОХОТНИКИ ЗА ГОЛОВАМИ: +15 ко всем статам', imageNum: 414, prof: 'Охотник за головами', mod: (h) => { if (h.prof === 'Охотник за головами') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } } }
+    { 
+        name: 'Логово Воров', desc: 'ВОРЫ: +15 ко всем статам', imageNum: 401, prof: 'Вор',
+        boss: { name: 'Глава Гильдии Теней', hp: 95, dmg: 55, arm: 25, gold: 70, imageNum: 901, desc: 'Мастер скрытности. Богат и опасен.' },
+        guards: [
+            { name: 'Теневой Клинок', hp: 70, dmg: 50, arm: 15, gold: 40, imageNum: 902, desc: 'Ассасин гильдии. Смертельный удар.' },
+            { name: 'Карманник-Мастер', hp: 50, dmg: 30, arm: 10, gold: 80, imageNum: 903, desc: 'Вируоз кражи. Неуловим.' }
+        ],
+        mod: (h) => { if (h.prof === 'Вор') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Вор', debuffDesc: '-5 Торговец (конкуренция)'
+    },
+    { 
+        name: 'Арена Гладиаторов', desc: 'ГЛАДИАТОРЫ: +15 ко всем статам', imageNum: 402, prof: 'Гладиатор',
+        boss: { name: 'Чемпион Арены', hp: 130, dmg: 60, arm: 35, gold: 20, imageNum: 904, desc: 'Непобедимый гладиатор. Мощь и броня.' },
+        guards: [
+            { name: 'Гладиатор-Ветеран', hp: 100, dmg: 45, arm: 30, gold: 15, imageNum: 905, desc: 'Опытный боец арены.' },
+            { name: 'Зверолов', hp: 80, dmg: 40, arm: 20, gold: 25, imageNum: 906, desc: 'Укротитель чудовищ.' }
+        ],
+        mod: (h) => { if (h.prof === 'Гладиатор') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Гладиатор', debuffDesc: '-5 Воин (зависть)'
+    },
+    { 
+        name: 'Кузница Титанов', desc: 'КУЗНЕЦЫ: +15 ко всем статам', imageNum: 403, prof: 'Кузнец',
+        boss: { name: 'Великий Кузнец', hp: 100, dmg: 40, arm: 50, gold: 45, imageNum: 907, desc: 'Мастер ковки. Броня и золото.' },
+        guards: [
+            { name: 'Подмастерье', hp: 75, dmg: 35, arm: 40, gold: 30, imageNum: 908, desc: 'Ученик кузнеца. Крепкий молот.' },
+            { name: 'Сталевар', hp: 85, dmg: 30, arm: 45, gold: 20, imageNum: 909, desc: 'Варит лучшую сталь.' }
+        ],
+        mod: (h) => { if (h.prof === 'Кузнец') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Кузнец', debuffDesc: '-5 Искатель (конкуренция за ресурсы)'
+    },
+    { 
+        name: 'Башня Чародеев', desc: 'КОЛДУНЫ: +15 ко всем статам', imageNum: 404, prof: 'Колдун',
+        boss: { name: 'Архимаг Мерлин', hp: 80, dmg: 65, arm: 20, gold: 50, imageNum: 910, desc: 'Величайший чародей. Урон и знания.' },
+        guards: [
+            { name: 'Маг Огня', hp: 60, dmg: 55, arm: 15, gold: 35, imageNum: 911, desc: 'Повелитель пламени.' },
+            { name: 'Маг Льда', hp: 65, dmg: 50, arm: 20, gold: 30, imageNum: 912, desc: 'Властелин холода.' }
+        ],
+        mod: (h) => { if (h.prof === 'Колдун') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Колдун', debuffDesc: '-5 Знахарь (магия vs природа)'
+    },
+    { 
+        name: 'Роща Знахаря', desc: 'ЗНАХАРИ: +15 ко всем статам', imageNum: 405, prof: 'Знахарь',
+        boss: { name: 'Великий Друид', hp: 90, dmg: 40, arm: 35, gold: 40, imageNum: 913, desc: 'Хранитель природы. Баланс статов.' },
+        guards: [
+            { name: 'Травница', hp: 60, dmg: 30, arm: 20, gold: 50, imageNum: 914, desc: 'Знаток целебных трав.' },
+            { name: 'Хранитель Рощи', hp: 80, dmg: 35, arm: 30, gold: 25, imageNum: 915, desc: 'Защитник священной земли.' }
+        ],
+        mod: (h) => { if (h.prof === 'Знахарь') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Знахарь', debuffDesc: '-5 Колдун (природа vs магия)'
+    },
+    { 
+        name: 'Стрельбище', desc: 'ЛУЧНИКИ: +15 ко всем статам', imageNum: 406, prof: 'Лучник',
+        boss: { name: 'Мастер Стрельбы', hp: 85, dmg: 60, arm: 20, gold: 40, imageNum: 916, desc: 'Легендарный лучник. Точность и урон.' },
+        guards: [
+            { name: 'Снайпер', hp: 65, dmg: 55, arm: 10, gold: 30, imageNum: 917, desc: 'Смертельный выстрел издалека.' },
+            { name: 'Разведчик', hp: 55, dmg: 35, arm: 15, gold: 45, imageNum: 918, desc: 'Быстрый и незаметный.' }
+        ],
+        mod: (h) => { if (h.prof === 'Лучник') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Лучник', debuffDesc: '-5 Охотник (соперничество)'
+    },
+    { 
+        name: 'Лагерь Охотников', desc: 'ОХОТНИКИ: +15 ко всем статам', imageNum: 407, prof: 'Охотник',
+        boss: { name: 'Верховный Охотник', hp: 95, dmg: 55, arm: 25, gold: 35, imageNum: 919, desc: 'Следопыт высшего ранга.' },
+        guards: [
+            { name: 'Зверолов', hp: 75, dmg: 45, arm: 20, gold: 30, imageNum: 920, desc: 'Мастер ловушек.' },
+            { name: 'Следопыт', hp: 60, dmg: 40, arm: 15, gold: 40, imageNum: 921, desc: 'Читает следы как книгу.' }
+        ],
+        mod: (h) => { if (h.prof === 'Охотник') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Охотник', debuffDesc: '-5 Лучник (соперничество)'
+    },
+    { 
+        name: 'Рынок Торговцев', desc: 'ТОРГОВЦЫ: +15 ко всем статам', imageNum: 408, prof: 'Торговец',
+        boss: { name: 'Гильдмастер Торговцев', hp: 60, dmg: 25, arm: 20, gold: 110, imageNum: 922, desc: 'Богатейший купец. Золото решает всё.' },
+        guards: [
+            { name: 'Охранник Каравана', hp: 70, dmg: 30, arm: 30, gold: 50, imageNum: 923, desc: 'Охраняет товары.' },
+            { name: 'Скупщик', hp: 50, dmg: 20, arm: 15, gold: 90, imageNum: 924, desc: 'Всегда при деньгах.' }
+        ],
+        mod: (h) => { if (h.prof === 'Торговец') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Торговец', debuffDesc: '-5 Вор (кражи)'
+    },
+    { 
+        name: 'Казармы Воинов', desc: 'ВОИНЫ: +15 ко всем статам', imageNum: 410, prof: 'Воин',
+        boss: { name: 'Генерал Армии', hp: 120, dmg: 55, arm: 40, gold: 25, imageNum: 925, desc: 'Верховный главнокомандующий.' },
+        guards: [
+            { name: 'Капитан Стражи', hp: 90, dmg: 40, arm: 35, gold: 20, imageNum: 926, desc: 'Опытный командир.' },
+            { name: 'Ветеран Войны', hp: 100, dmg: 45, arm: 25, gold: 15, imageNum: 927, desc: 'Закалён в сражениях.' }
+        ],
+        mod: (h) => { if (h.prof === 'Воин') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Воин', debuffDesc: '-5 Гладиатор (зависть)'
+    },
+    { 
+        name: 'Ристалище Кулачных Бойцов', desc: 'КУЛАЧНЫЕ БОЙЦЫ: +15 ко всем статам', imageNum: 411, prof: 'Кулачный боец',
+        boss: { name: 'Грандмастер Кулака', hp: 110, dmg: 65, arm: 30, gold: 15, imageNum: 928, desc: 'Мастер боевых искусств. Урон и здоровье.' },
+        guards: [
+            { name: 'Монах-Воин', hp: 85, dmg: 50, arm: 20, gold: 10, imageNum: 929, desc: 'Дисциплина и сила.' },
+            { name: 'Боец без Оружия', hp: 75, dmg: 55, arm: 15, gold: 10, imageNum: 930, desc: 'Кулаки как молоты.' }
+        ],
+        mod: (h) => { if (h.prof === 'Кулачный боец') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Кулачный боец', debuffDesc: '-5 Охотник за головами (разные школы)'
+    },
+    { 
+        name: 'Некрополь', desc: 'ВОЛХВЫ СМЕРТИ: +15 ко всем статам', imageNum: 412, prof: 'Волхв смерти',
+        boss: { name: 'Лич-Властелин', hp: 100, dmg: 60, arm: 25, gold: 40, imageNum: 931, desc: 'Повелитель нежити. Тёмная магия.' },
+        guards: [
+            { name: 'Рыцарь Смерти', hp: 95, dmg: 45, arm: 35, gold: 20, imageNum: 932, desc: 'Паладин тьмы.' },
+            { name: 'Некромант', hp: 60, dmg: 55, arm: 15, gold: 35, imageNum: 933, desc: 'Поднимает мёртвых.' }
+        ],
+        mod: (h) => { if (h.prof === 'Волхв смерти') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Волхв смерти', debuffDesc: '-5 Знахарь (смерть vs жизнь)'
+    },
+    { 
+        name: 'Зал Древностей', desc: 'ИСКАТЕЛИ: +15 ко всем статам', imageNum: 413, prof: 'Искатель древностей',
+        boss: { name: 'Хранитель Знаний', hp: 85, dmg: 45, arm: 30, gold: 55, imageNum: 934, desc: 'Владелец древних артефактов.' },
+        guards: [
+            { name: 'Археолог-Воин', hp: 70, dmg: 35, arm: 25, gold: 45, imageNum: 935, desc: 'Сражается реликвиями.' },
+            { name: 'Ловушка-Мастер', hp: 55, dmg: 40, arm: 20, gold: 50, imageNum: 936, desc: 'Специалист по ловушкам.' }
+        ],
+        mod: (h) => { if (h.prof === 'Искатель древностей') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Искатель', debuffDesc: '-5 Кузнец (ресурсы)'
+    },
+    { 
+        name: 'Гильдия Охотников за головами', desc: 'ОХОТНИКИ ЗА ГОЛОВАМИ: +15 ко всем статам', imageNum: 414, prof: 'Охотник за головами',
+        boss: { name: 'Лорд Охотников', hp: 105, dmg: 60, arm: 25, gold: 40, imageNum: 937, desc: 'Элитный охотник за головами.' },
+        guards: [
+            { name: 'Мандалор', hp: 90, dmg: 50, arm: 30, gold: 30, imageNum: 938, desc: 'Бронированный охотник.' },
+            { name: 'Стрелок', hp: 65, dmg: 55, arm: 15, gold: 35, imageNum: 939, desc: 'Меткий выстрел.' }
+        ],
+        mod: (h) => { if (h.prof === 'Охотник за головами') { h.hp += 15; h.dmg += 15; h.arm += 15; h.gold += 15; } },
+        buffDesc: '+15 Охотник за головами', debuffDesc: '-5 Кулачный боец (разные школы)'
+    }
 ];
 
-// Саги
+// ========== САГИ (с хранителями) ==========
 const SAGAS = [
-    { name: 'Вулканор', desc: 'ВУЛКАНОР: +20 ко всем статам', imageNum: 501, saga: 'Вулканор', mod: (h) => { if (h.saga === 'Вулканор') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } },
-    { name: 'Корона Короля Вампиров', desc: 'ВАМПИРЫ: +20 ко всем статам', imageNum: 502, saga: 'Корона Короля Вампиров', mod: (h) => { if (h.saga === 'Корона Короля Вампиров') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } },
-    { name: 'Золотое Яйцо Дракона', desc: 'ДРАКОНЬЕ ЯЙЦО: +20 ко всем статам', imageNum: 503, saga: 'Золотое Яйцо Дракона', mod: (h) => { if (h.saga === 'Золотое Яйцо Дракона') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } },
-    { name: 'Вслед за солнцем', desc: 'СОЛНЦЕ: +20 ко всем статам', imageNum: 504, saga: 'Вслед за солнцем', mod: (h) => { if (h.saga === 'Вслед за солнцем') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } },
-    { name: 'Амулет', desc: 'АМУЛЕТ: +20 ко всем статам', imageNum: 505, saga: 'Амулет', mod: (h) => { if (h.saga === 'Амулет') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } },
-    { name: 'Питомцы', desc: 'ПИТОМЦЫ: +20 ко всем статам', imageNum: 506, saga: 'Питомцы', mod: (h) => { if (h.saga === 'Питомцы') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } },
-    { name: 'Колодец с золотом', desc: 'ЗОЛОТО: +20 ко всем статам', imageNum: 507, saga: 'Колодец с золотом', mod: (h) => { if (h.saga === 'Колодец с золотом') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } },
-    { name: 'Небесные явления', desc: 'НЕБЕСА: +20 ко всем статам', imageNum: 508, saga: 'Небесные явления', mod: (h) => { if (h.saga === 'Небесные явления') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } } }
+    { 
+        name: 'Вулканор', desc: 'ВУЛКАНОР: +20 ко всем статам', imageNum: 501, saga: 'Вулканор',
+        boss: { name: 'Огненный Элементаль', hp: 140, dmg: 70, arm: 30, gold: 20, imageNum: 1001, desc: 'Воплощение вулкана. Максимальный урон.' },
+        guards: [
+            { name: 'Лавовый Голем', hp: 110, dmg: 50, arm: 40, gold: 15, imageNum: 1002, desc: 'Каменный страж.' },
+            { name: 'Жрец Пламени', hp: 70, dmg: 55, arm: 15, gold: 30, imageNum: 1003, desc: 'Служитель культа огня.' }
+        ],
+        mod: (h) => { if (h.saga === 'Вулканор') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } },
+        buffDesc: '+20 Вулканор', debuffDesc: '-5 Вслед за солнцем (огонь vs свет)'
+    },
+    { 
+        name: 'Корона Короля Вампиров', desc: 'ВАМПИРЫ: +20 ко всем статам', imageNum: 502, saga: 'Корона Короля Вампиров',
+        boss: { name: 'Король Вампиров', hp: 130, dmg: 65, arm: 35, gold: 45, imageNum: 1004, desc: 'Древний вампир. Крадёт жизнь.' },
+        guards: [
+            { name: 'Вампир-Аристократ', hp: 100, dmg: 50, arm: 25, gold: 50, imageNum: 1005, desc: 'Благородный кровопийца.' },
+            { name: 'Упырь-Страж', hp: 90, dmg: 45, arm: 30, gold: 15, imageNum: 1006, desc: 'Верный слуга.' }
+        ],
+        mod: (h) => { if (h.saga === 'Корона Короля Вампиров') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } },
+        buffDesc: '+20 Вампиры', debuffDesc: '-5 Амулет (тьма vs свет)'
+    },
+    { 
+        name: 'Золотое Яйцо Дракона', desc: 'ДРАКОНЬЕ ЯЙЦО: +20 ко всем статам', imageNum: 503, saga: 'Золотое Яйцо Дракона',
+        boss: { name: 'Золотой Дракон', hp: 150, dmg: 70, arm: 40, gold: 30, imageNum: 1007, desc: 'Легендарный золотой дракон.' },
+        guards: [
+            { name: 'Хранитель Гнезда', hp: 110, dmg: 50, arm: 35, gold: 25, imageNum: 1008, desc: 'Защищает яйцо.' },
+            { name: 'Драконий Птенец', hp: 80, dmg: 45, arm: 25, gold: 20, imageNum: 1009, desc: 'Молодой но опасный.' }
+        ],
+        mod: (h) => { if (h.saga === 'Золотое Яйцо Дракона') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } },
+        buffDesc: '+20 Яйцо', debuffDesc: '-5 Питомцы (хищник vs питомцы)'
+    },
+    { 
+        name: 'Вслед за солнцем', desc: 'СОЛНЦЕ: +20 ко всем статам', imageNum: 504, saga: 'Вслед за солнцем',
+        boss: { name: 'Солнечный Патриарх', hp: 120, dmg: 60, arm: 30, gold: 50, imageNum: 1010, desc: 'Верховный жрец солнца.' },
+        guards: [
+            { name: 'Паладин Солнца', hp: 100, dmg: 45, arm: 40, gold: 25, imageNum: 1011, desc: 'Святой воин.' },
+            { name: 'Жрец Света', hp: 70, dmg: 40, arm: 20, gold: 45, imageNum: 1012, desc: 'Исцеляет и карает.' }
+        ],
+        mod: (h) => { if (h.saga === 'Вслед за солнцем') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } },
+        buffDesc: '+20 Солнце', debuffDesc: '-5 Вулканор (свет vs огонь)'
+    },
+    { 
+        name: 'Амулет', desc: 'АМУЛЕТ: +20 ко всем статам', imageNum: 505, saga: 'Амулет',
+        boss: { name: 'Хранитель Амулета', hp: 110, dmg: 55, arm: 35, gold: 45, imageNum: 1013, desc: 'Древний страж артефакта.' },
+        guards: [
+            { name: 'Голем-Страж', hp: 120, dmg: 40, arm: 45, gold: 10, imageNum: 1014, desc: 'Каменный защитник.' },
+            { name: 'Мистик', hp: 65, dmg: 50, arm: 15, gold: 40, imageNum: 1015, desc: 'Читает тайны амулета.' }
+        ],
+        mod: (h) => { if (h.saga === 'Амулет') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } },
+        buffDesc: '+20 Амулет', debuffDesc: '-5 Вампиры (свет vs тьма)'
+    },
+    { 
+        name: 'Питомцы', desc: 'ПИТОМЦЫ: +20 ко всем статам', imageNum: 506, saga: 'Питомцы',
+        boss: { name: 'Великий Зверолов', hp: 115, dmg: 60, arm: 30, gold: 40, imageNum: 1016, desc: 'Повелитель зверей.' },
+        guards: [
+            { name: 'Ручной Медведь', hp: 130, dmg: 50, arm: 25, gold: 5, imageNum: 1017, desc: 'Огромный и верный.' },
+            { name: 'Стая Волков', hp: 80, dmg: 45, arm: 15, gold: 15, imageNum: 1018, desc: 'Охотятся стаей.' }
+        ],
+        mod: (h) => { if (h.saga === 'Питомцы') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } },
+        buffDesc: '+20 Питомцы', debuffDesc: '-5 Золотое Яйцо (питомцы vs хищник)'
+    },
+    { 
+        name: 'Колодец с золотом', desc: 'ЗОЛОТО: +20 ко всем статам', imageNum: 507, saga: 'Колодец с золотом',
+        boss: { name: 'Золотой Голем', hp: 130, dmg: 50, arm: 50, gold: 60, imageNum: 1019, desc: 'Отлит из чистого золота.' },
+        guards: [
+            { name: 'Страж Сокровищницы', hp: 100, dmg: 40, arm: 40, gold: 50, imageNum: 1020, desc: 'Бессмертный охранник.' },
+            { name: 'Счетовод', hp: 50, dmg: 20, arm: 15, gold: 100, imageNum: 1021, desc: 'Считает каждую монету.' }
+        ],
+        mod: (h) => { if (h.saga === 'Колодец с золотом') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } },
+        buffDesc: '+20 Золото', debuffDesc: '-5 Небесные явления (золото vs судьба)'
+    },
+    { 
+        name: 'Небесные явления', desc: 'НЕБЕСА: +20 ко всем статам', imageNum: 508, saga: 'Небесные явления',
+        boss: { name: 'Небесный Дракон', hp: 140, dmg: 65, arm: 35, gold: 35, imageNum: 1022, desc: 'Повелитель небес.' },
+        guards: [
+            { name: 'Грозовая Птица', hp: 90, dmg: 55, arm: 20, gold: 30, imageNum: 1023, desc: 'Призывает молнии.' },
+            { name: 'Звёздный Оракул', hp: 70, dmg: 45, arm: 15, gold: 50, imageNum: 1024, desc: 'Читает судьбу.' }
+        ],
+        mod: (h) => { if (h.saga === 'Небесные явления') { h.hp += 20; h.dmg += 20; h.arm += 20; h.gold += 20; } },
+        buffDesc: '+20 Небеса', debuffDesc: '-5 Колодец с золотом (судьба vs золото)'
+    }
 ];
 
-// ========== РЕЛИКВИИ (27 штук) — ОБНОВЛЁННЫЕ ==========
-// Сеты и их редкость:
-// Сет из 7 предметов — МИФИЧЕСКИЙ (оранжевый)
-// Сет из 6 предметов — ЛЕГЕНДАРНЫЙ (фиолетовый)
-// Сет из 5 предметов — ЭПИЧЕСКИЙ (синий)
-// Сет из 4 предметов — РЕДКИЙ (зелёный)
-// Сет из 3 предметов — НЕОБЫЧНЫЙ (белый)
-// Сет из 2 предметов — ОБЫЧНЫЙ (серый)
-// Слоты: helm, armor, shoulders, gloves, boots, weapon, shield, ring, amulet, cloak, belt, brooch, scroll, potion
+// ========== МОНСТРЫ (для ПВЕ фарма) ==========
+const MONSTERS = [
+    { name: 'Волк', hp: 30, dmg: 15, arm: 5, gold: 10, imageNum: 1101, desc: 'Обычный лесной волк. Награда: 5 жетонов.', reward: 5 },
+    { name: 'Гоблин', hp: 25, dmg: 10, arm: 3, gold: 15, imageNum: 1102, desc: 'Мелкий но хитрый. Награда: 5 жетонов.', reward: 5 },
+    { name: 'Скелет', hp: 35, dmg: 12, arm: 8, gold: 5, imageNum: 1103, desc: 'Восставший из могилы. Награда: 5 жетонов.', reward: 5 },
+    { name: 'Паук', hp: 20, dmg: 18, arm: 4, gold: 5, imageNum: 1104, desc: 'Ядовитый паук. Награда: 5 жетонов.', reward: 5 },
+    { name: 'Бандит', hp: 40, dmg: 18, arm: 8, gold: 20, imageNum: 1105, desc: 'Грабитель с большой дороги. Награда: 8 жетонов.', reward: 8 },
+    { name: 'Огр', hp: 60, dmg: 25, arm: 12, gold: 15, imageNum: 1106, desc: 'Тупой но сильный. Награда: 8 жетонов.', reward: 8 },
+    { name: 'Гарпия', hp: 35, dmg: 22, arm: 6, gold: 15, imageNum: 1107, desc: 'Крылатая хищница. Награда: 8 жетонов.', reward: 8 },
+    { name: 'Тролль', hp: 70, dmg: 28, arm: 15, gold: 20, imageNum: 1108, desc: 'Регенерирует раны. Награда: 12 жетонов.', reward: 12 },
+    { name: 'Элементаль', hp: 55, dmg: 30, arm: 18, gold: 25, imageNum: 1109, desc: 'Дух стихии. Награда: 12 жетонов.', reward: 12 },
+    { name: 'Демон', hp: 65, dmg: 35, arm: 20, gold: 30, imageNum: 1110, desc: 'Исчадие ада. Награда: 15 жетонов.', reward: 15 },
+    { name: 'Драконид', hp: 80, dmg: 38, arm: 25, gold: 35, imageNum: 1111, desc: 'Полудракон. Награда: 15 жетонов.', reward: 15 },
+    { name: 'Титан', hp: 100, dmg: 42, arm: 30, gold: 40, imageNum: 1112, desc: 'Древний гигант. Награда: 20 жетонов.', reward: 20 }
+];
 
+// ========== РЕЛИКВИИ (27 штук) ==========
 const RELICS = [
-    // ===== МИФИЧЕСКИЙ СЕТ "Доспехи Войны" (7 предметов) — слоты брони =====
     { id: 'relic_01', name: 'Шлем Доблести',      slot: 'helm',      setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 601 },
     { id: 'relic_02', name: 'Нагрудник Стойкости', slot: 'armor',     setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 602 },
     { id: 'relic_03', name: 'Наплечники Мощи',     slot: 'shoulders', setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 603 },
@@ -231,39 +492,29 @@ const RELICS = [
     { id: 'relic_05', name: 'Перчатки Ярости',     slot: 'gloves',    setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 605 },
     { id: 'relic_06', name: 'Сапоги Странника',    slot: 'boots',     setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 606 },
     { id: 'relic_07', name: 'Щит Бастиона',        slot: 'shield',    setName: 'Доспехи Войны', setSize: 7, bonus: 7, rarity: 'mythic',   desc: '+7/стат · Доспехи Войны', imageNum: 607 },
-    
-    // ===== ЛЕГЕНДАРНЫЙ СЕТ "Оружие Героя" (6 предметов) =====
     { id: 'relic_08', name: 'Меч Справедливости',  slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 608 },
     { id: 'relic_09', name: 'Топор Громовержца',   slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 609 },
     { id: 'relic_10', name: 'Молот Титана',        slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 610 },
     { id: 'relic_11', name: 'Копьё Бури',          slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 611 },
     { id: 'relic_12', name: 'Лук Охотника',        slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 612 },
     { id: 'relic_13', name: 'Кинжал Теней',        slot: 'weapon', setName: 'Оружие Героя', setSize: 6, bonus: 6, rarity: 'legendary', desc: '+6/стат · Оружие Героя', imageNum: 613 },
-    
-    // ===== ЭПИЧЕСКИЙ СЕТ "Кольца Силы" (5 предметов) =====
     { id: 'relic_14', name: 'Кольцо Огня',         slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 614 },
     { id: 'relic_15', name: 'Кольцо Воды',         slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 615 },
     { id: 'relic_16', name: 'Кольцо Земли',        slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 616 },
     { id: 'relic_17', name: 'Кольцо Воздуха',      slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 617 },
     { id: 'relic_18', name: 'Кольцо Духа',         slot: 'ring',  setName: 'Кольца Силы', setSize: 5, bonus: 5, rarity: 'epic', desc: '+5/стат · Кольца Силы', imageNum: 618 },
-    
-    // ===== РЕДКИЙ СЕТ "Амулеты Мудрости" (4 предмета) =====
     { id: 'relic_19', name: 'Амулет Жизни',        slot: 'amulet', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, rarity: 'rare', desc: '+4/стат · Амулеты Мудрости', imageNum: 619 },
     { id: 'relic_20', name: 'Амулет Смерти',       slot: 'amulet', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, rarity: 'rare', desc: '+4/стат · Амулеты Мудрости', imageNum: 620 },
     { id: 'relic_21', name: 'Амулет Времени',      slot: 'amulet', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, rarity: 'rare', desc: '+4/стат · Амулеты Мудрости', imageNum: 621 },
     { id: 'relic_22', name: 'Амулет Судьбы',       slot: 'amulet', setName: 'Амулеты Мудрости', setSize: 4, bonus: 4, rarity: 'rare', desc: '+4/стат · Амулеты Мудрости', imageNum: 622 },
-    
-    // ===== НЕОБЫЧНЫЙ СЕТ "Плащ и Пояс" (3 предмета) =====
     { id: 'relic_23', name: 'Плащ Теней',          slot: 'cloak',  setName: 'Плащ и Пояс', setSize: 3, bonus: 3, rarity: 'uncommon', desc: '+3/стат · Плащ и Пояс', imageNum: 623 },
     { id: 'relic_24', name: 'Пояс Силы',           slot: 'belt',   setName: 'Плащ и Пояс', setSize: 3, bonus: 3, rarity: 'uncommon', desc: '+3/стат · Плащ и Пояс', imageNum: 624 },
     { id: 'relic_25', name: 'Брошь Отваги',        slot: 'brooch', setName: 'Плащ и Пояс', setSize: 3, bonus: 3, rarity: 'uncommon', desc: '+3/стат · Плащ и Пояс', imageNum: 625 },
-    
-    // ===== ОБЫЧНЫЙ СЕТ "Свитки и Зелья" (2 предмета) =====
     { id: 'relic_26', name: 'Свиток Знаний',       slot: 'scroll', setName: 'Свитки и Зелья', setSize: 2, bonus: 2, rarity: 'common', desc: '+2/стат · Свитки и Зелья', imageNum: 626 },
     { id: 'relic_27', name: 'Зелье Мощи',          slot: 'potion', setName: 'Свитки и Зелья', setSize: 2, bonus: 2, rarity: 'common', desc: '+2/стат · Свитки и Зелья', imageNum: 627 }
 ];
 
-// Цвета редкости реликвий
+// ========== ЦВЕТА РЕДКОСТИ ==========
 const RARITY_COLORS = {
     'mythic':   { border: '#ff8c00', glow: '#ffaa00', bg: 'linear-gradient(145deg, #3a2000, #1a0e00)', text: '#ffcc66', name: 'Мифический' },
     'legendary': { border: '#9b30ff', glow: '#bb66ff', bg: 'linear-gradient(145deg, #2a0a3a, #150520)', text: '#d4a0ff', name: 'Легендарный' },
@@ -273,7 +524,7 @@ const RARITY_COLORS = {
     'common':   { border: '#757575', glow: '#9e9e9e', bg: 'linear-gradient(145deg, #151515, #0a0a0a)', text: '#bdbdbd', name: 'Обычный' }
 };
 
-// Слоты экипировки
+// ========== СЛОТЫ ЭКИПИРОВКИ ==========
 const EQUIP_SLOTS = [
     { id: 'helm',      name: 'Шлем',       icon: '🪖' },
     { id: 'armor',     name: 'Нагрудник',  icon: '🛡️' },
@@ -291,7 +542,7 @@ const EQUIP_SLOTS = [
     { id: 'potion',    name: 'Зелье',      icon: '🧪' }
 ];
 
-// ========== ЗВАНИЯ (10 уровней) ==========
+// ========== ЗВАНИЯ ==========
 const TITLES = [
     { level: 1,  name: 'Новобранец',    bonus: 1,  imageNum: 701 },
     { level: 2,  name: 'Ветеран',       bonus: 2,  imageNum: 702 },
@@ -305,18 +556,21 @@ const TITLES = [
     { level: 10, name: 'Божество',      bonus: 10, imageNum: 710 }
 ];
 
-// Функция получения бонуса от экипированных реликвий (лучший сет)
+// ========== ПОРЯДОК ОТКРЫТИЯ СЛОТОВ ==========
+const SLOT_UNLOCK_ORDER = ['weapon', 'armor', 'ring', 'amulet', 'helm', 'cloak', 'shield'];
+
+// ========== ФУНКЦИИ ==========
+function getHeroCost(hero) {
+    return hero.power + hero.gold;
+}
+
 function getActiveSetBonus(equippedRelics) {
     if (!equippedRelics || equippedRelics.length === 0) return 0;
-    
-    // Группируем реликвии по сетам
     const setGroups = {};
     equippedRelics.forEach(r => {
         if (!setGroups[r.setName]) setGroups[r.setName] = [];
         setGroups[r.setName].push(r);
     });
-    
-    // Ищем лучший сет (максимальный бонус)
     let bestTotalBonus = 0;
     for (const [setName, items] of Object.entries(setGroups)) {
         const setSize = items[0].setSize;
@@ -324,9 +578,7 @@ function getActiveSetBonus(equippedRelics) {
         const collectedCount = items.length;
         const isComplete = collectedCount >= setSize;
         const totalSetBonus = collectedCount * perItemBonus * (isComplete ? 2 : 1);
-        if (totalSetBonus > bestTotalBonus) {
-            bestTotalBonus = totalSetBonus;
-        }
+        if (totalSetBonus > bestTotalBonus) bestTotalBonus = totalSetBonus;
     }
     return bestTotalBonus;
 }
