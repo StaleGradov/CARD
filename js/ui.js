@@ -33,6 +33,7 @@ function renderArena() {
                     <span class="streak-badge" id="streakP${idx}"></span>
                     <span class="token-badge" id="tokensP${idx}"></span>
                     <button class="inventory-btn" id="invBtn${idx}" title="Инвентарь">🎒</button>
+                    <button class="inventory-btn camp-btn" id="campBtn${idx}" title="Перейти в лагерь" style="background:#2a471f; border-color:#4caf50;">🏰</button>
                 </div>
                 <div class="round-result" id="roundResult${idx}"></div>
                 <div class="hero-cards" id="handP${idx}"></div>
@@ -426,6 +427,15 @@ function updateUI() {
                 e.preventDefault();
                 e.stopPropagation();
                 showInventoryModal(idx);
+            };
+        }
+
+        const campBtn = document.getElementById(`campBtn${idx}`);
+        if (campBtn) {
+            campBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                goToCamp();
             };
         }
 
