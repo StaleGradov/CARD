@@ -314,7 +314,7 @@ function initGame(mode) {
         } else {
             oldData[i] = {
                 collection: [], relics: [], equippedRelics: {},
-                unlockedSlots: 3, tokens: 20, titleLevel: 0, winStreak: 0,
+                unlockedSlots: 3, tokens: 100, titleLevel: 0, winStreak: 0,
                 capturedKingdom: null, capturedProfession: null, capturedSaga: null
             };
         }
