@@ -819,9 +819,15 @@ function startDuel() {
     endActionPhase();
 }
 
-// ========== МОНСТР ==========
 function fightMonster() {
     const player = players[activePlayerIndex];
+    
+    if (player.collection.length === 0) {
+        addLog('⚠️ У вас нет героев для боя с монстром! Сначала купите героя в магазине.');
+        endActionPhase();
+        return;
+    }
+    
     if (eventDecks.monsters.length === 0) {
         eventDecks.monsters = shuffle([...MONSTERS]);
     }
@@ -830,11 +836,17 @@ function fightMonster() {
     const playerPower = player.collection.reduce((s, h) => s + getPower(h) + h.gold + getHeroBonus(h, player), 0);
     const monsterPower = monster.hp + monster.dmg + monster.arm + monster.gold;
 
+    addLog(`👹 Игрок ${activePlayerIndex + 1} сражается с ${monster.name}! (${monster.desc})`);
+    addLog(`   Сила игрока: ${playerPower} vs Сила монстра: ${monsterPower}`);
+
     if (playerPower > monsterPower) {
         player.tokens += monster.reward;
-        addLog(`👹 Игрок ${activePlayerIndex + 1} победил ${monster.name}! +${monster.reward} 🪙`);
-    } else {
+        addLog(`👹 Победа! ${monster.name} повержен! +${monster.reward} 🪙`);
+    } else if (playerPower < monsterPower) {
         addLog(`💀 ${monster.name} оказался слишком силён! Поражение.`);
+    } else {
+        addLog(`🤝 Ничья с ${monster.name}! +5 🪙`);
+        player.tokens += 5;
     }
 
     updateUI();
@@ -1113,12 +1125,12 @@ function startFarmBattle() {
 
     if (roundWinner === null) {
         addLog(`🤝 НИЧЬЯ!`);
-        players.forEach(p => p.tokens += 1);
+        players.forEach(p => p.tokens += 15);
     } else {
         const winner = players[roundWinner], loser = players[1 - roundWinner];
-        winner.tokens += 2;
-        loser.tokens += 1;
-        addLog(`🏆 Раунд ${round}: Победил Фронт ${winner.id + 1}! +2🪙 / +1🪙`);
+        winner.tokens += 25;
+        loser.tokens += 15;
+        addLog(`🏆 Раунд ${round}: Победил Фронт ${winner.id + 1}! +25🪙 / +15🪙`);
 
         winner.hand = winner.hand.filter(h => !winner.selectedHeroes.includes(h));
         loser.hand = loser.hand.filter(h => !loser.selectedHeroes.includes(h));
@@ -1137,7 +1149,7 @@ function startFarmBattle() {
         if (players[i].hand.length === 0) {
             const winner = players[i];
             const loser = players[1 - i];
-            winner.tokens += 3;
+            winner.tokens += 30;
             winner.winStreak++;
             loser.winStreak = 0;
             loser.titleLevel = 0;
@@ -1145,7 +1157,7 @@ function startFarmBattle() {
                 winner.titleLevel = winner.winStreak;
                 addLog(`🏅 Звание: ${TITLES[winner.titleLevel - 1].name}! (+${TITLES[winner.titleLevel - 1].bonus})`);
             }
-            addLog(`👑 ФРОНТ ${i + 1} ВЫИГРАЛ ФАРМ-ФАЗУ! +3🪙 бонус`);
+            addLog(`👑 ФРОНТ ${i + 1} ВЫИГРАЛ ФАРМ-ФАЗУ! +30🪙 бонус`);
 
             gamePhase = 'action';
             activePlayerIndex = 0;
